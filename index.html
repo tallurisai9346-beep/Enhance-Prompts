@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Check — AI Prompt Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <a href="#" class="nav-brand">
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <span class="nav-name">Vibe Check</span>
+  </a>
+  <div class="nav-links">
+    <button class="nav-link active" data-tab="enhance">Enhance</button>
+    <button class="nav-link" data-tab="templates">Templates</button>
+    <button class="nav-link" data-tab="engineer">Engineer</button>
+    <button class="nav-link" data-tab="history">History</button>
+  </div>
+  <div class="nav-actions">
+    <a href="#app" class="nav-icon-btn" title="Open Tool">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+    </a>
+    <button class="nav-icon-btn" id="settings-btn" title="Settings">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-img"></div>
+  <div class="hero-gradient"></div>
+  <div class="hero-content">
+    <div class="hero-pill">
+      <span class="hero-pill-dot"></span>AI-Powered Prompt Engineering
+    </div>
+    <h1 class="hero-h1">Write <em>better</em><br>prompts.</h1>
+    <p class="hero-p">Enhance, score, and engineer prompts with AI. Built for v0, Bolt, Cursor, ChatGPT, Claude, and any coding tool.</p>
+    <a href="#app" class="hero-btn">
+      Start Writing 
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<!-- APP -->
+<div class="app-bg">
+  <div class="app-bg-img"></div>
+  <div class="app-bg-frost"></div>
+</div>
+
+<section id="app" class="app-wrap">
+  <div class="glass">
+    
+    <!-- APP HEADER -->
+    <div class="app-top">
+      <div class="app-logo">
+        <div class="app-logo-ic">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <span class="app-logo-t">VIBE CHECK</span>
+      </div>
+      <nav class="app-tabs">
+        <button class="tab-btn active" data-tab="enhance">Enhance</button>
+        <button class="tab-btn" data-tab="templates">Templates</button>
+        <button class="tab-btn" data-tab="engineer">Engineer</button>
+        <button class="tab-btn" data-tab="history">History</button>
+      </nav>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div id="tab-content">
+
+      <!-- ENHANCE TAB -->
+      <div class="tab-panel active" id="panel-enhance">
+        <div id="stack-badge" class="stack-badge hidden">
+          <span class="stack-dot"></span>
+          <span class="stack-lbl">Currently on:</span>
+          <span class="stack-nm" id="stack-name"></span>
+        </div>
+        
+        <div id="stack-tips" class="stack-tips hidden">
+          <div class="tips-hdr">Tips for <span id="tips-stack-name"></span>:</div>
+          <ul id="tips-list"></ul>
+        </div>
+
+        <div class="textarea-wrap">
+          <textarea id="prompt-input" placeholder="Type or paste your prompt here..." maxlength="5000"></textarea>
+          <div class="input-meta">
+            <span id="word-count">0 words &middot; 0 characters</span>
+            <span id="complexity-badge" class="complexity-badge hidden"></span>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn-enhance" id="btn-enhance" disabled>
+            <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span class="btn-label">Enhance Prompt</span>
+            <span class="btn-spinner"></span>
+          </button>
+          
+          <button class="btn-icon-only hidden" id="btn-undo" title="Undo">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+          </button>
+          
+          <button class="btn-icon-only hidden" id="btn-redo" title="Redo">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:scaleX(-1)">
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- SCORE DISPLAY -->
+        <div id="score-display" class="score-box hidden">
+          <div style="display:flex;align-items:baseline;gap:2px">
+            <span class="score-num" id="score-number">0</span>
+            <span class="score-div">/</span>
+            <span class="score-max">100</span>
+          </div>
+          <div class="score-lbl" id="score-label">Prompt Quality</div>
+          <div class="score-bars" id="score-bars"></div>
+          <div class="score-fb" id="score-feedback"></div>
+        </div>
+
+        <!-- ENHANCED AREA -->
+        <div id="enhanced-area" class="enhanced-box hidden">
+          <div class="enh-hdr">
+            <span class="enh-t">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg> 
+              Enhanced
+            </span>
+            <button class="btn-cp" id="btn-copy-enhanced" title="Copy Enhanced Prompt">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+          <pre class="enh-txt" id="enhanced-text"></pre>
+          <div class="imp-list" id="improvements-list"></div>
+        </div>
+
+        <!-- BEFORE / AFTER -->
+        <div id="before-after" class="ba hidden">
+          <div class="ba-cols">
+            <div class="ba-col">
+              <div class="ba-hdr">
+                <span class="ba-lbl ba-before">Before</span>
+                <button class="btn-cps" id="btn-copy-before" title="Copy Original">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                </button>
+              </div>
+              <pre class="ba-txt" id="before-text"></pre>
+            </div>
+            <div class="ba-col">
+              <div class="ba-hdr">
+                <span class="ba-lbl ba-after">After</span>
+                <button class="btn-cps" id="btn-copy-after" title="Copy Enhanced">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                </button>
+              </div>
+              <pre class="ba-txt" id="after-text"></pre>
+            </div>
+          </div>
+          <div class="ch-list" id="changes-list"></div>
+        </div>
+
+        <!-- TOKEN EFFICIENCY -->
+        <div id="token-efficiency" class="tok-eff hidden">
+          <div class="eff-hdr" id="efficiency-toggle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+            </svg>
+            <span>Token Efficiency</span>
+            <span class="eff-pct" id="efficiency-pct"></span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eff-chv" id="eff-chv-icon">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          <div class="eff-body hidden" id="efficiency-body">
+            <div class="eff-ring">
+              <svg width="56" height="56" viewBox="0 0 56 56">
+                <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3.5"/>
+                <circle id="efficiency-ring" cx="28" cy="28" r="24" fill="none" stroke="#fff" stroke-width="3.5" stroke-dasharray="150.8" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 28 28)"/>
+              </svg>
+              <span class="eff-rp" id="ring-percent">100%</span>
+            </div>
+            <div class="eff-det">
+              <div class="fill-cnt" id="filler-count">0 fluff words detected</div>
+              <ul class="fill-lst" id="filler-list"></ul>
+              <button class="btn-outline btn-sm" id="btn-strip-filler">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg> Strip Filler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEMPLATES TAB -->
+      <div class="tab-panel" id="panel-templates">
+        <div class="template-categories" id="templates-category-tabs">
+          <button class="template-cat-btn active" data-category="ui-components">UI Components</button>
+          <button class="template-cat-btn" data-category="full-apps">Full Apps</button>
+          <button class="template-cat-btn" data-category="fixes">Fixes</button>
+          <button class="template-cat-btn" data-category="api-backend">API</button>
+          <button class="template-cat-btn" data-category="ai-prompts">AI</button>
+        </div>
+        <div class="template-search-wrapper">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" class="template-search" id="template-search" placeholder="Search templates...">
+        </div>
+        <div class="templates-grid" id="templates-grid"></div>
+      </div>
+
+      <!-- ENGINEER TAB -->
+      <div class="tab-panel" id="panel-engineer">
+        <div class="eng-sec">
+          <div class="sec-hdr">
+            <span class="sec-lbl">Source Prompt</span>
+            <button class="btn-outline btn-sm" id="btn-engineer-from-enhance">Use Last Enhanced</button>
+          </div>
+          <textarea id="engineer-input" placeholder="Paste or type your prompt to engineer..." maxlength="5000"></textarea>
+          <div class="input-meta">
+            <span id="engineer-word-count">0 words &middot; 0 characters</span>
+          </div>
+        </div>
+
+        <div class="eng-sec">
+          <div class="sec-hdr">
+            <span class="sec-lbl">Quality Checklist</span>
+            <span class="chk-score" id="checklist-score">0/6 Pass</span>
+          </div>
+          <div class="chk-grid" id="checklist-grid"></div>
+        </div>
+
+        <div class="eng-sec">
+          <div class="sec-hdr">
+            <span class="sec-lbl">Apply Techniques</span>
+            <button class="btn-outline btn-sm" id="btn-apply-techniques">Apply Selected</button>
+          </div>
+          <div class="tech-grid" id="techniques-grid"></div>
+        </div>
+
+        <div class="eng-sec">
+          <div class="sec-hdr">
+            <span class="sec-lbl">Prompt Variants</span>
+            <button class="btn-outline btn-sm" id="btn-generate-variants">Generate 3 Variants</button>
+          </div>
+          <div id="variants-container">
+            <div class="empty-state sm"><p>Click Generate to create 3 variations</p></div>
+          </div>
+        </div>
+
+        <div class="eng-sec">
+          <div class="sec-hdr">
+            <span class="sec-lbl">Version History</span>
+            <div class="ver-act">
+              <button class="btn-outline btn-sm" id="btn-save-version">Save</button>
+              <button class="btn-outline btn-sm" id="btn-clear-versions">Clear</button>
+            </div>
+          </div>
+          <div id="versions-list">
+            <div class="empty-state sm"><p>No versions saved</p></div>
+          </div>
+        </div>
+
+        <!-- CREDIT SAVER -->
+        <div class="eng-sec cr-sav">
+          <div class="sec-hdr">
+            <span class="sec-lbl">Credit Saver</span>
+            <span class="sec-sub">English to Chinese</span>
+          </div>
+          <div class="cr-int">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span>Chinese directives use ~60% fewer API input tokens. Save credits on any LLM provider.</span>
+          </div>
+          <div class="textarea-wrap cr-ta">
+            <textarea id="credit-input" placeholder="Paste your English prompt here..." maxlength="5000" spellcheck="false"></textarea>
+            <div class="input-meta"><span id="credit-word-count">0 words &middot; 0 characters</span></div>
+          </div>
+          <div class="action-row">
+            <button class="btn-enhance btn-cr" id="btn-credit-transform" disabled>
+              <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 8l6 6M5 8l-6 6M5 8v12"/><path d="M19 4v14"/><path d="M16 4l3-3 3 3"/>
+              </svg>
+              <span class="btn-label">Transform to 中文</span>
+              <span class="btn-spinner"></span>
+            </button>
+            <span class="cr-badge">Saves ~60% Tokens</span>
+          </div>
+          <div id="credit-result" class="enhanced-box hidden">
+            <div class="enh-hdr">
+              <span class="enh-t">Chinese Optimized Directive</span>
+              <button class="btn-cp" id="btn-copy-credit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </button>
+            </div>
+            <pre class="enh-txt" id="credit-text"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY TAB -->
+      <div class="tab-panel" id="panel-history">
+        <div class="history-search-wrapper">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" class="history-search" id="history-search" placeholder="Search saved prompts...">
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="empty-state" id="history-empty">
+            <p>No prompts yet.</p>
+            <p class="sub">Enhance your first prompt to build history.</p>
+          </div>
+        </div>
+        <button class="btn-del" id="btn-clear-history">Clear All History</button>
+      </div>
+
+    </div>
+
+    <!-- TIPS BAR -->
+    <div class="tips-bar">
+      <button class="tips-arr" id="tip-prev" title="Previous Tip">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <span class="tips-txt" id="tip-text">Tip: Specify edge cases (e.g. empty states, offline behavior) for 3x fewer revision loops.</span>
+      <button class="tips-arr" id="tip-next" title="Next Tip">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" class="modal hidden">
+  <div class="modal-bg" id="settings-backdrop"></div>
+  <div class="modal-box">
+    <div class="modal-top">
+      <span class="modal-t">Settings</span>
+      <button class="modal-x" id="settings-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="set-sec">
+        <div class="set-title">Behavior & View</div>
+        <div class="set-row">
+          <label class="set-lbl" for="setting-auto-stack">Auto-detect tech stack</label>
+          <label class="tog">
+            <input type="checkbox" id="setting-auto-stack" checked>
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+        <div class="set-row">
+          <label class="set-lbl" for="setting-token-eff">Show Token efficiency</label>
+          <label class="tog">
+            <input type="checkbox" id="setting-token-eff" checked>
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+        <div class="set-row">
+          <label class="set-lbl" for="setting-before-after">Show Before/After comparison</label>
+          <label class="tog">
+            <input type="checkbox" id="setting-before-after" checked>
+            <span class="tog-sl"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="set-sec">
+        <div class="set-title">Data Management</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="btn-outline" id="btn-export">Export Data JSON</button>
+          <button class="btn-outline btn-red" id="btn-clear-data">Reset Local Storage</button>
+        </div>
+      </div>
+      <button class="btn-outline btn-sm" id="btn-reset-settings">Reset Settings to Default</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how section-img" id="how">
+  <div class="bg"></div>
+  <div class="frost"></div>
+  <div class="how-in">
+    <div style="text-align:center"><div class="sec-tag">How It Works</div></div>
+    <h2 class="sec-t">Three steps to <span class="dim">better prompts</span></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">01</div>
+        <div class="step-t">Type Your Prompt</div>
+        <div class="step-d">Write what you want to build. Even a rough idea or quick spec works.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <div class="step-t">Enhance or Engineer</div>
+        <div class="step-d">AI rewrites it with structure, requirements, tech stack details, and constraints.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <div class="step-t">Copy & Build</div>
+        <div class="step-d">Paste into any AI coding workspace (v0, Cursor, Bolt, Claude, ChatGPT). Ship it fast.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section class="plats section-img" id="platforms">
+  <div class="bg"></div>
+  <div class="frost"></div>
+  <div class="plats-in">
+    <div class="sec-tag">Works With</div>
+    <h2 class="sec-t" style="font-size:clamp(22px,3vw,32px)">Any AI coding <span class="dim">platform</span></h2>
+    <div class="plats-grid">
+      <div class="plat-chip">v0</div><div class="plat-chip">Bolt</div><div class="plat-chip">Lovable</div><div class="plat-chip">Cursor</div>
+      <div class="plat-chip">ChatGPT</div><div class="plat-chip">Claude</div><div class="plat-chip">Gemini</div><div class="plat-chip">Perplexity</div>
+      <div class="plat-chip">DeepSeek</div><div class="plat-chip">Replit</div><div class="plat-chip">StackBlitz</div><div class="plat-chip">GitHub Copilot</div>
+      <div class="plat-chip">Phind</div><div class="plat-chip">Windsurf</div><div class="plat-chip">Cody</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Vibe Check — AI Prompt Engineer</span>
+</footer>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script src="app.js" defer></script>
+</body>
+</html>
