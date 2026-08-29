@@ -1,662 +1,1115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Check — AI Prompt Engineer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibe Check — Prompt Workshop</title>
 <style>
-:root{--bg:#0a0a0f;--accent:#fff;--accent-dim:rgba(255,255,255,.7);--text:#f5f5f7;--text-dim:#86868b;--text-muted:#48484a;--border:rgba(255,255,255,.12);--glass:rgba(255,255,255,.08);--ease:cubic-bezier(.25,.46,.45,.94)}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;min-height:100vh}
+:root{
+  --page:#090a0f; --panel:#12131a; --panel2:#171820; --line:#292b35;
+  --ink:#f7f7fa; --muted:#9a9ca6; --soft:#676a75; --ok:#45d483; --bad:#ff5b57;
+  --shadow:0 18px 55px rgba(0,0,0,.38); --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100vh; color:var(--ink); background:
+  radial-gradient(circle at 50% 0,#1b1c26 0,transparent 38%),var(--page);
+  font:14px/1.5 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
 button,input,textarea{font:inherit}
 button{cursor:pointer}
-::selection{background:rgba(255,255,255,.2);color:#fff}
+a{color:inherit}
 .hidden{display:none!important}
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,48px);height:52px;background:rgba(255,255,255,.08);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.12);transition:all .4s var(--ease)}
-.nav.scrolled{background:rgba(255,255,255,.12);box-shadow:0 1px 0 rgba(255,255,255,.15)}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-icon{width:28px;height:28px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center}
-.nav-name{font-size:14px;font-weight:600;color:#fff}
-.nav-links{display:flex;gap:2px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px}
-.nav-link{padding:6px 16px;border-radius:7px;background:transparent;border:0;color:var(--text-dim);font-size:12px;font-weight:500}
-.nav-link:hover,.nav-link.active{color:#fff}
-.nav-link.active{background:rgba(255,255,255,.08)}
-.nav-actions{display:flex;gap:8px}
-.nav-icon-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--text-dim);display:flex;align-items:center;justify-content:center}
-.nav-icon-btn:hover{background:rgba(255,255,255,.08);color:#fff}
-
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.08),transparent 38%),linear-gradient(180deg,#0b0b11 0%,#0a0a0f 100%)}
-.hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 0,rgba(10,10,15,.15) 50%,#0a0a0f 100%)}
-.hero-content{position:relative;z-index:2;text-align:center;padding:120px 24px 80px;max-width:800px}
-.hero-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:9999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:12px;font-weight:500;color:rgba(255,255,255,.8);margin-bottom:28px}
-.hero-pill-dot{width:6px;height:6px;border-radius:50%;background:#34c759;box-shadow:0 0 8px rgba(52,199,89,.5)}
-.hero-h1{font-size:clamp(52px,9vw,96px);font-weight:700;line-height:.92;letter-spacing:-.04em;margin-bottom:20px;color:#fff}
-.hero-h1 em{font-style:normal;background:linear-gradient(135deg,#fff,rgba(255,255,255,.6));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-p{font-size:18px;color:rgba(255,255,255,.6);line-height:1.6;max-width:520px;margin:0 auto 40px}
-.hero-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:9999px;background:#fff;color:#0a0a0f;font-size:15px;font-weight:600;text-decoration:none;border:0;box-shadow:0 2px 12px rgba(0,0,0,.3)}
-.hero-btn:hover{transform:scale(1.02)}
-
-.app-wrap{max-width:540px;margin:-40px auto 0;padding:0 0 100px;position:relative;z-index:5}
-.glass{background:rgba(255,255,255,.08);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.15);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15)}
-.app-top{display:flex;align-items:center;height:48px;padding:0 14px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.08);border-radius:20px 20px 0 0;gap:8px}
-.app-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.app-logo-ic{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#fff,#aaa);display:flex;align-items:center;justify-content:center}
-.app-logo-t{font-size:11px;font-weight:700;letter-spacing:.08em;color:#fff}
-.app-tabs{display:flex;gap:1px;flex:1;overflow-x:auto;scrollbar-width:none}
-.app-tabs::-webkit-scrollbar{display:none}
-.tab-btn{padding:6px 14px;border-radius:7px;border:0;background:transparent;color:var(--text-muted);font-size:12px;font-weight:500;white-space:nowrap}
-.tab-btn:hover{color:var(--text-dim)}
-.tab-btn.active{background:rgba(255,255,255,.1);color:#fff}
-#tab-content{padding:14px}
-.tab-panel{display:none}
-.tab-panel.active{display:block;animation:fadeUp .2s var(--ease)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-
-.stack-badge{display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,255,255,.05);border:.5px solid rgba(255,255,255,.08);border-radius:9999px;font-size:12px;margin-bottom:10px}
-.stack-dot{width:6px;height:6px;border-radius:50%;background:#34c759;box-shadow:0 0 6px rgba(52,199,89,.5)}
-.stack-lbl{color:var(--text-muted)}.stack-nm{color:#fff;font-weight:600}
-.stack-tips{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-bottom:10px;font-size:12px}
-.tips-hdr{color:rgba(255,255,255,.8);font-weight:600;margin-bottom:8px}
-#tips-list{list-style:none}#tips-list li{padding:4px 0 4px 14px;color:var(--text-dim);position:relative}
-#tips-list li:before{content:"";position:absolute;left:0;top:10px;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.5)}
-
-.textarea-wrap{margin-bottom:12px}
-textarea{resize:vertical;outline:none}
-#prompt-input{width:100%;height:140px;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;color:#fff;font-family:"JetBrains Mono",monospace;font-size:13px;line-height:1.65}
-#prompt-input:focus,#engineer-input:focus,#credit-input:focus{border-color:rgba(255,255,255,.25);box-shadow:0 0 0 3px rgba(255,255,255,.06)}
-textarea::placeholder,input::placeholder{color:var(--text-muted)}
-.input-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--text-muted)}
-.complexity-badge{padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:600;text-transform:uppercase}
-.complexity-badge.simple{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
-.complexity-badge.moderate{background:rgba(175,130,255,.12);color:#af82ff}
-.complexity-badge.detailed{background:rgba(52,199,89,.12);color:#34c759}
-
-.action-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
-.btn-enhance{flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#0a0a0f;border:0;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.btn-enhance:hover:not(:disabled){transform:translateY(-1px)}
-.btn-enhance:disabled{opacity:.3;cursor:not-allowed}
-.btn-spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.12);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;display:none}
+.topbar{
+  position:sticky; top:0; z-index:20; min-height:58px; padding:10px 4vw;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(9,10,15,.78); border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700}
+.brand-mark,.app-mark{display:grid;place-items:center;background:#fff;color:#101116;border-radius:8px}
+.brand-mark{width:30px;height:30px}
+.brand-name{letter-spacing:.01em}
+.main-nav{display:flex;gap:3px;padding:3px;background:rgba(255,255,255,.04);border-radius:10px}
+.main-nav button,.small-icon{
+  border:0;background:transparent;color:var(--muted);border-radius:8px
+}
+.main-nav button{padding:7px 15px;font-size:12px}
+.main-nav button:hover,.main-nav button.active{background:rgba(255,255,255,.08);color:#fff}
+.top-actions{display:flex;gap:7px}
+.small-icon{width:34px;height:34px;border:1px solid var(--line)}
+.small-icon:hover{background:rgba(255,255,255,.07);color:#fff}
+.hero{text-align:center;padding:110px 20px 85px}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;padding:7px 14px;
+  border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);
+  color:#d7d8dd;font-size:12px
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 9px rgba(69,212,131,.5)}
+.hero h1{font-size:clamp(48px,9vw,94px);line-height:.93;letter-spacing:-.055em;margin:24px 0 18px}
+.hero h1 span{color:#a7a9b1}
+.hero p{max-width:580px;margin:0 auto 32px;color:var(--muted);font-size:17px}
+.primary{
+  border:0;border-radius:999px;padding:13px 25px;background:#fff;color:#0b0c10;
+  font-weight:700;box-shadow:0 5px 18px rgba(0,0,0,.25)
+}
+.primary:hover{transform:translateY(-1px)}
+.shell{width:min(920px,calc(100% - 28px));margin:-30px auto 85px}
+.workspace{overflow:hidden;border:1px solid var(--line);border-radius:22px;background:rgba(18,19,26,.88);box-shadow:var(--shadow)}
+.workspace-head{display:flex;align-items:center;gap:15px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.app-id{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.1em}
+.app-mark{width:25px;height:25px;border-radius:6px}
+.workspace-tabs{display:flex;gap:3px;overflow:auto;flex:1;scrollbar-width:none}
+.workspace-tabs::-webkit-scrollbar{display:none}
+.workspace-tabs button{
+  flex:0 0 auto;padding:7px 13px;border:0;border-radius:8px;background:transparent;color:var(--soft);font-size:12px
+}
+.workspace-tabs button.active{color:#fff;background:rgba(255,255,255,.08)}
+.panel{padding:18px}
+.panel:not(.active){display:none}
+.box{
+  padding:14px;margin-bottom:12px;border:1px solid var(--line);border-radius:15px;
+  background:rgba(255,255,255,.025)
+}
+textarea,input[type=text]{
+  width:100%;border:1px solid var(--line);outline:0;color:#fff;background:#0e0f15;
+  border-radius:12px
+}
+textarea{resize:vertical}
+textarea:focus,input[type=text]:focus{border-color:#4a4d59;box-shadow:0 0 0 3px rgba(255,255,255,.035)}
+#prompt-input{min-height:155px;padding:14px;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}
+.meta{display:flex;justify-content:space-between;gap:12px;margin-top:7px;color:var(--soft);font-size:10px}
+.level{padding:3px 8px;border-radius:99px;font-size:10px;font-weight:700}
+.level.simple{background:#24262e;color:#b9bbc3}
+.level.moderate{background:#30263e;color:#c39cff}
+.level.detailed{background:#19382a;color:#75e0a0}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.grow{flex:1}
+.secondary,.copy-btn{
+  border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:9px
+}
+.secondary{padding:7px 12px;font-size:11px}
+.secondary:hover{background:rgba(255,255,255,.05);color:#fff}
+.enhance{
+  width:100%;height:44px;border:0;border-radius:12px;background:#fff;color:#0b0c10;font-weight:750
+}
+.enhance:disabled{opacity:.3;cursor:not-allowed}
+.busy .label{display:none}
+.busy .spinner{display:block}
+.spinner{
+  display:none;width:17px;height:17px;border:2px solid #c9c9cd;border-top-color:#111;border-radius:50%;
+  animation:spin .7s linear infinite;margin:auto
+}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btn-enhance.loading .btn-label,.btn-enhance.loading .btn-icon{display:none}
-.btn-enhance.loading .btn-spinner{display:inline-block}
-.btn-icon{display:flex;align-items:center}
-.btn-icon-only{width:36px;height:36px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--text-muted);border-radius:9px;display:flex;align-items:center;justify-content:center}
-.btn-icon-only:hover{color:#fff;background:rgba(255,255,255,.08)}
-.btn-outline{padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text-dim);font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
-.btn-outline:hover{border-color:rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.04)}
-.btn-outline.btn-sm{font-size:11px;padding:4px 10px}
-.btn-outline.btn-red{border-color:rgba(255,69,58,.25);color:#ff453a}
-
-.score-box,.enhanced-box,.ba,.tok-eff{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
-.score-box{padding:20px;display:flex;flex-wrap:wrap;gap:16px}
-.score-num{font-size:42px;font-weight:700;color:#fff;line-height:1}
-.score-div{font-size:16px;color:var(--text-muted);font-weight:300}.score-max{font-size:12px;color:var(--text-muted)}
-.score-lbl{font-size:15px;font-weight:600;margin-bottom:10px}.score-bars{width:100%}
-.score-bar{display:flex;align-items:center;gap:8px;margin-bottom:5px}.score-bar-l{width:80px;font-size:11px;color:var(--text-dim)}
-.score-bar-t{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}.score-bar-f{height:100%;background:#fff;border-radius:3px;transition:width .5s}.score-bar-v{width:30px;font-size:10px;color:var(--text-muted);text-align:right}
-.score-fb{width:100%;border-top:.5px solid rgba(255,255,255,.06);padding-top:10px}.score-fi{font-size:11px;color:rgba(255,255,255,.7);padding:2px 0}
-.enhanced-box{border-left:2px solid #fff;overflow:hidden}.enh-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 0}.enh-t{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em}.btn-cp{background:none;border:.5px solid rgba(255,255,255,.08);color:var(--text-muted);cursor:pointer;padding:5px;border-radius:7px}.btn-cp.ok{color:#34c759;border-color:#34c759}
-.enh-txt{padding:10px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.6;color:#fff;white-space:pre-wrap;word-wrap:break-word;max-height:240px;overflow:auto}.imp-list{padding:0 14px 12px}.imp-i{font-size:11px;color:var(--text-dim);padding:2px 0}
-.ba{border:0}.ba-cols{display:flex;gap:8px}.ba-col{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}.ba-hdr{display:flex;justify-content:space-between;padding:8px 10px;border-bottom:.5px solid rgba(255,255,255,.04)}.ba-lbl{font-size:10px;font-weight:600;text-transform:uppercase}.ba-before{color:#ff453a}.ba-after{color:#34c759}.btn-cps{background:none;border:0;color:var(--text-muted);padding:2px}.ba-txt{padding:10px;font-family:"JetBrains Mono",monospace;font-size:11px;line-height:1.5;color:#fff;white-space:pre-wrap;max-height:150px;overflow:auto}.ch-list{margin-top:8px}.ch-i{font-size:11px;color:var(--text-dim);padding:2px 0}
-.tok-eff{overflow:hidden}.eff-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer}.eff-pct{margin-left:auto;font-size:11px;color:var(--text-muted)}.eff-body{display:flex;gap:14px;padding:0 14px 12px}.eff-ring{position:relative;width:56px;height:56px;flex-shrink:0}.eff-rp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:700}.fill-cnt{font-size:11px;color:var(--text-dim);margin-bottom:6px}.fill-lst{list-style:none;margin-bottom:8px}.fill-lst li{font-size:10px;color:var(--text-muted);padding:2px 0;font-family:"JetBrains Mono",monospace}
-
-.template-categories{display:flex;gap:4px;margin-bottom:10px;overflow:auto}.template-cat-btn{padding:5px 12px;border:1px solid rgba(255,255,255,.08);border-radius:9999px;background:transparent;color:var(--text-muted);font-size:11px;white-space:nowrap}.template-cat-btn.active{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.15)}
-.template-search,.history-search{width:100%;padding:8px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#fff;font-size:12px;outline:none;margin-bottom:10px}.templates-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.template-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;cursor:pointer}.template-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px)}.template-card-name{font-size:13px;font-weight:600;margin-bottom:3px}.template-card-preview{font-size:11px;color:var(--text-muted);line-height:1.4}.template-card-tag{display:inline-block;font-size:9px;color:var(--text-dim);background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px;margin-top:6px;text-transform:uppercase}
-
-.eng-sec{margin-bottom:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:14px}.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.sec-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.06em}.sec-sub{font-size:10px;color:var(--text-muted)}#engineer-input{width:100%;height:90px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#fff;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.6}.chk-grid{display:flex;flex-direction:column;gap:3px}.chk-i{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;font-size:12px}.chk-i.pass{background:rgba(52,199,89,.04)}.chk-i.fail{background:rgba(255,69,58,.04)}.chk-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}.chk-i.pass .chk-ic{background:rgba(52,199,89,.12);color:#34c759}.chk-i.fail .chk-ic{background:rgba(255,69,58,.12);color:#ff453a}.chk-lbl{flex:1}.chk-fix{font-size:10px;color:rgba(255,255,255,.5);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tech-card{display:flex;align-items:flex-start;gap:8px;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer}.tech-card.sel{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08)}.tech-chk{width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(255,255,255,.12);flex-shrink:0}.tech-card.sel .tech-chk{background:#fff}.tech-nm{font-size:12px;font-weight:600;margin-bottom:2px}.tech-ds{font-size:10px;color:var(--text-muted);line-height:1.4}
-#credit-input{width:100%;height:70px;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#fff;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.6}.cr-int{display:flex;gap:8px;font-size:11px;color:var(--text-dim);margin-bottom:10px;line-height:1.5;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:10px}.cr-int strong{color:#fff}.cr-badge{font-size:10px;font-weight:600;color:rgba(255,255,255,.6);background:rgba(255,255,255,.06);padding:4px 10px;border-radius:9999px;white-space:nowrap}
-
-.history-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:6px}.history-item-text{flex:1;font-size:12px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.history-item-score{font-size:11px;font-weight:600;color:rgba(255,255,255,.7)}.history-copy-btn,.history-star{background:none;border:0;color:var(--text-muted);padding:4px}.history-star.active{color:#fbbf24}.empty-state{text-align:center;padding:24px 16px}.empty-state p{color:var(--text-muted);font-size:12px}.empty-state .sub{font-size:11px;opacity:.5;margin-top:4px}.btn-del{padding:6px 14px;background:transparent;border:1px solid rgba(255,69,58,.2);border-radius:8px;color:#ff453a;font-size:11px;margin-top:8px}
-.tips-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06)}.tips-arr{background:none;border:0;color:var(--text-muted);padding:4px}.tips-txt{flex:1;font-size:11px;color:var(--text-muted);text-align:center}
-.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center}.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}.modal-box{position:relative;width:90%;max-width:440px;max-height:80vh;overflow:auto;background:rgba(16,16,24,.95);border:1px solid rgba(255,255,255,.1);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.5)}.modal-top{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 0}.modal-t{font-size:15px;font-weight:700}.modal-x{background:none;border:0;color:var(--text-muted);padding:6px}.modal-body{padding:18px 22px 22px}.set-sec{margin-bottom:18px}.set-title{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}.set-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0}.set-lbl{font-size:13px}.tog{position:relative;width:38px;height:22px;cursor:pointer}.tog input{opacity:0;width:0;height:0}.tog-sl{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:22px}.tog-sl:before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}.tog input:checked+.tog-sl{background:#34c759}.tog input:checked+.tog-sl:before{transform:translateX(16px)}
-#toast-container{position:fixed;top:64px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}.toast{padding:10px 16px;border-radius:10px;background:rgba(16,16,24,.95);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
-.how{padding:80px 24px;position:relative}.how-in,.plats-in{max-width:880px;margin:auto}.sec-tag{display:inline-block;padding:5px 14px;border-radius:9999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);font-size:11px;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}.sec-t{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-.03em;text-align:center;margin-bottom:44px}.dim{color:var(--text-muted)}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step{padding:24px 20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px}.step-n{font-size:28px;font-weight:700;color:rgba(255,255,255,.15);margin-bottom:8px}.step-t{font-size:15px;font-weight:600;margin-bottom:4px}.step-d{font-size:13px;color:var(--text-dim);line-height:1.5}
-.plats{padding:40px 24px 80px;text-align:center}.plats-in{max-width:780px}.plats-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}.plat-chip{padding:6px 14px;border-radius:9999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--text-dim)}
-footer{text-align:center;padding:28px 24px 40px;font-size:12px;color:var(--text-muted);border-top:1px solid rgba(255,255,255,.06)}
-@media(max-width:768px){.nav{padding:0 16px}.nav-links{display:none}.hero-h1{letter-spacing:-.03em}.app-wrap{padding:0 14px 60px}.steps{grid-template-columns:1fr}.templates-grid,.tech-grid{grid-template-columns:1fr}.ba-cols{flex-direction:column}}
+.result-head,.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.result-head{padding:12px 14px 0}
+.result-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#c7c8ce;font-weight:700}
+.copy-btn{padding:5px 9px;font-size:10px}
+.copy-btn.done{color:var(--ok);border-color:var(--ok)}
+.result-text,.compare pre{
+  margin:0;padding:11px 14px;color:#fff;white-space:pre-wrap;overflow:auto;
+  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace
+}
+.result-text{max-height:260px}
+.improvements,.changes{padding:0 14px 12px;color:var(--muted);font-size:11px}
+.improvements div,.changes div{padding:2px 0}
+.score{
+  display:grid;grid-template-columns:auto 1fr;gap:14px;padding:18px;
+  border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);margin-bottom:12px
+}
+.score-value{font-size:42px;font-weight:800;line-height:1}
+.score-caption{font-weight:700;margin-bottom:9px}
+.meter{display:grid;grid-template-columns:75px 1fr 28px;align-items:center;gap:7px;margin:5px 0;font-size:10px;color:var(--muted)}
+.track{height:4px;background:#252730;border-radius:99px;overflow:hidden}
+.fill{height:100%;background:#fff;border-radius:inherit}
+.score-note{grid-column:1/-1;padding-top:9px;border-top:1px solid rgba(255,255,255,.06);color:var(--muted);font-size:11px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.compare>div{overflow:hidden;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025)}
+.compare h4{margin:0;padding:8px 10px;border-bottom:1px solid var(--line);font-size:10px;text-transform:uppercase}
+.before h4{color:var(--bad)} .after h4{color:var(--ok)}
+.compare pre{max-height:170px;padding:10px}
+.efficiency{overflow:hidden;padding:0}
+.eff-head{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer;font-size:12px;font-weight:700}
+.eff-head span:last-child{margin-left:auto;color:var(--soft);font-size:10px}
+.eff-body{display:flex;gap:14px;padding:0 13px 13px}
+.ring{width:58px;height:58px;flex:0 0 58px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring-label{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;font-weight:800}
+.mini-list{margin:5px 0 8px;padding:0;list-style:none;color:var(--soft);font:10px/1.5 ui-monospace,monospace}
+.stack{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025);font-size:11px}
+.stack strong{color:#fff}.stack small{color:var(--soft)}
+.tipbox{padding:12px;margin-bottom:12px;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:11px}
+.tipbox strong{display:block;color:#ddd;margin-bottom:5px}
+.template-tools{display:flex;gap:6px;overflow:auto;margin-bottom:10px}
+.chip{border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--soft);padding:5px 11px;font-size:10px;white-space:nowrap}
+.chip.active{background:#24262d;color:#fff}
+.search{padding:9px 11px;margin-bottom:10px;font-size:12px}
+.template-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{
+  padding:13px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);
+  cursor:pointer
+}
+.card:hover{border-color:#4a4d59;transform:translateY(-1px)}
+.card b{display:block;font-size:12px;margin-bottom:3px}.card p{margin:0;color:var(--soft);font-size:10px;line-height:1.45}
+.tag{display:inline-block;margin-top:7px;padding:2px 6px;border-radius:4px;background:#24262d;color:var(--muted);font-size:8px}
+.section-head{margin-bottom:8px}.section-label{text-transform:uppercase;letter-spacing:.07em;color:#c4c5ca;font-size:10px;font-weight:700}.section-sub{color:var(--soft);font-size:10px}
+#engineer-input,#credit-input{padding:12px;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+#engineer-input{min-height:105px}#credit-input{min-height:80px}
+.checks{display:grid;gap:3px}.check{
+  display:grid;grid-template-columns:20px 1fr auto;gap:7px;align-items:center;padding:6px 8px;border-radius:8px;font-size:11px
+}
+.check.pass{background:rgba(69,212,131,.035)}.check.fail{background:rgba(255,91,87,.035)}
+.check-icon{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:800}
+.pass .check-icon{background:rgba(69,212,131,.12);color:var(--ok)}.fail .check-icon{background:rgba(255,91,87,.12);color:var(--bad)}
+.check-fix{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--soft);font-size:9px}
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tech{
+  display:flex;gap:8px;padding:10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02);cursor:pointer
+}
+.tech.selected{border-color:#5a5d68;background:rgba(255,255,255,.07)}
+.tech-mark{width:14px;height:14px;border:1px solid #4b4d57;border-radius:4px;flex:0 0 14px;margin-top:1px}
+.selected .tech-mark{background:#fff;border-color:#fff}
+.tech b{display:block;font-size:11px}.tech small{display:block;color:var(--soft);font-size:9px}
+.history-row{display:flex;align-items:center;gap:8px;padding:9px 11px;margin-bottom:6px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px}
+.history-score{font-size:10px;color:#ddd}.plain{border:0;background:none;color:var(--soft);padding:4px}
+.plain.starred{color:#f7c84b}.empty{text-align:center;padding:24px;color:var(--soft);font-size:11px}
+.bottom-tip{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid var(--line);color:var(--soft);font-size:10px}
+.bottom-tip span{flex:1;text-align:center}.bottom-tip button{border:0;background:none;color:#777b85;font-size:18px}
+.info-section{width:min(880px,calc(100% - 40px));margin:0 auto;padding:70px 0}
+.info-title{text-align:center;font-size:clamp(28px,4vw,40px);letter-spacing:-.03em;margin:0 0 38px}
+.info-title span{color:#686b75}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.step{padding:22px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025)}
+.step-num{font-size:25px;color:#4d505a;font-weight:800}.step h3{font-size:14px;margin:8px 0 4px}.step p{margin:0;color:var(--muted);font-size:12px}
+.platforms{text-align:center;padding-top:15px}
+.platform-list{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:16px}
+.platform-list span{padding:6px 12px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:11px}
+footer{padding:30px;text-align:center;border-top:1px solid var(--line);color:var(--soft);font-size:11px}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(6px)}
+.modal-card{position:relative;width:min(440px,100%);max-height:80vh;overflow:auto;padding:20px;border:1px solid var(--line);border-radius:17px;background:#15161e;box-shadow:var(--shadow)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-weight:800}
+.modal-close{border:0;background:none;color:var(--soft)}
+.setting{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:12px}
+.switch{position:relative;width:38px;height:22px}.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#30323b;border-radius:99px}.slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s}
+.switch input:checked+.slider{background:#35bf73}.switch input:checked+.slider:before{transform:translateX(16px)}
+.modal-actions{padding-top:14px;border-top:1px solid var(--line);margin-top:12px}
+.toast-area{position:fixed;right:18px;top:72px;z-index:80;display:grid;gap:7px}
+.toast{padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:#171820;color:#fff;box-shadow:var(--shadow);font-size:11px}
+@media(max-width:760px){
+  .main-nav{display:none}.topbar{padding:9px 15px}.hero{padding:85px 18px 70px}
+  .shell{width:calc(100% - 20px)}.workspace-head{padding:9px}.panel{padding:12px}
+  .template-grid,.tech-grid,.compare,.steps{grid-template-columns:1fr}
+  .score{grid-template-columns:1fr}.score-note{grid-column:auto}
+  .info-section{width:calc(100% - 28px)}
+}
 </style>
 </head>
 <body>
-
-<nav class="nav" id="mainNav">
-  <a href="#" class="nav-brand">
-    <div class="nav-icon">◆</div><span class="nav-name">Vibe Check</span>
-  </a>
-  <div class="nav-links">
-    <button class="nav-link active" data-tab="enhance">Enhance</button>
-    <button class="nav-link" data-tab="templates">Templates</button>
-    <button class="nav-link" data-tab="engineer">Engineer</button>
-    <button class="nav-link" data-tab="history">History</button>
+<header class="topbar">
+  <a class="brand" href="#"><span class="brand-mark">◆</span><span>Vibe Check</span></a>
+  <nav class="main-nav" aria-label="Main">
+    <button class="active" data-tab="enhance">Enhance</button>
+    <button data-tab="templates">Templates</button>
+    <button data-tab="engineer">Engineer</button>
+    <button data-tab="history">History</button>
+  </nav>
+  <div class="top-actions">
+    <a class="small-icon" href="#workspace" aria-label="Open workspace">◆</a>
+    <button class="small-icon" id="settings-btn" aria-label="Settings">⚙</button>
   </div>
-  <div class="nav-actions">
-    <a href="#app" class="nav-icon-btn">◆</a>
-    <button class="nav-icon-btn" id="settings-btn">⚙</button>
-  </div>
-</nav>
+</header>
 
+<main>
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-pill"><span class="hero-pill-dot"></span>AI-Powered Prompt Engineering</div>
-    <h1 class="hero-h1">Write <em>better</em><br>prompts.</h1>
-    <p class="hero-p">Enhance, score, and engineer prompts with AI. Built for v0, Bolt, Cursor, ChatGPT, Claude, and any coding tool.</p>
-    <a href="#app" class="hero-btn">Start Writing →</a>
-  </div>
+  <div class="badge"><span class="dot"></span>Prompt workshop for AI coding tools</div>
+  <h1>Write <span>better</span><br>prompts.</h1>
+  <p>Improve, score, test, and organize prompts before you hand them to your coding assistant.</p>
+  <a class="primary" href="#workspace">Start writing →</a>
 </section>
 
-<section id="app" class="app-wrap">
-<div class="glass">
-  <div class="app-top">
-    <div class="app-logo"><div class="app-logo-ic">◆</div><span class="app-logo-t">VIBE CHECK</span></div>
-    <nav class="app-tabs">
-      <button class="tab-btn active" data-tab="enhance">Enhance</button>
-      <button class="tab-btn" data-tab="templates">Templates</button>
-      <button class="tab-btn" data-tab="engineer">Engineer</button>
-      <button class="tab-btn" data-tab="history">History</button>
+<section class="shell" id="workspace">
+<div class="workspace">
+  <div class="workspace-head">
+    <div class="app-id"><span class="app-mark">◆</span>VIBE CHECK</div>
+    <nav class="workspace-tabs">
+      <button class="active" data-tab="enhance">Enhance</button>
+      <button data-tab="templates">Templates</button>
+      <button data-tab="engineer">Engineer</button>
+      <button data-tab="history">History</button>
     </nav>
   </div>
 
-  <div id="tab-content">
-    <div class="tab-panel active" id="panel-enhance">
-      <div id="stack-badge" class="stack-badge hidden"><span class="stack-dot"></span><span class="stack-lbl">Currently on:</span><span class="stack-nm" id="stack-name"></span></div>
-      <div id="stack-tips" class="stack-tips hidden"><div class="tips-hdr">Tips for <span id="tips-stack-name"></span>:</div><ul id="tips-list"></ul></div>
+  <section class="panel active" id="panel-enhance">
+    <div class="stack hidden" id="stack-badge"><span class="dot"></span><small>Detected stack:</small><strong id="stack-name"></strong></div>
+    <div class="tipbox hidden" id="stack-tips"><strong>Useful reminders</strong><span id="tips-stack-name"></span><ul id="tips-list"></ul></div>
 
-      <div class="textarea-wrap">
-        <textarea id="prompt-input" placeholder="Type or paste your prompt here..." maxlength="5000"></textarea>
-        <div class="input-meta"><span id="word-count">0 words · 0 characters</span><span id="complexity-badge" class="complexity-badge hidden"></span></div>
-      </div>
+    <div class="box">
+      <textarea id="prompt-input" maxlength="5000" placeholder="Type or paste your prompt here..."></textarea>
+      <div class="meta"><span id="word-count">0 words · 0 characters</span><span id="complexity-badge" class="level hidden"></span></div>
+    </div>
 
-      <div class="action-row">
-        <button class="btn-enhance" id="btn-enhance" disabled><span class="btn-icon">◆</span><span class="btn-label">Enhance Prompt</span><span class="btn-spinner"></span></button>
-        <button class="btn-icon-only hidden" id="btn-undo" title="Undo">↶</button>
-        <button class="btn-icon-only hidden" id="btn-redo" title="Redo">↷</button>
-      </div>
+    <div class="row">
+      <button class="enhance grow" id="btn-enhance" disabled>
+        <span class="label">Enhance prompt</span><span class="spinner"></span>
+      </button>
+      <button class="small-icon hidden" id="btn-undo" title="Undo">↶</button>
+      <button class="small-icon hidden" id="btn-redo" title="Redo">↷</button>
+    </div>
 
-      <div id="score-display" class="score-box hidden">
-        <div><span class="score-num" id="score-number">0</span><span class="score-div"> / </span><span class="score-max">100</span></div>
-        <div class="score-lbl" id="score-label"></div>
-        <div class="score-bars" id="score-bars"></div>
-        <div class="score-fb" id="score-feedback"></div>
-      </div>
+    <div class="score hidden" id="score-display">
+      <div><span class="score-value" id="score-number">0</span><span style="color:var(--soft)"> / 100</span></div>
+      <div><div class="score-caption" id="score-label"></div><div id="score-bars"></div></div>
+      <div class="score-note" id="score-feedback"></div>
+    </div>
 
-      <div id="enhanced-area" class="enhanced-box hidden">
-        <div class="enh-hdr"><span class="enh-t">✓ Enhanced</span><button class="btn-cp" id="btn-copy-enhanced">Copy</button></div>
-        <pre class="enh-txt" id="enhanced-text"></pre><div class="imp-list" id="improvements-list"></div>
-      </div>
+    <div class="box hidden" id="enhanced-area" style="padding:0;border-left:2px solid #fff">
+      <div class="result-head"><span class="result-title">✓ Enhanced</span><button class="copy-btn" id="btn-copy-enhanced">Copy</button></div>
+      <pre class="result-text" id="enhanced-text"></pre>
+      <div class="improvements" id="improvements-list"></div>
+    </div>
 
-      <div id="before-after" class="ba hidden">
-        <div class="ba-cols">
-          <div class="ba-col"><div class="ba-hdr"><span class="ba-lbl ba-before">Before</span><button class="btn-cps" id="btn-copy-before">Copy</button></div><pre class="ba-txt" id="before-text"></pre></div>
-          <div class="ba-col"><div class="ba-hdr"><span class="ba-lbl ba-after">After</span><button class="btn-cps" id="btn-copy-after">Copy</button></div><pre class="ba-txt" id="after-text"></pre></div>
-        </div><div class="ch-list" id="changes-list"></div>
-      </div>
+    <div class="compare hidden" id="before-after">
+      <div class="before"><h4>Before</h4><pre id="before-text"></pre></div>
+      <div class="after"><h4>After</h4><pre id="after-text"></pre></div>
+      <div class="changes" id="changes-list" style="grid-column:1/-1"></div>
+    </div>
 
-      <div id="token-efficiency" class="tok-eff hidden">
-        <div class="eff-hdr" id="efficiency-toggle">▥ <span>Token Efficiency</span><span class="eff-pct" id="efficiency-pct"></span>⌄</div>
-        <div class="eff-body hidden" id="efficiency-body">
-          <div class="eff-ring"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3.5"/><circle id="efficiency-ring" cx="28" cy="28" r="24" fill="none" stroke="#fff" stroke-width="3.5" stroke-dasharray="150.8" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 28 28)"/></svg><span class="eff-rp" id="ring-percent">100%</span></div>
-          <div><div class="fill-cnt" id="filler-count"></div><ul class="fill-lst" id="filler-list"></ul><button class="btn-outline btn-sm" id="btn-strip-filler">Strip Filler</button></div>
+    <div class="box efficiency hidden" id="token-efficiency">
+      <div class="eff-head" id="efficiency-toggle">▥ <span>Token efficiency</span><span id="efficiency-pct"></span>⌄</div>
+      <div class="eff-body hidden" id="efficiency-body">
+        <div class="ring">
+          <svg width="58" height="58" viewBox="0 0 58 58">
+            <circle cx="29" cy="29" r="24" fill="none" stroke="#292b35" stroke-width="4"/>
+            <circle id="efficiency-ring" cx="29" cy="29" r="24" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="150.8" stroke-linecap="round"/>
+          </svg>
+          <span class="ring-label" id="ring-percent">100%</span>
         </div>
+        <div><div id="filler-count" style="color:var(--muted);font-size:11px"></div><ul class="mini-list" id="filler-list"></ul><button class="secondary" id="btn-strip-filler">Strip filler</button></div>
       </div>
     </div>
+  </section>
 
-    <div class="tab-panel" id="panel-templates">
-      <div class="template-categories" id="templates-category-tabs">
-        <button class="template-cat-btn active" data-category="ui-components">UI Components</button><button class="template-cat-btn" data-category="full-apps">Full Apps</button><button class="template-cat-btn" data-category="fixes">Fixes</button><button class="template-cat-btn" data-category="api-backend">API</button><button class="template-cat-btn" data-category="ai-prompts">AI</button>
-      </div>
-      <input type="text" class="template-search" id="template-search" placeholder="Search templates...">
-      <div class="templates-grid" id="templates-grid"></div>
+  <section class="panel" id="panel-templates">
+    <div class="template-tools" id="templates-category-tabs">
+      <button class="chip active" data-category="ui-components">UI</button>
+      <button class="chip" data-category="full-apps">Apps</button>
+      <button class="chip" data-category="fixes">Fixes</button>
+      <button class="chip" data-category="api-backend">API</button>
+      <button class="chip" data-category="ai-prompts">AI</button>
+    </div>
+    <input class="search" id="template-search" type="text" placeholder="Search templates...">
+    <div class="template-grid" id="templates-grid"></div>
+  </section>
+
+  <section class="panel" id="panel-engineer">
+    <div class="box">
+      <div class="section-head"><span class="section-label">Source prompt</span><button class="secondary" id="btn-engineer-from-enhance">Use last enhanced</button></div>
+      <textarea id="engineer-input" maxlength="5000" placeholder="Paste or type your prompt to engineer..."></textarea>
+      <div class="meta"><span id="engineer-word-count">0 words · 0 characters</span></div>
     </div>
 
-    <div class="tab-panel" id="panel-engineer">
-      <div class="eng-sec"><div class="sec-hdr"><span class="sec-lbl">Source Prompt</span><button class="btn-outline btn-sm" id="btn-engineer-from-enhance">Use last enhanced</button></div><textarea id="engineer-input" placeholder="Paste or type your prompt to engineer..." maxlength="5000"></textarea><div class="input-meta"><span id="engineer-word-count">0 words · 0 characters</span></div></div>
-      <div class="eng-sec"><div class="sec-hdr"><span class="sec-lbl">Quality Checklist</span><span id="checklist-score"></span></div><div class="chk-grid" id="checklist-grid"></div></div>
-      <div class="eng-sec"><div class="sec-hdr"><span class="sec-lbl">Apply Techniques</span><button class="btn-outline btn-sm" id="btn-apply-techniques">Apply Selected</button></div><div class="tech-grid" id="techniques-grid"></div></div>
-      <div class="eng-sec"><div class="sec-hdr"><span class="sec-lbl">Prompt Variants</span><button class="btn-outline btn-sm" id="btn-generate-variants">Generate</button></div><div id="variants-container"><div class="empty-state"><p>Click Generate to create 3 variations</p></div></div></div>
-      <div class="eng-sec"><div class="sec-hdr"><span class="sec-lbl">Version History</span><div><button class="btn-outline btn-sm" id="btn-save-version">Save</button> <button class="btn-outline btn-sm" id="btn-clear-versions">Clear</button></div></div><div id="versions-list"><div class="empty-state"><p>No versions saved</p></div></div></div>
-      <div class="eng-sec">
-        <div class="sec-hdr"><span class="sec-lbl">Credit Saver</span><span class="sec-sub">English to Chinese</span></div>
-        <div class="cr-int">ⓘ <span>Chinese uses ~60% fewer tokens. Save on <strong>any</strong> provider.</span></div>
-        <div class="textarea-wrap"><textarea id="credit-input" placeholder="Paste your English prompt..." maxlength="5000"></textarea><div class="input-meta"><span id="credit-word-count">0 words · 0 characters</span></div></div>
-        <div class="action-row"><button class="btn-enhance btn-cr" id="btn-credit-transform" disabled><span class="btn-label">Transform</span><span class="btn-spinner"></span></button><span class="cr-badge">Save ~60%</span></div>
-        <div id="credit-result" class="enhanced-box hidden"><div class="enh-hdr"><span class="enh-t">Chinese Prompt</span><button class="btn-cp" id="btn-copy-credit">Copy</button></div><pre class="enh-txt" id="credit-text"></pre></div>
-      </div>
+    <div class="box">
+      <div class="section-head"><span class="section-label">Quality checklist</span><span id="checklist-score" class="section-sub"></span></div>
+      <div class="checks" id="checklist-grid"></div>
     </div>
 
-    <div class="tab-panel" id="panel-history">
-      <input type="text" class="history-search" id="history-search" placeholder="Search prompts...">
-      <div class="history-list" id="history-list"></div>
-      <button class="btn-del" id="btn-clear-history">Clear All History</button>
+    <div class="box">
+      <div class="section-head"><span class="section-label">Apply techniques</span><button class="secondary" id="btn-apply-techniques">Apply selected</button></div>
+      <div class="tech-grid" id="techniques-grid"></div>
     </div>
-  </div>
 
-  <div class="tips-bar"><button class="tips-arr" id="tip-prev">‹</button><span class="tips-txt" id="tip-text"></span><button class="tips-arr" id="tip-next">›</button></div>
+    <div class="box">
+      <div class="section-head"><span class="section-label">Prompt variants</span><button class="secondary" id="btn-generate-variants">Generate</button></div>
+      <div id="variants-container"><div class="empty">Click Generate to create 3 variations</div></div>
+    </div>
+
+    <div class="box">
+      <div class="section-head"><span class="section-label">Version history</span><span><button class="secondary" id="btn-save-version">Save</button> <button class="secondary" id="btn-clear-versions">Clear</button></span></div>
+      <div id="versions-list"><div class="empty">No versions saved</div></div>
+    </div>
+
+    <div class="box">
+      <div class="section-head"><span class="section-label">Credit saver</span><span class="section-sub">English → Chinese</span></div>
+      <p style="margin:7px 0 10px;color:var(--muted);font-size:10px">Chinese can use fewer tokens for some prompts. Compare provider-specific usage before relying on the estimate.</p>
+      <textarea id="credit-input" maxlength="5000" placeholder="Paste your English prompt..."></textarea>
+      <div class="meta"><span id="credit-word-count">0 words · 0 characters</span><span>estimate only</span></div>
+      <div class="row" style="margin-top:10px"><button class="enhance grow" id="btn-credit-transform" disabled><span class="label">Transform</span><span class="spinner"></span></button></div>
+      <div class="box hidden" id="credit-result" style="margin:10px 0 0"><div class="result-head"><span class="result-title">Chinese prompt</span><button class="copy-btn" id="btn-copy-credit">Copy</button></div><pre class="result-text" id="credit-text"></pre></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-history">
+    <input class="search" id="history-search" type="text" placeholder="Search prompts...">
+    <div id="history-list"></div>
+    <button class="secondary" id="btn-clear-history" style="margin-top:7px;color:var(--bad)">Clear all history</button>
+  </section>
+
+  <div class="bottom-tip"><button id="tip-prev">‹</button><span id="tip-text"></span><button id="tip-next">›</button></div>
 </div>
 </section>
 
-<section class="how" id="how">
-  <div class="how-in">
-    <div style="text-align:center"><div class="sec-tag">How It Works</div></div>
-    <h2 class="sec-t">Three steps to <span class="dim">better prompts</span></h2>
-    <div class="steps">
-      <div class="step"><div class="step-n">01</div><div class="step-t">Type Your Prompt</div><div class="step-d">Write what you want to build. Even a rough idea works.</div></div>
-      <div class="step"><div class="step-n">02</div><div class="step-t">Enhance or Engineer</div><div class="step-d">AI rewrites it with structure, tech stack, and constraints.</div></div>
-      <div class="step"><div class="step-n">03</div><div class="step-t">Copy & Build</div><div class="step-d">Paste into any AI coding tool. Ship it.</div></div>
-    </div>
+<section class="info-section">
+  <div class="badge" style="display:flex;width:max-content;margin:auto">How it works</div>
+  <h2 class="info-title">Three steps to <span>better prompts</span></h2>
+  <div class="steps">
+    <article class="step"><div class="step-num">01</div><h3>Write the rough idea</h3><p>Start with the outcome you want. The first draft does not need to be polished.</p></article>
+    <article class="step"><div class="step-num">02</div><h3>Improve the request</h3><p>Use scoring, structure, constraints, techniques, and stack detection to tighten it.</p></article>
+    <article class="step"><div class="step-num">03</div><h3>Copy and build</h3><p>Take the resulting prompt into the coding assistant you actually use.</p></article>
   </div>
 </section>
 
-<section class="plats" id="platforms">
-  <div class="plats-in"><div class="sec-tag">Works With</div><h2 class="sec-t" style="font-size:clamp(22px,3vw,32px)">Any AI coding <span class="dim">platform</span></h2>
-    <div class="plats-grid"><span class="plat-chip">v0</span><span class="plat-chip">Bolt</span><span class="plat-chip">Lovable</span><span class="plat-chip">Cursor</span><span class="plat-chip">ChatGPT</span><span class="plat-chip">Claude</span><span class="plat-chip">Gemini</span><span class="plat-chip">Perplexity</span><span class="plat-chip">DeepSeek</span><span class="plat-chip">Replit</span><span class="plat-chip">StackBlitz</span><span class="plat-chip">GitHub Copilot</span><span class="plat-chip">Phind</span><span class="plat-chip">Windsurf</span><span class="plat-chip">Cody</span></div>
+<section class="info-section platforms">
+  <div class="badge" style="display:flex;width:max-content;margin:auto">Works with</div>
+  <h2 class="info-title" style="font-size:30px">Any AI coding <span>platform</span></h2>
+  <div class="platform-list">
+    <span>v0</span><span>Bolt</span><span>Lovable</span><span>Cursor</span><span>ChatGPT</span>
+    <span>Claude</span><span>Gemini</span><span>Perplexity</span><span>DeepSeek</span><span>Replit</span>
+    <span>StackBlitz</span><span>GitHub Copilot</span><span>Phind</span><span>Windsurf</span><span>Cody</span>
   </div>
 </section>
+</main>
 
-<footer>Vibe Check — AI Prompt Engineer</footer>
+<footer>Vibe Check — Prompt Workshop</footer>
 
-<div id="settings-modal" class="modal hidden">
+<div class="modal hidden" id="settings-modal">
   <div class="modal-bg" id="settings-backdrop"></div>
-  <div class="modal-box">
-    <div class="modal-top"><span class="modal-t">Settings</span><button class="modal-x" id="settings-close">✕</button></div>
-    <div class="modal-body">
-      <div class="set-sec"><div class="set-title">Behavior</div>
-        <div class="set-row"><label class="set-lbl">Auto-detect stack</label><label class="tog"><input type="checkbox" id="setting-auto-stack" checked><span class="tog-sl"></span></label></div>
-        <div class="set-row"><label class="set-lbl">Token efficiency</label><label class="tog"><input type="checkbox" id="setting-token-eff" checked><span class="tog-sl"></span></label></div>
-        <div class="set-row"><label class="set-lbl">Before/after</label><label class="tog"><input type="checkbox" id="setting-before-after" checked><span class="tog-sl"></span></label></div>
-      </div>
-      <div class="set-sec"><div class="set-title">Data</div><button class="btn-outline" id="btn-export">Export</button> <button class="btn-outline btn-red" id="btn-clear-data">Clear All</button></div>
-      <button class="btn-outline btn-sm" id="btn-reset-settings">Reset</button>
+  <div class="modal-card">
+    <div class="modal-head"><span>Settings</span><button class="modal-close" id="settings-close">✕</button></div>
+    <div class="setting"><span>Auto-detect stack</span><label class="switch"><input type="checkbox" id="setting-auto-stack" checked><span class="slider"></span></label></div>
+    <div class="setting"><span>Token efficiency</span><label class="switch"><input type="checkbox" id="setting-token-eff" checked><span class="slider"></span></label></div>
+    <div class="setting"><span>Before / after</span><label class="switch"><input type="checkbox" id="setting-before-after" checked><span class="slider"></span></label></div>
+    <div class="modal-actions">
+      <button class="secondary" id="btn-export">Export data</button>
+      <button class="secondary" id="btn-clear-data" style="color:var(--bad)">Clear all data</button>
+      <button class="secondary" id="btn-reset-settings">Reset settings</button>
     </div>
   </div>
 </div>
-<div id="toast-container"></div>
+<div class="toast-area" id="toast-container"></div>
 
 <script>
 (() => {
   "use strict";
 
-  const $ = id => document.getElementById(id);
-  const state = {
-    lastEnhanced: "",
-    before: "",
-    history: JSON.parse(localStorage.getItem("vibe_history") || "[]"),
-    versions: JSON.parse(localStorage.getItem("vibe_versions") || "[]"),
-    settings: JSON.parse(localStorage.getItem("vibe_settings") || '{"autoStack":true,"tokenEff":true,"beforeAfter":true}'),
+  const el = id => document.getElementById(id);
+  const q = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const store = {
+    read(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+      catch { return fallback; }
+    },
+    write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+  };
+
+  const app = {
+    history: store.read("vibe_history", []),
+    versions: store.read("vibe_versions", []),
+    settings: store.read("vibe_settings", {
+      autoStack: true, tokenEff: true, beforeAfter: true
+    }),
+    lastEnhanced: localStorage.getItem("vibe_last_enhanced") || "",
+    original: "",
     tip: 0
   };
 
   const tips = [
-    "Be specific about what the AI should build.",
-    "Add constraints, requirements, and acceptance criteria.",
-    "Mention your target framework and environment when relevant.",
-    "Ask for production-ready, accessible, responsive output.",
-    "Break complex work into clear sections."
+    "Name the outcome instead of describing a vague intention.",
+    "Include constraints, edge cases, and completion criteria.",
+    "Mention the framework or environment when it changes the solution.",
+    "Ask for accessible and responsive behavior when building UI.",
+    "For larger jobs, split the request into clear deliverables."
   ];
 
-  const templates = {
-    "ui-components":[
-      ["Responsive Dashboard","Build a responsive dashboard with sidebar navigation, cards, tables, filters, and loading states.","UI"],
-      ["Landing Page","Create a modern responsive landing page with hero, features, testimonials, CTA, and footer.","UI"],
-      ["Modal Component","Create an accessible reusable modal with keyboard support, focus management, and animations.","UI"],
-      ["Data Table","Build a responsive data table with sorting, filtering, pagination, and empty states.","UI"]
+  const library = {
+    "ui-components": [
+      ["Responsive dashboard","Build a responsive dashboard with navigation, cards, tables, filters, and loading states.","UI"],
+      ["Landing page","Create a modern responsive landing page with a hero, features, testimonials, CTA, and footer.","UI"],
+      ["Accessible modal","Create a reusable modal with keyboard support, focus management, and sensible animation.","UI"],
+      ["Data table","Build a responsive table with sorting, filtering, pagination, and empty states.","UI"]
     ],
-    "full-apps":[
-      ["SaaS Starter","Build a production-ready SaaS app with authentication, dashboard, settings, billing, and responsive UI.","APP"],
-      ["Task Manager","Create a full task management application with projects, tasks, priorities, filters, and persistence.","APP"],
-      ["Admin Panel","Build an admin panel with authentication, analytics, users, roles, and settings.","APP"]
+    "full-apps": [
+      ["SaaS starter","Build a production-ready SaaS app with authentication, dashboard, settings, billing, and responsive UI.","APP"],
+      ["Task manager","Create a task management app with projects, tasks, priorities, filters, and persistence.","APP"],
+      ["Admin panel","Build an admin panel with authentication, analytics, users, roles, and settings.","APP"]
     ],
-    "fixes":[
-      ["Fix Responsive Layout","Fix the responsive layout without changing the existing design or functionality.","FIX"],
-      ["Fix JavaScript","Find and fix JavaScript errors and broken event handlers without changing the UI.","FIX"],
-      ["Fix Form Validation","Fix form validation, error states, and submission handling while preserving the existing design.","FIX"]
+    fixes: [
+      ["Responsive layout","Fix the responsive layout without changing the existing design or functionality.","FIX"],
+      ["JavaScript bug","Find and fix JavaScript errors and broken event handlers without changing the UI.","FIX"],
+      ["Form validation","Fix validation, error states, and submission handling while preserving the existing design.","FIX"]
     ],
-    "api-backend":[
-      ["REST API","Create a REST API with validation, error handling, authentication, pagination, and clear endpoint structure.","API"],
-      ["Database Schema","Design a normalized database schema with relationships, indexes, and migration-ready SQL.","API"],
-      ["Auth Backend","Implement secure authentication with sessions, password hashing, validation, and protected routes.","API"]
+    "api-backend": [
+      ["REST API","Create a REST API with validation, authentication, error handling, pagination, and clear endpoints.","API"],
+      ["Database schema","Design a normalized database schema with relationships, indexes, and migration-ready SQL.","API"],
+      ["Authentication","Implement secure authentication with sessions, password hashing, validation, and protected routes.","API"]
     ],
-    "ai-prompts":[
-      ["Code Review","Review this code for correctness, security, performance, accessibility, and maintainability. Return actionable fixes.","AI"],
-      ["Debug Prompt","Debug the issue systematically. Explain the root cause, then provide the smallest safe fix.","AI"],
-      ["Refactor Prompt","Refactor this code for readability and maintainability without changing its behavior.","AI"]
+    "ai-prompts": [
+      ["Code review","Review this code for correctness, security, performance, accessibility, and maintainability. Return actionable fixes.","AI"],
+      ["Debugging","Debug the issue systematically. Explain the root cause, then provide the smallest safe fix.","AI"],
+      ["Refactor","Refactor this code for readability and maintainability without changing its behavior.","AI"]
     ]
   };
 
-  function toast(msg) {
-    const el = document.createElement("div");
-    el.className = "toast";
-    el.textContent = msg;
-    $("toast-container").appendChild(el);
-    setTimeout(() => el.remove(), 2400);
+  const techniques = [
+    ["Role","Define an expert perspective."],
+    ["Constraints","Add explicit rules and boundaries."],
+    ["Steps","Turn the work into ordered actions."],
+    ["Criteria","Define measurable completion checks."],
+    ["Edge cases","Cover failure and unusual states."],
+    ["Output format","Specify exactly how the answer should be returned."]
+  ];
+
+  function notify(message) {
+    const node = document.createElement("div");
+    node.className = "toast";
+    node.textContent = message;
+    el("toast-container").append(node);
+    setTimeout(() => node.remove(), 2200);
   }
 
-  async function copyText(text, btn) {
+  async function copy(value, button) {
     try {
-      await navigator.clipboard.writeText(text);
-      if (btn) { btn.classList.add("ok"); btn.textContent = "Copied"; setTimeout(() => { btn.classList.remove("ok"); btn.textContent = "Copy"; }, 1200); }
-      toast("Copied to clipboard");
-    } catch { toast("Copy failed — select and copy the text"); }
+      await navigator.clipboard.writeText(value);
+      if (button) {
+        button.textContent = "Copied";
+        button.classList.add("done");
+        setTimeout(() => {
+          button.textContent = "Copy";
+          button.classList.remove("done");
+        }, 1100);
+      }
+      notify("Copied to clipboard");
+    } catch {
+      notify("Clipboard access failed");
+    }
   }
 
-  function wordCount(text) { return text.trim() ? text.trim().split(/\s+/).length : 0; }
-
-  function updateMeta(input, target) {
-    const v = input.value.trim();
-    target.textContent = `${wordCount(v)} words · ${v.length} characters`;
+  function words(value) {
+    const clean = value.trim();
+    return clean ? clean.split(/\s+/).length : 0;
   }
 
-  function scorePrompt(prompt) {
-    const p = prompt.toLowerCase();
-    const metrics = [
-      ["Clarity", Math.min(100, 35 + (p.length > 80 ? 20 : 0) + (/[.!?]/.test(p) ? 15 : 0) + (/\b(build|create|make|fix|design|implement)\b/.test(p) ? 30 : 0))],
-      ["Specificity", Math.min(100, 25 + (p.length > 150 ? 25 : 0) + (/\b(react|next|vue|html|css|javascript|typescript|api|database)\b/.test(p) ? 25 : 0) + (/\b(responsive|mobile|desktop|accessible)\b/.test(p) ? 25 : 0))],
-      ["Constraints", Math.min(100, 20 + (/\b(must|should|required|without|only|do not|don't)\b/.test(p) ? 35 : 0) + (/\b(performance|security|accessibility|validation)\b/.test(p) ? 25 : 0) + (p.includes("acceptance") ? 20 : 0))],
-      ["Context", Math.min(100, 25 + (p.length > 100 ? 20 : 0) + (/\b(user|users|customer|admin|developer)\b/.test(p) ? 20 : 0) + (/\b(existing|current|project|app|website)\b/.test(p) ? 35 : 0))]
+  function updateCount(input, output) {
+    const value = input.value.trim();
+    output.textContent = `${words(value)} words · ${value.length} characters`;
+  }
+
+  function complexity(value) {
+    const count = words(value);
+    if (count < 20) return ["simple", "Simple"];
+    if (count < 80) return ["moderate", "Moderate"];
+    return ["detailed", "Detailed"];
+  }
+
+  function score(value) {
+    const text = value.toLowerCase();
+    const measures = [
+      ["Clarity", 35 + (value.length > 80 ? 20 : 0) +
+        (/[.!?]/.test(value) ? 15 : 0) +
+        (/\b(build|create|make|fix|design|implement|write)\b/.test(text) ? 30 : 0)],
+      ["Specificity", 25 + (value.length > 150 ? 25 : 0) +
+        (/\b(react|next|vue|svelte|html|css|javascript|typescript|api|database)\b/.test(text) ? 25 : 0) +
+        (/\b(responsive|mobile|desktop|accessible)\b/.test(text) ? 25 : 0)],
+      ["Constraints", 20 +
+        (/\b(must|should|required|without|only|avoid|don't|do not)\b/.test(text) ? 35 : 0) +
+        (/\b(performance|security|accessibility|validation)\b/.test(text) ? 25 : 0) +
+        (text.includes("acceptance") ? 20 : 0)],
+      ["Context", 25 + (value.length > 100 ? 20 : 0) +
+        (/\b(user|users|customer|admin|developer)\b/.test(text) ? 20 : 0) +
+        (/\b(existing|current|project|app|website)\b/.test(text) ? 35 : 0)]
     ];
-    const total = Math.round(metrics.reduce((a,b)=>a+b[1],0)/metrics.length);
-    return {total, metrics};
+    measures.forEach(item => item[1] = Math.min(100, item[1]));
+    return {
+      total: Math.round(measures.reduce((sum, item) => sum + item[1], 0) / measures.length),
+      measures
+    };
   }
 
-  function complexity(text) {
-    const w = wordCount(text);
-    return w < 20 ? ["simple","Simple"] : w < 80 ? ["moderate","Moderate"] : ["detailed","Detailed"];
-  }
+  function localRewrite(input) {
+    let result = input.trim();
+    const changes = [];
+    const lower = result.toLowerCase();
 
-  function localEnhance(prompt) {
-    let result = prompt.trim();
-    const additions = [];
-    const p = result.toLowerCase();
-
-    if (!/\b(goal|objective|build|create|make|implement|fix|design)\b/.test(p)) {
-      result = "Goal: " + result;
-      additions.push("Added a clear goal");
+    if (!/\b(goal|objective|build|create|make|implement|fix|design|write)\b/.test(lower)) {
+      result = `Goal: ${result}`;
+      changes.push("Added a clear goal");
     }
-    if (!/\b(responsive|mobile|desktop)\b/.test(p)) {
-      result += "\n\nRequirements:\n- Responsive on mobile, tablet, and desktop.";
-      additions.push("Added responsive requirements");
+    if (!/\b(responsive|mobile|desktop)\b/.test(lower)) {
+      result += "\n\nRequirements:\n- Work well on mobile, tablet, and desktop.";
+      changes.push("Added responsive requirements");
     }
-    if (!/\b(accessib|aria|keyboard)\b/.test(p)) {
-      result += "\n- Follow accessible UI and keyboard interaction best practices.";
-      additions.push("Added accessibility guidance");
+    if (!/\b(accessib|aria|keyboard)\b/.test(lower)) {
+      result += "\n- Follow accessible UI and keyboard interaction practices.";
+      changes.push("Added accessibility guidance");
     }
-    if (!/\b(error|loading|empty)\b/.test(p)) {
+    if (!/\b(error|loading|empty|validation)\b/.test(lower)) {
       result += "\n- Include loading, empty, validation, and error states.";
-      additions.push("Added state handling");
+      changes.push("Added state handling");
     }
-    if (!/\b(do not|don't|without|avoid|must)\b/.test(p)) {
-      result += "\n- Keep the implementation clean, maintainable, and production-ready.";
-      additions.push("Added implementation constraints");
+    if (!/\b(do not|don't|without|avoid|must)\b/.test(lower)) {
+      result += "\n- Keep the implementation maintainable and production-ready.";
+      changes.push("Added implementation constraints");
     }
-    result += "\n\nAcceptance criteria:\n- The result works end-to-end.\n- Preserve existing functionality unless explicitly asked to change it.";
-    additions.push("Added acceptance criteria");
 
-    return {enhanced: result, improvements: additions};
+    result += "\n\nAcceptance criteria:\n- The result works end-to-end.\n- Preserve existing behavior unless the request explicitly changes it.";
+    changes.push("Added acceptance criteria");
+
+    return { enhanced: result, improvements: changes };
   }
 
-  async function enhancePrompt(prompt, mode="enhance") {
+  async function improve(prompt, mode = "enhance") {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 7000);
       const response = await fetch("/api/enhance", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({prompt, mode}),
-        signal:controller.signal
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({prompt, mode}),
+        signal: controller.signal
       });
-      clearTimeout(timer);
       if (response.ok) {
         const data = await response.json();
-        if (data.enhanced) return {enhanced:data.enhanced, improvements:data.improvements || []};
+        if (data && data.enhanced) {
+          return {enhanced:data.enhanced, improvements:data.improvements || []};
+        }
       }
-    } catch {}
-    return localEnhance(prompt);
+    } catch (_) {
+      // Fall through to the offline rewrite.
+    } finally {
+      clearTimeout(timeout);
+    }
+    return localRewrite(prompt);
+  }
+
+  function stackFor(prompt) {
+    const rules = [
+      ["Next.js", /next\.?js|nextjs/],
+      ["React", /\breact\b/],
+      ["Vue", /\bvue\b/],
+      ["Svelte", /\bsvelte\b/],
+      ["Tailwind CSS", /tailwind/],
+      ["Node.js", /\bnode\.?js\b|express/],
+      ["Python", /\bpython\b|django|flask/]
+    ];
+    const lower = prompt.toLowerCase();
+    return rules.find(rule => rule[1].test(lower))?.[0] || "";
+  }
+
+  function showStack(prompt) {
+    const found = app.settings.autoStack ? stackFor(prompt) : "";
+    const badge = el("stack-badge");
+    const tip = el("stack-tips");
+    if (!found) {
+      badge.classList.add("hidden");
+      tip.classList.add("hidden");
+      return;
+    }
+    el("stack-name").textContent = found;
+    el("tips-stack-name").textContent = `${found} is detected.`;
+    el("tips-list").innerHTML =
+      `<li>Use conventions already established by the project.</li>` +
+      `<li>Avoid introducing incompatible tooling without a reason.</li>`;
+    badge.classList.remove("hidden");
+    tip.classList.remove("hidden");
+  }
+
+  function fillerStats(value) {
+    const list = ["very","really","basically","just","simply","please","kindly","obviously","actually"];
+    const hits = list.filter(word => new RegExp(`\\b${word}\\b`, "i").test(value));
+    const count = hits.reduce((sum, word) => {
+      const found = value.match(new RegExp(`\\b${word}\\b`, "gi"));
+      return sum + (found ? found.length : 0);
+    }, 0);
+    return {hits, count, total:words(value)};
+  }
+
+  function updateEfficiency(value) {
+    if (!app.settings.tokenEff) {
+      el("token-efficiency").classList.add("hidden");
+      return;
+    }
+    const stats = fillerStats(value);
+    const pct = stats.total ? Math.max(0, Math.round((1 - stats.count / stats.total) * 100)) : 100;
+    el("token-efficiency").classList.remove("hidden");
+    el("efficiency-pct").textContent = `${pct}% efficient`;
+    el("ring-percent").textContent = `${pct}%`;
+    el("efficiency-ring").style.strokeDashoffset = 150.8 - 150.8 * pct / 100;
+    el("filler-count").textContent = stats.count ? `${stats.count} possible filler word(s)` : "No obvious filler found";
+    el("filler-list").innerHTML = stats.hits.map(item => `<li>${item}</li>`).join("");
   }
 
   function renderScore(prompt) {
-    const s = scorePrompt(prompt);
-    $("score-display").classList.remove("hidden");
-    $("score-number").textContent = s.total;
-    $("score-label").textContent = s.total >= 80 ? "Strong prompt" : s.total >= 60 ? "Good foundation" : "Needs more detail";
-    $("score-bars").innerHTML = s.metrics.map(([name,val]) =>
-      `<div class="score-bar"><span class="score-bar-l">${name}</span><span class="score-bar-t"><span class="score-bar-f" style="width:${val}%"></span></span><span class="score-bar-v">${val}</span></div>`
+    const result = score(prompt);
+    el("score-display").classList.remove("hidden");
+    el("score-number").textContent = result.total;
+    el("score-label").textContent =
+      result.total >= 80 ? "Strong prompt" :
+      result.total >= 60 ? "Good foundation" : "Needs more detail";
+
+    el("score-bars").innerHTML = result.measures.map(([name, value]) =>
+      `<div class="meter"><span>${name}</span><span class="track"><span class="fill" style="width:${value}%"></span></span><span>${value}</span></div>`
     ).join("");
-    $("score-feedback").innerHTML = s.total < 80
-      ? `<div class="score-fi">Add more specific requirements and constraints.</div>`
-      : `<div class="score-fi">Good structure. Add acceptance criteria for even more reliable output.</div>`;
-    return s.total;
+
+    el("score-feedback").textContent = result.total < 80
+      ? "Add concrete requirements, context, and constraints."
+      : "Good structure. Acceptance criteria can make results more repeatable.";
+
+    return result.total;
   }
 
-  function detectStack(prompt) {
-    const p = prompt.toLowerCase();
-    const checks = [
-      ["Next.js",/next\.?js|nextjs/],["React",/\breact\b/],["Vue",/\bvue\b/],["Svelte",/\bsvelte\b/],
-      ["Tailwind CSS",/tailwind/],["Node.js",/\bnode\.?js\b|express/],["Python",/\bpython\b|django|flask/]
-    ];
-    return checks.find(x=>x[1].test(p))?.[0] || "";
-  }
-
-  function updateStack(prompt) {
-    const stack = state.settings.autoStack ? detectStack(prompt) : "";
-    if (!stack) { $("stack-badge").classList.add("hidden"); $("stack-tips").classList.add("hidden"); return; }
-    $("stack-name").textContent = stack; $("tips-stack-name").textContent = stack;
-    $("tips-list").innerHTML = `<li>Use ${stack} conventions and current project structure.</li><li>Keep the implementation compatible with the existing stack.</li>`;
-    $("stack-badge").classList.remove("hidden");
-  }
-
-  function fillerInfo(text) {
-    const words = text.split(/\s+/).filter(Boolean);
-    const fillers = ["very","really","basically","just","simply","please","kindly","obviously","actually","in order to"];
-    const found = fillers.filter(f => new RegExp("\\b"+f.replace(/ /g,"\\s+")+"\\b","i").test(text));
-    const saved = found.reduce((n,f)=>n + words.filter(w=>w.toLowerCase().replace(/[.,!?]/g,"")===f).length,0);
-    return {found,saved,total:words.length};
-  }
-
-  function updateEfficiency(text) {
-    if (!state.settings.tokenEff) { $("token-efficiency").classList.add("hidden"); return; }
-    const f = fillerInfo(text);
-    $("token-efficiency").classList.remove("hidden");
-    const pct = f.total ? Math.max(0,Math.round((1-f.saved/f.total)*100)) : 100;
-    $("efficiency-pct").textContent = pct+"% efficient";
-    $("ring-percent").textContent = pct+"%";
-    $("efficiency-ring").style.strokeDashoffset = 150.8 - 150.8*pct/100;
-    $("filler-count").textContent = f.saved ? `${f.saved} filler word(s) found` : "No obvious filler found";
-    $("filler-list").innerHTML = f.found.map(x=>`<li>${x}</li>`).join("");
-  }
-
-  function showResult(original, data) {
-    state.lastEnhanced = data.enhanced;
-    state.before = original;
-    $("enhanced-text").textContent = data.enhanced;
-    $("improvements-list").innerHTML = (data.improvements || []).map(x=>`<div class="imp-i">• ${x}</div>`).join("");
-    $("enhanced-area").classList.remove("hidden");
-
-    if (state.settings.beforeAfter) {
-      $("before-text").textContent = original;
-      $("after-text").textContent = data.enhanced;
-      const changes = data.improvements?.length ? data.improvements : ["Improved structure and specificity"];
-      $("changes-list").innerHTML = changes.map(x=>`<div class="ch-i">• ${x}</div>`).join("");
-      $("before-after").classList.remove("hidden");
-    } else $("before-after").classList.add("hidden");
-
-    updateEfficiency(data.enhanced);
-    localStorage.setItem("vibe_last_enhanced", data.enhanced);
-    addHistory(original, data.enhanced);
-    $("btn-undo").classList.remove("hidden");
-    $("btn-redo").classList.add("hidden");
-  }
-
-  function addHistory(original, enhanced) {
-    const item = {id:Date.now(), prompt:original, enhanced, score:scorePrompt(original).total, starred:false};
-    state.history.unshift(item);
-    state.history = state.history.slice(0,30);
-    localStorage.setItem("vibe_history", JSON.stringify(state.history));
+  function saveHistory(original, enhanced) {
+    app.history.unshift({
+      id: Date.now(),
+      prompt: original,
+      enhanced,
+      score: score(original).total,
+      starred: false
+    });
+    app.history = app.history.slice(0, 30);
+    store.write("vibe_history", app.history);
     renderHistory();
   }
 
-  function renderHistory(filter="") {
-    const list = $("history-list");
-    const items = state.history.filter(x=>x.prompt.toLowerCase().includes(filter.toLowerCase()));
-    if (!items.length) { list.innerHTML='<div class="empty-state"><p>No prompts yet.</p><p class="sub">Enhance your first prompt to build history.</p></div>'; return; }
-    list.innerHTML = items.map(x=>`<div class="history-item" data-id="${x.id}"><span class="history-item-text">${escapeHtml(x.prompt)}</span><span class="history-item-score">${x.score}</span><button class="history-star ${x.starred?"active":""}" data-star="${x.id}">★</button><button class="history-copy-btn" data-copy="${x.id}">Copy</button></div>`).join("");
+  function presentResult(original, data) {
+    app.original = original;
+    app.lastEnhanced = data.enhanced;
+    localStorage.setItem("vibe_last_enhanced", data.enhanced);
+
+    el("enhanced-text").textContent = data.enhanced;
+    el("improvements-list").innerHTML = (data.improvements || [])
+      .map(item => `<div>• ${item}</div>`).join("");
+    el("enhanced-area").classList.remove("hidden");
+
+    if (app.settings.beforeAfter) {
+      el("before-text").textContent = original;
+      el("after-text").textContent = data.enhanced;
+      el("changes-list").innerHTML = (data.improvements?.length
+        ? data.improvements
+        : ["Improved structure and specificity"])
+        .map(item => `<div>• ${item}</div>`).join("");
+      el("before-after").classList.remove("hidden");
+    } else {
+      el("before-after").classList.add("hidden");
+    }
+
+    updateEfficiency(data.enhanced);
+    saveHistory(original, data.enhanced);
+    el("btn-undo").classList.remove("hidden");
+    el("btn-redo").classList.add("hidden");
   }
 
-  function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+  function renderTemplates(category = "ui-components", search = "") {
+    const query = search.toLowerCase();
+    const data = (library[category] || []).filter(item =>
+      `${item[0]} ${item[1]}`.toLowerCase().includes(query)
+    );
+    el("templates-grid").innerHTML = data.map(item =>
+      `<article class="card" data-template="${escapeHtml(item[1])}">
+        <b>${escapeHtml(item[0])}</b><p>${escapeHtml(item[1])}</p><span class="tag">${item[2]}</span>
+      </article>`
+    ).join("");
+  }
 
-  function renderTemplates(category="ui-components", search="") {
-    const data = (templates[category]||[]).filter(x=>(x[0]+" "+x[1]).toLowerCase().includes(search.toLowerCase()));
-    $("templates-grid").innerHTML = data.map((x,i)=>`<div class="template-card" data-template="${escapeHtml(x[1])}"><div class="template-card-name">${escapeHtml(x[0])}</div><div class="template-card-preview">${escapeHtml(x[1])}</div><span class="template-card-tag">${x[2]}</span></div>`).join("");
+  function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, char => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[char]));
   }
 
   function checklist(prompt) {
-    const p=prompt.toLowerCase();
-    const checks=[
-      ["Clear objective",/\b(build|create|make|implement|fix|design|write)\b/,"State the desired outcome"],
-      ["Specific context",prompt.length>80,"Add project/context details"],
-      ["Constraints",/\b(must|should|required|without|avoid|don't|do not)\b/,"Add explicit constraints"],
-      ["Edge states",/\b(error|loading|empty|validation)\b/,"Define error/loading/empty states"],
-      ["Acceptance criteria",/\b(acceptance|criteria|done when|must include)\b/,"Add measurable completion criteria"]
+    const lower = prompt.toLowerCase();
+    const checks = [
+      ["Clear objective", /\b(build|create|make|implement|fix|design|write)\b/, "State the desired outcome"],
+      ["Specific context", prompt.length > 80, "Add project or context details"],
+      ["Constraints", /\b(must|should|required|without|avoid|don't|do not)\b/, "Add explicit constraints"],
+      ["Edge states", /\b(error|loading|empty|validation)\b/, "Define failure and loading states"],
+      ["Acceptance criteria", /\b(acceptance|criteria|done when|must include)\b/, "Add measurable completion criteria"]
     ];
-    const pass=checks.filter(x=>typeof x[1]==="boolean"?x[1]:x[1].test(p)).length;
-    $("checklist-score").textContent=`${pass}/${checks.length}`;
-    $("checklist-grid").innerHTML=checks.map(x=>{const ok=typeof x[1]==="boolean"?x[1]:x[1].test(p);return `<div class="chk-i ${ok?"pass":"fail"}"><span class="chk-ic">${ok?"✓":"!"}</span><span class="chk-lbl">${x[0]}</span><span class="chk-fix">${ok?"Good":x[2]}</span></div>`}).join("");
+    const passed = checks.filter(item =>
+      typeof item[1] === "boolean" ? item[1] : item[1].test(lower)
+    ).length;
+
+    el("checklist-score").textContent = `${passed}/${checks.length}`;
+    el("checklist-grid").innerHTML = checks.map(item => {
+      const ok = typeof item[1] === "boolean" ? item[1] : item[1].test(lower);
+      return `<div class="check ${ok ? "pass" : "fail"}">
+        <span class="check-icon">${ok ? "✓" : "!"}</span>
+        <span>${item[0]}</span><span class="check-fix">${ok ? "Good" : item[2]}</span>
+      </div>`;
+    }).join("");
   }
 
-  const techniques=[
-    ["Role","Define the expert role and perspective."],
-    ["Constraints","Add explicit rules and boundaries."],
-    ["Steps","Break the task into ordered steps."],
-    ["Criteria","Define measurable acceptance criteria."],
-    ["Edge Cases","Call out failure and edge cases."],
-    ["Output Format","Specify the exact response format."]
-  ];
-  $("techniques-grid").innerHTML=techniques.map((x,i)=>`<div class="tech-card" data-tech="${i}"><span class="tech-chk"></span><div><div class="tech-nm">${x[0]}</div><div class="tech-ds">${x[1]}</div></div></div>`).join("");
-
-  function engineerApply(){
-    let p=$("engineer-input").value.trim(); if(!p){toast("Enter a prompt first");return;}
-    const selected=[...document.querySelectorAll(".tech-card.sel")].map(x=>techniques[+x.dataset.tech][0]);
-    if(selected.includes("Role")) p="Act as an expert implementation engineer.\n\n"+p;
-    if(selected.includes("Constraints")) p+="\n\nConstraints:\n- Preserve existing behavior unless explicitly requested.\n- Keep the solution maintainable and production-ready.";
-    if(selected.includes("Steps")) p+="\n\nImplementation steps:\n1. Inspect the existing implementation.\n2. Identify the root cause or required changes.\n3. Implement the smallest correct solution.\n4. Verify the result.";
-    if(selected.includes("Criteria")) p+="\n\nAcceptance criteria:\n- Works end-to-end.\n- No regressions.\n- Responsive and accessible.";
-    if(selected.includes("Edge Cases")) p+="\n\nHandle loading, empty, validation, error, and mobile states.";
-    if(selected.includes("Output Format")) p+="\n\nOutput format:\n1. Brief diagnosis.\n2. Exact changes.\n3. Complete code where applicable.";
-    $("engineer-input").value=p; updateEngineer(); toast("Techniques applied");
+  function renderTechniques() {
+    el("techniques-grid").innerHTML = techniques.map((item, index) =>
+      `<div class="tech" data-tech="${index}">
+        <span class="tech-mark"></span><div><b>${item[0]}</b><small>${item[1]}</small></div>
+      </div>`
+    ).join("");
   }
 
-  function updateEngineer(){updateMeta($("engineer-input"),$("engineer-word-count"));checklist($("engineer-input").value)}
+  function applyTechniques() {
+    let prompt = el("engineer-input").value.trim();
+    if (!prompt) return notify("Enter a prompt first");
 
-  async function transformCredit(){
-    const p=$("credit-input").value.trim(); if(!p)return;
-    const btn=$("btn-credit-transform"); btn.classList.add("loading"); btn.disabled=true;
-    const data=await enhancePrompt(p,"chinese");
-    $("credit-text").textContent=data.enhanced;
-    $("credit-result").classList.remove("hidden");
-    btn.classList.remove("loading"); btn.disabled=false;
+    const selected = q(".tech.selected").map(node => techniques[Number(node.dataset.tech)][0]);
+
+    if (selected.includes("Role"))
+      prompt = `Act as an experienced implementation engineer.\n\n${prompt}`;
+    if (selected.includes("Constraints"))
+      prompt += "\n\nConstraints:\n- Preserve existing behavior unless explicitly requested.\n- Keep the implementation maintainable.";
+    if (selected.includes("Steps"))
+      prompt += "\n\nImplementation plan:\n1. Inspect the existing implementation.\n2. Identify the required change or root cause.\n3. Make the smallest correct change.\n4. Verify the result.";
+    if (selected.includes("Criteria"))
+      prompt += "\n\nAcceptance criteria:\n- Works end-to-end.\n- No regressions.\n- Responsive and accessible.";
+    if (selected.includes("Edge cases"))
+      prompt += "\n\nCover loading, empty, validation, error, and mobile states.";
+    if (selected.includes("Output format"))
+      prompt += "\n\nResponse format:\n1. Brief diagnosis.\n2. Exact changes.\n3. Complete code where appropriate.";
+
+    el("engineer-input").value = prompt;
+    updateEngineer();
+    notify("Selected techniques applied");
   }
 
-  function saveVersion(){
-    const p=$("engineer-input").value.trim(); if(!p){toast("Nothing to save");return;}
-    state.versions.unshift({id:Date.now(),text:p,date:new Date().toLocaleString()});
-    state.versions=state.versions.slice(0,20);localStorage.setItem("vibe_versions",JSON.stringify(state.versions));renderVersions();toast("Version saved");
-  }
-  function renderVersions(){
-    $("versions-list").innerHTML=state.versions.length?state.versions.map(v=>`<div class="history-item"><span class="history-item-text">${escapeHtml(v.text)}</span><button class="btn-outline btn-sm" data-version="${v.id}">Use</button></div>`).join(""):'<div class="empty-state"><p>No versions saved</p></div>';
+  function updateEngineer() {
+    updateCount(el("engineer-input"), el("engineer-word-count"));
+    checklist(el("engineer-input").value);
   }
 
-  function switchTab(tab){
-    document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
-    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active",p.id==="panel-"+tab));
-    if(tab==="history")renderHistory();
-    if(tab==="templates")renderTemplates();
-    if(tab==="engineer")updateEngineer();
-    document.querySelector("#app").scrollIntoView({behavior:"smooth",block:"start"});
+  function renderVersions() {
+    const target = el("versions-list");
+    if (!app.versions.length) {
+      target.innerHTML = '<div class="empty">No versions saved</div>';
+      return;
+    }
+    target.innerHTML = app.versions.map(version =>
+      `<div class="history-row">
+        <span class="history-text">${escapeHtml(version.text)}</span>
+        <button class="secondary" data-version="${version.id}">Use</button>
+      </div>`
+    ).join("");
   }
 
-  document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
-  window.addEventListener("scroll",()=> $("mainNav").classList.toggle("scrolled",scrollY>60),{passive:true});
+  function saveVersion() {
+    const text = el("engineer-input").value.trim();
+    if (!text) return notify("Nothing to save");
+    app.versions.unshift({id:Date.now(), text, date:new Date().toLocaleString()});
+    app.versions = app.versions.slice(0, 20);
+    store.write("vibe_versions", app.versions);
+    renderVersions();
+    notify("Version saved");
+  }
 
-  $("prompt-input").addEventListener("input",e=>{
-    const v=e.target.value.trim();$("btn-enhance").disabled=!v;updateMeta(e.target,$("word-count"));
-    const c=complexity(v), badge=$("complexity-badge");badge.textContent=c[1];badge.className="complexity-badge "+c[0]+(v?"":" hidden");updateStack(v);
-  });
+  function renderHistory(filter = "") {
+    const query = filter.toLowerCase();
+    const entries = app.history.filter(item => item.prompt.toLowerCase().includes(query));
+    if (!entries.length) {
+      el("history-list").innerHTML = '<div class="empty">No prompts yet.</div>';
+      return;
+    }
 
-  $("btn-enhance").addEventListener("click",async()=>{
-    const input=$("prompt-input"), prompt=input.value.trim(); if(!prompt)return;
-    const btn=$("btn-enhance");btn.classList.add("loading");btn.disabled=true;
+    el("history-list").innerHTML = entries.map(item =>
+      `<div class="history-row" data-id="${item.id}">
+        <span class="history-text">${escapeHtml(item.prompt)}</span>
+        <span class="history-score">${item.score}</span>
+        <button class="plain ${item.starred ? "starred" : ""}" data-star="${item.id}">★</button>
+        <button class="plain" data-copy="${item.id}">Copy</button>
+      </div>`
+    ).join("");
+  }
+
+  function switchTab(name) {
+    q("[data-tab]").forEach(button => button.classList.toggle("active", button.dataset.tab === name));
+    q(".panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
+
+    if (name === "templates") renderTemplates();
+    if (name === "history") renderHistory();
+    if (name === "engineer") updateEngineer();
+  }
+
+  async function runEnhance() {
+    const input = el("prompt-input");
+    const prompt = input.value.trim();
+    if (!prompt) return;
+
+    const button = el("btn-enhance");
+    button.classList.add("busy");
+    button.disabled = true;
     renderScore(prompt);
-    const data=await enhancePrompt(prompt);
-    showResult(prompt,data);
-    btn.classList.remove("loading");btn.disabled=false;
+
+    try {
+      presentResult(prompt, await improve(prompt));
+    } finally {
+      button.classList.remove("busy");
+      button.disabled = false;
+    }
+  }
+
+  async function transformCredit() {
+    const prompt = el("credit-input").value.trim();
+    if (!prompt) return;
+
+    const button = el("btn-credit-transform");
+    button.classList.add("busy");
+    button.disabled = true;
+
+    try {
+      const result = await improve(prompt, "chinese");
+      el("credit-text").textContent = result.enhanced;
+      el("credit-result").classList.remove("hidden");
+    } finally {
+      button.classList.remove("busy");
+      button.disabled = false;
+    }
+  }
+
+  function openSettings() {
+    el("settings-modal").classList.remove("hidden");
+    el("setting-auto-stack").checked = app.settings.autoStack;
+    el("setting-token-eff").checked = app.settings.tokenEff;
+    el("setting-before-after").checked = app.settings.beforeAfter;
+  }
+
+  function updateSettings() {
+    app.settings = {
+      autoStack: el("setting-auto-stack").checked,
+      tokenEff: el("setting-token-eff").checked,
+      beforeAfter: el("setting-before-after").checked
+    };
+    store.write("vibe_settings", app.settings);
+    showStack(el("prompt-input").value);
+    updateEfficiency(app.lastEnhanced);
+  }
+
+  q("[data-tab]").forEach(button =>
+    button.addEventListener("click", () => switchTab(button.dataset.tab))
+  );
+
+  el("prompt-input").addEventListener("input", event => {
+    const value = event.target.value.trim();
+    el("btn-enhance").disabled = !value;
+    updateCount(event.target, el("word-count"));
+    const [className, label] = complexity(value);
+    el("complexity-badge").textContent = label;
+    el("complexity-badge").className = `level ${className}${value ? "" : " hidden"}`;
+    showStack(value);
   });
 
-  $("btn-copy-enhanced").addEventListener("click",()=>copyText($("enhanced-text").textContent,$("btn-copy-enhanced")));
-  $("btn-copy-before").addEventListener("click",()=>copyText($("before-text").textContent));
-  $("btn-copy-after").addEventListener("click",()=>copyText($("after-text").textContent));
-  $("btn-copy-credit").addEventListener("click",()=>copyText($("credit-text").textContent,$("btn-copy-credit")));
+  el("btn-enhance").addEventListener("click", runEnhance);
+  el("btn-copy-enhanced").addEventListener("click", () => copy(el("enhanced-text").textContent, el("btn-copy-enhanced")));
+  el("btn-copy-before").addEventListener("click", () => copy(el("before-text").textContent));
+  el("btn-copy-after").addEventListener("click", () => copy(el("after-text").textContent));
+  el("btn-copy-credit").addEventListener("click", () => copy(el("credit-text").textContent, el("btn-copy-credit")));
 
-  $("btn-undo").addEventListener("click",()=>{if(state.before){$("prompt-input").value=state.before;$("btn-undo").classList.add("hidden");$("btn-redo").classList.remove("hidden");$("btn-enhance").disabled=false;updateMeta($("prompt-input"),$("word-count"));}});
-  $("btn-redo").addEventListener("click",()=>{if(state.lastEnhanced){$("prompt-input").value=state.lastEnhanced;$("btn-redo").classList.add("hidden");$("btn-undo").classList.remove("hidden");updateMeta($("prompt-input"),$("word-count"));}});
+  el("btn-undo").addEventListener("click", () => {
+    if (!app.original) return;
+    el("prompt-input").value = app.original;
+    el("btn-undo").classList.add("hidden");
+    el("btn-redo").classList.remove("hidden");
+    el("btn-enhance").disabled = false;
+    updateCount(el("prompt-input"), el("word-count"));
+  });
 
-  document.querySelectorAll(".template-cat-btn").forEach(b=>b.addEventListener("click",()=>{
-    document.querySelectorAll(".template-cat-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderTemplates(b.dataset.category,$("template-search").value);
+  el("btn-redo").addEventListener("click", () => {
+    if (!app.lastEnhanced) return;
+    el("prompt-input").value = app.lastEnhanced;
+    el("btn-redo").classList.add("hidden");
+    el("btn-undo").classList.remove("hidden");
+    updateCount(el("prompt-input"), el("word-count"));
+  });
+
+  q(".chip").forEach(button => button.addEventListener("click", () => {
+    q(".chip").forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    renderTemplates(button.dataset.category, el("template-search").value);
   }));
-  $("template-search").addEventListener("input",()=>renderTemplates(document.querySelector(".template-cat-btn.active").dataset.category,$("template-search").value));
-  $("templates-grid").addEventListener("click",e=>{const card=e.target.closest(".template-card");if(!card)return;$("prompt-input").value=card.dataset.template;$("btn-enhance").disabled=false;updateMeta($("prompt-input"),$("word-count"));switchTab("enhance");});
 
-  $("engineer-input").addEventListener("input",updateEngineer);
-  $("btn-engineer-from-enhance").addEventListener("click",()=>{if(state.lastEnhanced){$("engineer-input").value=state.lastEnhanced;updateEngineer();toast("Loaded last enhanced prompt")}else toast("Enhance a prompt first")});
-  $("btn-apply-techniques").addEventListener("click",engineerApply);
-  document.querySelectorAll(".tech-card").forEach(c=>c.addEventListener("click",()=>c.classList.toggle("sel")));
-  $("btn-generate-variants").addEventListener("click",()=>{
-    const p=$("engineer-input").value.trim();if(!p){toast("Enter a prompt first");return}
-    const variants=[
-      p+"\n\nPrioritize a minimal, reliable implementation.",
-      "You are an expert engineer. "+p+"\n\nReturn a production-ready solution with clear acceptance criteria.",
-      p+"\n\nFirst analyze the requirements, then implement the solution and verify edge cases."
+  el("template-search").addEventListener("input", () =>
+    renderTemplates(document.querySelector(".chip.active").dataset.category, el("template-search").value)
+  );
+
+  el("templates-grid").addEventListener("click", event => {
+    const card = event.target.closest("[data-template]");
+    if (!card) return;
+    el("prompt-input").value = card.dataset.template;
+    el("btn-enhance").disabled = false;
+    updateCount(el("prompt-input"), el("word-count"));
+    showStack(card.dataset.template);
+    switchTab("enhance");
+    document.querySelector("#workspace").scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  el("engineer-input").addEventListener("input", updateEngineer);
+  el("btn-engineer-from-enhance").addEventListener("click", () => {
+    if (!app.lastEnhanced) return notify("Enhance a prompt first");
+    el("engineer-input").value = app.lastEnhanced;
+    updateEngineer();
+    notify("Loaded last enhanced prompt");
+  });
+  el("btn-apply-techniques").addEventListener("click", applyTechniques);
+  el("techniques-grid").addEventListener("click", event => {
+    const card = event.target.closest(".tech");
+    if (card) card.classList.toggle("selected");
+  });
+
+  el("btn-generate-variants").addEventListener("click", () => {
+    const prompt = el("engineer-input").value.trim();
+    if (!prompt) return notify("Enter a prompt first");
+
+    const variants = [
+      `${prompt}\n\nPrefer the smallest reliable implementation.`,
+      `Act as an experienced engineer.\n\n${prompt}\n\nReturn a production-ready solution with explicit completion checks.`,
+      `${prompt}\n\nAnalyze requirements first, implement the solution second, and verify important edge cases last.`
     ];
-    $("variants-container").innerHTML=variants.map((v,i)=>`<div class="template-card" style="margin-bottom:8px"><div class="template-card-name">Variant ${i+1}</div><div class="template-card-preview">${escapeHtml(v)}</div><button class="btn-outline btn-sm" data-variant="${i}" style="margin-top:8px">Use</button></div>`).join("");
-    $("variants-container").querySelectorAll("[data-variant]").forEach((b,i)=>b.addEventListener("click",()=>{$("engineer-input").value=variants[i];updateEngineer();toast("Variant selected")}));
-  });
-  $("btn-save-version").addEventListener("click",saveVersion);
-  $("btn-clear-versions").addEventListener("click",()=>{state.versions=[];localStorage.removeItem("vibe_versions");renderVersions()});
-  $("versions-list").addEventListener("click",e=>{const b=e.target.closest("[data-version]");if(!b)return;const v=state.versions.find(x=>x.id==b.dataset.version);if(v){$("engineer-input").value=v.text;updateEngineer();}});
-  $("credit-input").addEventListener("input",e=>{updateMeta(e.target,$("credit-word-count"));$("btn-credit-transform").disabled=!e.target.value.trim()});
-  $("btn-credit-transform").addEventListener("click",transformCredit);
 
-  $("history-search").addEventListener("input",e=>renderHistory(e.target.value));
-  $("history-list").addEventListener("click",e=>{
-    const star=e.target.closest("[data-star]"), cp=e.target.closest("[data-copy]"), item=e.target.closest(".history-item");
-    if(star){const h=state.history.find(x=>x.id==star.dataset.star);if(h){h.starred=!h.starred;localStorage.setItem("vibe_history",JSON.stringify(state.history));renderHistory($("history-search").value)}} 
-    else if(cp){const h=state.history.find(x=>x.id==cp.dataset.copy);if(h)copyText(h.enhanced)}
-    else if(item){const h=state.history.find(x=>x.id==item.dataset.id);if(h){$("prompt-input").value=h.prompt;$("btn-enhance").disabled=false;updateMeta($("prompt-input"),$("word-count"));switchTab("enhance")}}
-  });
-  $("btn-clear-history").addEventListener("click",()=>{state.history=[];localStorage.removeItem("vibe_history");renderHistory();toast("History cleared")});
+    el("variants-container").innerHTML = variants.map((value, index) =>
+      `<div class="card" style="margin-bottom:8px">
+        <b>Variant ${index + 1}</b><p>${escapeHtml(value)}</p>
+        <button class="secondary" data-variant="${index}" style="margin-top:8px">Use</button>
+      </div>`
+    ).join("");
 
-  $("efficiency-toggle").addEventListener("click",()=> $("efficiency-body").classList.toggle("hidden"));
-  $("btn-strip-filler").addEventListener("click",()=>{
-    const el=$("enhanced-text");let t=el.textContent;
-    t=t.replace(/\b(very|really|basically|just|simply|please|kindly|obviously|actually)\b/gi,"").replace(/[ ]{2,}/g," ");
-    el.textContent=t;state.lastEnhanced=t;toast("Filler removed");
+    q("[data-variant]", el("variants-container")).forEach(button =>
+      button.addEventListener("click", () => {
+        el("engineer-input").value = variants[Number(button.dataset.variant)];
+        updateEngineer();
+        notify("Variant selected");
+      })
+    );
   });
 
-  function openSettings(){ $("settings-modal").classList.remove("hidden"); $("setting-auto-stack").checked=state.settings.autoStack; $("setting-token-eff").checked=state.settings.tokenEff; $("setting-before-after").checked=state.settings.beforeAfter; }
-  $("settings-btn").addEventListener("click",openSettings);$("settings-close").addEventListener("click",()=> $("settings-modal").classList.add("hidden"));$("settings-backdrop").addEventListener("click",()=> $("settings-modal").classList.add("hidden"));
-  ["auto-stack","token-eff","before-after"].forEach(id=>$(id.startsWith("auto")?"setting-auto-stack":id.startsWith("token")?"setting-token-eff":"setting-before-after").addEventListener("change",e=>{
-    state.settings={autoStack:$("setting-auto-stack").checked,tokenEff:$("setting-token-eff").checked,beforeAfter:$("setting-before-after").checked};
-    localStorage.setItem("vibe_settings",JSON.stringify(state.settings));updateStack($("prompt-input").value);updateEfficiency(state.lastEnhanced);
-  }));
-  $("btn-reset-settings").addEventListener("click",()=>{state.settings={autoStack:true,tokenEff:true,beforeAfter:true};localStorage.setItem("vibe_settings",JSON.stringify(state.settings));openSettings();});
-  $("btn-clear-data").addEventListener("click",()=>{localStorage.clear();location.reload()});
-  $("btn-export").addEventListener("click",()=>{
-    const data={history:state.history,versions:state.versions,settings:state.settings};
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vibe-check-data.json";a.click();URL.revokeObjectURL(a.href);
+  el("btn-save-version").addEventListener("click", saveVersion);
+  el("btn-clear-versions").addEventListener("click", () => {
+    app.versions = [];
+    localStorage.removeItem("vibe_versions");
+    renderVersions();
   });
 
-  $("tip-text").textContent=tips[0];
-  $("tip-prev").addEventListener("click",()=>{state.tip=(state.tip+tips.length-1)%tips.length;$("tip-text").textContent=tips[state.tip]});
-  $("tip-next").addEventListener("click",()=>{state.tip=(state.tip+1)%tips.length;$("tip-text").textContent=tips[state.tip]});
+  el("versions-list").addEventListener("click", event => {
+    const button = event.target.closest("[data-version]");
+    if (!button) return;
+    const version = app.versions.find(item => item.id == button.dataset.version);
+    if (version) {
+      el("engineer-input").value = version.text;
+      updateEngineer();
+    }
+  });
 
-  renderTemplates();renderHistory();renderVersions();
+  el("credit-input").addEventListener("input", event => {
+    updateCount(event.target, el("credit-word-count"));
+    el("btn-credit-transform").disabled = !event.target.value.trim();
+  });
+  el("btn-credit-transform").addEventListener("click", transformCredit);
+
+  el("history-search").addEventListener("input", event => renderHistory(event.target.value));
+  el("history-list").addEventListener("click", event => {
+    const star = event.target.closest("[data-star]");
+    const copier = event.target.closest("[data-copy]");
+    const row = event.target.closest("[data-id]");
+
+    if (star) {
+      const item = app.history.find(entry => entry.id == star.dataset.star);
+      if (item) {
+        item.starred = !item.starred;
+        store.write("vibe_history", app.history);
+        renderHistory(el("history-search").value);
+      }
+      return;
+    }
+
+    if (copier) {
+      const item = app.history.find(entry => entry.id == copier.dataset.copy);
+      if (item) copy(item.enhanced);
+      return;
+    }
+
+    if (row) {
+      const item = app.history.find(entry => entry.id == row.dataset.id);
+      if (!item) return;
+      el("prompt-input").value = item.prompt;
+      el("btn-enhance").disabled = false;
+      updateCount(el("prompt-input"), el("word-count"));
+      showStack(item.prompt);
+      switchTab("enhance");
+    }
+  });
+
+  el("btn-clear-history").addEventListener("click", () => {
+    app.history = [];
+    localStorage.removeItem("vibe_history");
+    renderHistory();
+    notify("History cleared");
+  });
+
+  el("efficiency-toggle").addEventListener("click", () =>
+    el("efficiency-body").classList.toggle("hidden")
+  );
+
+  el("btn-strip-filler").addEventListener("click", () => {
+    const cleaned = el("enhanced-text").textContent
+      .replace(/\b(very|really|basically|just|simply|please|kindly|obviously|actually)\b/gi, "")
+      .replace(/[ ]{2,}/g, " ")
+      .replace(/\n[ \t]+/g, "\n")
+      .trim();
+
+    el("enhanced-text").textContent = cleaned;
+    app.lastEnhanced = cleaned;
+    localStorage.setItem("vibe_last_enhanced", cleaned);
+    updateEfficiency(cleaned);
+    notify("Filler removed");
+  });
+
+  el("settings-btn").addEventListener("click", openSettings);
+  el("settings-close").addEventListener("click", () => el("settings-modal").classList.add("hidden"));
+  el("settings-backdrop").addEventListener("click", () => el("settings-modal").classList.add("hidden"));
+  ["setting-auto-stack","setting-token-eff","setting-before-after"].forEach(id =>
+    el(id).addEventListener("change", updateSettings)
+  );
+
+  el("btn-reset-settings").addEventListener("click", () => {
+    app.settings = {autoStack:true, tokenEff:true, beforeAfter:true};
+    store.write("vibe_settings", app.settings);
+    openSettings();
+    updateSettings();
+  });
+
+  el("btn-clear-data").addEventListener("click", () => {
+    localStorage.clear();
+    location.reload();
+  });
+
+  el("btn-export").addEventListener("click", () => {
+    const payload = JSON.stringify({
+      history:app.history, versions:app.versions, settings:app.settings
+    }, null, 2);
+    const blob = new Blob([payload], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "vibe-check-data.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  function showTip() { el("tip-text").textContent = tips[app.tip]; }
+  el("tip-prev").addEventListener("click", () => {
+    app.tip = (app.tip + tips.length - 1) % tips.length;
+    showTip();
+  });
+  el("tip-next").addEventListener("click", () => {
+    app.tip = (app.tip + 1) % tips.length;
+    showTip();
+  });
+
+  renderTechniques();
+  renderTemplates();
+  renderHistory();
+  renderVersions();
+  showTip();
 })();
 </script>
 </body>
