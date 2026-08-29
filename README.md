@@ -1,118 +1,110 @@
-ibe Check
+Vibe Check
 
-I created Vibe Check to solve my frustration of writing prompts like "make me a cool dashboard" in Cursor and spending more time fixing the result than actually building the project.
+Stop typing “make me a cool dashboard” and hoping for the best.
 
-The purpose of Vibe Check is simple: you give it the rough prompt in your head and it helps convert it to one fit for an AI coding tool.
+Vibe Check is a lightweigh prompt engineering tool that transforms vague ideas into prompts fit for dev-assist coding tools.
 
-You don't have to write a great prompt before it even runs.
+The workflow is simple:
 
-What is Vibe Check?
+Write → Enhance → Score → Review → Copy → Build
 
-Vibe Check is a lightweight browser-based prompt engineering tool for developers using AI coding tools.
+No complex setup, no account login: prompt history and settings can be saved in your browser.
 
-You can paste in prompts as simple as:
+What It Does
+
+With Vibe Check, you can paste a prompt such as:
 
 make a dashboard
 
-and let Vibe Check help you enhance them.
+or:
 
-It can improve the prompt, score it, find out what is missing, remove unneeded words, and track what was changed.
+fix the login bug
 
-The goal is to make prompting simple and to get a helpful response from the AI tools that you are already using.
+and turn it into something far more useful for your coding assistant.
 
-What it does
+✨ Prompt Enhancement
 
-Prompt Enhancement
+Takes a rough, vague idea and turns it into a prompt with structure and specificity.
 
-This is the core functionality.
+Adds things like:
 
-You write your rough idea in your own words and Vibe Check adds appropriate structure where needed.
+Clear goals
 
-For example, it can turn a prompt like:
+Specific requirements
 
-make a login page
+Technical context
 
-into something closer to:
+Constraints
 
-Build a responsive login page for a web application.
+Responsive behavior
 
-Requirements:
+Accessibility considerations
 
-- Email and password fields
+Loading, empty, validation, and error states
 
-- Form validation
+Acceptance criteria
 
-- Clear error messages
+By default, this runs on rule-based logic; an external AI endpoint can be used for AI-enhanced prompting, if desired.
 
-- Loading state while submitting
+📊 5-Category Prompt Scoring
 
-- Responsive layout for mobile and desktop
+Vibe Check evaluates prompts across 5 categories:
 
-- Accessible keyboard navigation
+Category
 
-- Clean and reusable component structure
+Description
 
-Acceptance criteria:
+Clarity
 
-- Users can submit the form successfully
+Is the prompt's request understandable?
 
-- Invalid input shows useful feedback
+Specificity
 
-- The layout works on mobile and desktop
+Does the prompt contain enough detail?
 
-You can then copy the prompt and past it right into Cursor, Claude, v0, Bolt, ChatGPT, or whatever tool you are using.
+Completeness
 
-The basic enhancement is run locally using rule-based logic. A configured AI enhancement endpoint can be used if one is set up.
+Are there any missing requirements or states?
 
-Prompt Scoring
+Structure
 
-Sometimes it is hard to tell how good a prompt is.
+Is the prompt organized in a way that's easy to follow?
 
-Vibe Check gives the prompt a score out of 100 and breaks it down into different areas.
+Effectiveness
 
-The scoring system tracks things like:
+Would the prompt likely lead to a successful result?
 
-Clarity — Was what you asked for clear?
+Note that this is only a guideline; a prompt with a high score is not necessarily a correct prompt.
 
-Specificity — Did you give the needed detail?
+⚡ Token Efficiency
 
-Completeness — Were the requirements and states covered?
+Detects and highlights redundant phrasing that can be removed to make the prompt more token-efficient.
 
-Structure — Did the prompt have good formatting?
+Examples:
 
-Effectiveness — Does the prompt have a good chance to get you what you want?
+I want you to...
 
-Instead of saying "this prompt is bad", Vibe Check tries to explain what it could add or change.
+Can you please...
 
-Scoring is meant to be a general guide and should not be seen as a measurement of whether an AI response will be good.
+Could you kindly...
 
-Token Efficiency
+In order to...
 
-Long prompts are not always good.
+Basically...
 
-Vibe Check looks for words and phrases that do not add a lot of value, including filler, repeated words, and unneeded politeness.
+Really...
 
-For example:
+Just...
 
-Can you please just basically make a really nice dashboard for me?
+It also lets you remove these phrases with the touch of a button.
 
-can be made more efficient as:
+If you're working with token-limited AI APIs, this can help you get more out of each request.
 
-Build a modern dashboard.
+🧠 Stack-Aware Tips
 
-The Token Efficiency section shows what it found and gives the option to take out some of the unneeded words with the click of a button.
+Let's you know what technologies or dev platforms were mentioned in your prompt.
 
-This is especially helpful for working with APIs or models where tokens are important.
-
-Stack-Aware Tips
-
-Sometimes different AI coding tools can need a little help.
-
-A good prompt in Cursor isn't necessarily written the same way I would do it for v0 or Bolt.
-
-Vibe Check can recognize common technologies and AI development platforms in a prompt and provide tips that are related.
-
-Some of the platforms covered are:
+Includes tips for working with various tools, such as:
 
 v0
 
@@ -144,55 +136,89 @@ StackBlitz
 
 Phind
 
-The goal is not to force you to use a specific format, but instead to give you a better starting point.
+The purpose is to give your prompt the context it needs to work with the tool of your choice.
 
-Before and After
+Features
 
-One thing that I wanted was a place to see what changes were actually made.
+Prompt Enhancement
 
-After enhancing a prompt, Vibe Check can show the original and enhanced versions of the prompt side-by-side.
+Paste your own rough prompt, click "Enhance Prompt," and review the results.
 
 You can see:
 
-What was added
+The original prompt
 
-What was more specific
+The enhanced prompt
 
-What requirements were added
+The prompt score
 
-What constraints were added
+Scores for each category
 
-What the final prompt looks like
+Notes about what's changed
 
-This makes it easier to learn how better prompts are written instead of just copying an answer and moving on.
+A comparison of the two prompts side-by-side
+
+Token efficiency stats
+
+Detected technologies
+
+Before / After View
+
+Want to see what's changed? Switch to this view to see a side-by-side comparison of your original and enhanced prompts.
+
+BEFORE
+
+make a dashboard
+
+AFTER
+
+Build a responsive task-management dashboard.
+
+Requirements:
+
+- Responsive on mobile, tablet, and desktop
+
+- Accessible keyboard interactions
+
+- Loading, empty, validation, and error states
+
+- Clean and maintainable component structure
+
+Acceptance criteria:
+
+- The dashboard works end-to-end
+
+- Existing functionality is preserved
+
+- The UI is responsive and accessible
+
+This makes it easier to understand what's changed in your enhanced prompt, and why.
 
 Templates
 
-If you don't want to type into an empty textarea, there are templates you can use.
-
-Templates are grouped into categories:
+Want to start from a prompt template, rather than from scratch? There are several categories to choose from, including:
 
 UI Components
 
-Full Apps
+Apps (Full)
 
 Fixes
 
-API / Backend
+APIs & Backend Development
 
-AI Prompts
+AI & Code Prompts
 
-Some examples of templates are:
+Some examples of UI Component prompts include:
 
 Responsive dashboards
 
 Landing pages
 
-Modals
-
 Data tables
 
-SaaS starters
+Modals
+
+SaaS applications
 
 Task managers
 
@@ -208,135 +234,587 @@ Debugging
 
 Refactoring
 
-Pick a template, customize it for your project, and then apply it to the enhancer.
+Pick one, customize it, then enhance it.
 
-Engineer Tab
+Engineer
 
-The Engineer tab is for when you want to go a little deeper than a basic enhancement.
+The "Engineer" tab contains tools for taking your prompt further.
 
-It includes a checklist for common elements that an AI coding tool may need to know.
+It contains things like:
 
-You can also apply different prompt techniques, such as:
+Quality checklist
 
-Defining a role
+Prompt techniques
 
-Adding constraints
+Combinations
 
-Breaking the work into steps
+Prompt variants
 
-Adding acceptance criteria
-
-Calling out edge cases
-
-Defining an output format
-
-You can select multiple techniques and apply them to the same prompt.
-
-There is also a variant generator that creates three different versions of a prompt, allowing you to compare and use whichever fits your task best.
-
-Version History
-
-When working on a prompt, you may try a few different versions before finding one you like.
-
-The Engineer tab allows you to save versions of your prompt and load them at a later time.
-
-It is stored locally in the browser, so no account is required to keep your prompt versions.
-
-History
-
-Enhanced prompts are saved in local browser storage in the project.
-
-The history page allows you to:
-
-Search previous prompts
-
-See their scores
-
-Favorite prompts
-
-Copy enhanced prompts
-
-Clear your history
-
-There is an export option in settings for you to keep a copy of your local data.
+Version history
 
 Credit Saver
 
-The Engineer tab also includes a Credit Saver feature that can convert an English prompt into Chinese.
+Some of the available techniques include:
 
-The idea is to experiment with reducing token usage when working with models where token costs matter.
+Role definition
 
-The amount of token reduction will depend on the model and tokenizer, so the approximately 60% figure should be treated as an estimate rather than a promise.
+Constraints
 
-How to use it
+Step-by-step instructions
 
-Using Vibe Check is simple and only has four steps:
+Acceptance criteria
 
-1. Write your idea
+Edge cases
 
-Don't worry about making it perfect.
+Output format
 
-make a task management app
+You can combine different techniques to build a better prompt.
 
-2. Enhance it
+Prompt Variants
 
-Click Enhance Prompt.
+Need multiple versions of the same prompt? This lets you generate several variations so that you can pick the one you like best.
 
-3. Check the result
+Some common types of variants include:
 
-Look at the score, improvements, token efficiency, and before/after view.
+Balanced structural version
 
-4. Copy it
+Shorter directive version
 
-Paste the improved prompt into your AI coding tool.
+Production/testing-focused version
 
-That's it.
+Version History
+
+This lets you save different versions of the prompt as you engineer it.
+
+Some things you can do with it include:
+
+Save versions
+
+Reuse versions
+
+Review versions
+
+Clear versions
+
+This is useful if you're experimenting with different prompt variations.
+
+History
+
+Enhanced prompts can be saved in browser history for later reference.
+
+Some things you can do with it include:
+
+Search
+
+Prompt scores
+
+Favorites
+
+Copy enhanced prompts
+
+Clear history
+
+Note that this does not save your enhanced prompt data in the cloud.
+
+Undo / Redo
+
+The prompt editor contains undo and redo controls so that you can easily go back to a previous version of your prompt.
+
+Credit Saver
+
+The "Engineer" tab also contains a "Credit Saver" mode that lets you convert English prompts to Chinese.
+
+The idea is to experiment with shorter token lengths for providers that charge per token.
+
+Note that token savings will vary depending on the model, language, tokenizer, and prompt.
+
+The commonly-quoted "60% savings" is only an approximation and should be treated as such.
+
+Quick Start
+
+There are two ways to try out Vibe Check: the deployed website and the local version.
+
+Option 1: Deployed Website
+
+Go to the deployed website:
+
+https://enhance-prompts.vercel.app/
+
+Then:
+
+Type in a rough prompt.
+
+Review the detected technology/platform.
+
+Click "Enhance Prompt."
+
+Review the prompt score.
+
+Copy the enhanced prompt to your clipboard.
+
+Use it in your favorite dev-assist coding tool.
+
+Option 2: Local Version
+
+This tool is designed to be a lightweigh browser app.
+
+To set up the local version:
+
+Clone the repo:
+
+git clone https: //github.com/tallurisai9346-beep/Enhance-Prompts.git
+
+cd Enhance-Prompts
+
+Then open the file:
+
+index.html
+
+in your browser.
+
+If your version uses a serverless enhancement endpoint, configure it as needed.
 
 Example
 
-I think a great example of what Vibe Check does is shown below.
-
 Before
 
-make a cool dashboard for my app
+make me a cool dashboard
 
 After
 
-Build a modern responsive dashboard for a web application.
+Build a modern responsive admin dashboard for managing tasks.
 
 Requirements:
 
+- Desktop, tablet, and mobile responsive layout
+
 - Sidebar navigation
 
-- Dashboard summary cards
+- Dashboard overview cards
 
-- Recent activity section
+- Task list with status and priority
 
 - Search and filtering
 
-- Responsive layout for mobile, tablet, and desktop
+- Loading, empty, and error states
 
-- Loading, empty, validation, and error states
+- Accessible keyboard navigation
 
-- Accessible keyboard interactions
+- Clean reusable components
 
-- Reusable and maintainable components
+- Maintainable project structure
 
 Acceptance criteria:
 
-- The dashboard works end-to-end
+- All dashboard interactions work
 
-- All major interactions have appropriate states
+- The layout remains usable on small screens
 
-- The layout works across common screen sizes
+- Components are reusable and easy to maintain
 
-- Existing functionality should not be changed unless requested
+- Existing functionality is not changed unless explicitly requested
 
-Obviously, the exact output depends on what you put into the tool.
+Note that the specific output will vary depending on the prompt and the enhancement settings used.
 
-Supported Platforms
+Supported AI Coding Tools
 
-Vibe Check is designed to work alongside the tools that people already use:
+Vibe Check is designed to prepare prompts for a variety of dev-assist coding tools, including:
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+v0
+
+Bolt
+
+Lovable
+
+Cursor
+
+Replit
+
+Claude
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+ChatGPT
+
+Gemini
+
+Perplexity
+
+DeepSeek
+
+Windsurf
+
+GitHub Copilot
+
+CodeSandbox
+
+StackBlitz
+
+Phind
+
+The enhanced prompt is then copied into whichever tool you want to use.
+
+Privacy & Data
+
+Vibe Check favors browser-based storage for user data.
+
+Depending on your deployment/configuration, this can include things like:
+
+Prompt history
+
+Saved versions
+
+Settings
+
+Data export
+
+Clearing prompt history or versions is also possible.
+
+If you're using an external enhancement endpoint, data sent to it is subject to the receiving server's privacy policy.
+
+Settings
+
+The settings panel lets you configure things like:
+
+Automatic technology detection
+
+Token efficiency analysis
+
+Before/after comparison
+
+Data export
+
+Clearing history/data
+
+External enhancement endpoints, if available
+
+Tech Stack
+
+Vibe Check is deliberately lightweight when it comes to the tech stack.
+
+HTML
+
+CSS
+
+Vanilla JavaScript
+
+CSS Custom Properties
+
+Browser Local Storage
+
+Serverless API / Vercel (if using an external enhancement endpoint)
+
+There is no need for a heavier front-end framework or node_modules just to run a simple browser app.
+
+Project Structure
+
+A basic project structure could look like this:
+
+Enhance-Prompts/
+
+├── index.html
+
+├── README.md
+
+└── ...
+
+Depending on your needs, additional JS modules, assets, or API files can be added.
+
+Why I Built This
+
+I got tired of typing in prompts such as:
+
+make me a cool dashboard
+
+into Cursor and getting a dashboard that's technically cool, but nowhere near what I actually asked for.
+
+The issue is rarely the coding assistant; it's the prompt.
+
+I had to spend hours rewriting prompts myself:
+
+Add in the tech stack.
+
+State out requirements.
+
+Specify responsive behavior.
+
+Mention edge cases.
+
+Add acceptance criteria.
+
+Tell the assistant what not to change.
+
+Eventually, I got frustrated and asked myself:
+
+Why am I doing this every single time?
+
+That's when I decided to build Vibe Check.
+
+The goal with this tool is not to replace dev-assist coding tools.
+
+The point is to improve the prompts we give them.
+
+Recommended Workflow
+
+Rough Idea
+
+│
+
+▼
+
+┌─────────────┐
+
+│ Vibe Check │
+
+│ Prompt Edit │
+
+└──────┬──────┘
+
+│
+
+▼
+
+Enhancement
+
+│
+
+▼
+
+Score + Checks
+
+│
+
+▼
+
+Review / Edit
+
+│
+
+▼
+
+Copy
+
+│
+
+▼
+
+AI Coding Tool
+
+An example workflow might look like this:
+
+Idea
+
+↓
+
+"make a task app"
+
+↓
+
+Enhance
+
+↓
+
+Add requirements + constraints + states
+
+↓
+
+Review score
+
+↓
+
+Engineer if needed
+
+↓
+
+Copy
+
+↓
+
+Cursor / Claude / v0 / Bolt / etc.
+
+Contributing
+
+Contributions are welcome.
+
+If you find a bug:
+
+Open an issue.
+
+Describe what happened.
+
+Include the prompt or the steps needed to reproduce the issue.
+
+Include a screenshot/console log, if available.
+
+Want to contribute something bigger, like adding support for another AI coding platform?
+
+The stack detection and platform tips can be extended. Feel free to open a pull request.
+
+Ideas for Future Versions
+
+Some ideas for future versions include:
+
+More AI platform profiles
+
+More prompt templates
+
+More prompt comparison options
+
+More advanced scoring system
+
+Custom scoring rules
+
+Improved import/export
+
+More enhancement strategies
+
+More token analysis
+
+Custom platform profiles
+
+Shareable prompt presets
+
+License
+
+MIT License.
+
+The code can be freely used, modified, and distributed per the terms of the license.
+
+Author
+
+This tool was created to help developers, students, designers, and creators improve their results when using AI.
+
+Links
+
+Repository: https://github.com/tallurisai9346-beep/Enhance-Prompts
+
+Live Demo: https://enhance-prompts.vercel.app/
+
+Stop typing “make me a cool dashboard” and hoping for the best.
+
+Vibe Check is a lightweigh prompt engineering tool that transforms vague ideas into prompts fit for dev-assist coding tools.
+
+The workflow is simple:
+
+Write → Enhance → Score → Review → Copy → Build
+
+No complex setup, no account login: prompt history and settings can be saved in your browser.
+
+What It Does
+
+With Vibe Check, you can paste a prompt such as:
+
+make a dashboard
+
+or:
+
+fix the login bug
+
+and turn it into something far more useful for your coding assistant.
+
+✨ Prompt Enhancement
+
+Takes a rough, vague idea and turns it into a prompt with structure and specificity.
+
+Adds things like:
+
+Clear goals
+
+Specific requirements
+
+Technical context
+
+Constraints
+
+Responsive behavior
+
+Accessibility considerations
+
+Loading, empty, validation, and error states
+
+Acceptance criteria
+
+By default, this runs on rule-based logic; an external AI endpoint can be used for AI-enhanced prompting, if desired.
+
+📊 5-Category Prompt Scoring
+
+Vibe Check evaluates prompts across 5 categories:
+
+Category
+
+Description
+
+Clarity
+
+Is the prompt's request understandable?
+
+Specificity
+
+Does the prompt contain enough detail?
+
+Completeness
+
+Are there any missing requirements or states?
+
+Structure
+
+Is the prompt organized in a way that's easy to follow?
+
+Effectiveness
+
+Would the prompt likely lead to a successful result?
+
+Note that this is only a guideline; a prompt with a high score is not necessarily a correct prompt.
+
+⚡ Token Efficiency
+
+Detects and highlights redundant phrasing that can be removed to make the prompt more token-efficient.
+
+Examples:
+
+I want you to...
+
+Can you please...
+
+Could you kindly...
+
+In order to...
+
+Basically...
+
+Really...
+
+Just...
+
+It also lets you remove these phrases with the touch of a button.
+
+If you're working with token-limited AI APIs, this can help you get more out of each request.
+
+🧠 Stack-Aware Tips
+
+Let's you know what technologies or dev platforms were mentioned in your prompt.
+
+Includes tips for working with various tools, such as:
 
 v0
 
@@ -368,47 +846,381 @@ StackBlitz
 
 Phind
 
-You can copy the final prompt into any of them.
+The purpose is to give your prompt the context it needs to work with the tool of your choice.
+
+Features
+
+Prompt Enhancement
+
+Paste your own rough prompt, click "Enhance Prompt," and review the results.
+
+You can see:
+
+The original prompt
+
+The enhanced prompt
+
+The prompt score
+
+Scores for each category
+
+Notes about what's changed
+
+A comparison of the two prompts side-by-side
+
+Token efficiency stats
+
+Detected technologies
+
+Before / After View
+
+Want to see what's changed? Switch to this view to see a side-by-side comparison of your original and enhanced prompts.
+
+BEFORE
+
+make a dashboard
+
+AFTER
+
+Build a responsive task-management dashboard.
+
+Requirements:
+
+- Responsive on mobile, tablet, and desktop
+
+- Accessible keyboard interactions
+
+- Loading, empty, validation, and error states
+
+- Clean and maintainable component structure
+
+Acceptance criteria:
+
+- The dashboard works end-to-end
+
+- Existing functionality is preserved
+
+- The UI is responsive and accessible
+
+This makes it easier to understand what's changed in your enhanced prompt, and why.
+
+Templates
+
+Want to start from a prompt template, rather than from scratch? There are several categories to choose from, including:
+
+UI Components
+
+Apps (Full)
+
+Fixes
+
+APIs & Backend Development
+
+AI & Code Prompts
+
+Some examples of UI Component prompts include:
+
+Responsive dashboards
+
+Landing pages
+
+Data tables
+
+Modals
+
+SaaS applications
+
+Task managers
+
+Admin panels
+
+REST APIs
+
+Authentication
+
+Code reviews
+
+Debugging
+
+Refactoring
+
+Pick one, customize it, then enhance it.
+
+Engineer
+
+The "Engineer" tab contains tools for taking your prompt further.
+
+It contains things like:
+
+Quality checklist
+
+Prompt techniques
+
+Combinations
+
+Prompt variants
+
+Version history
+
+Credit Saver
+
+Some of the available techniques include:
+
+Role definition
+
+Constraints
+
+Step-by-step instructions
+
+Acceptance criteria
+
+Edge cases
+
+Output format
+
+You can combine different techniques to build a better prompt.
+
+Prompt Variants
+
+Need multiple versions of the same prompt? This lets you generate several variations so that you can pick the one you like best.
+
+Some common types of variants include:
+
+Balanced structural version
+
+Shorter directive version
+
+Production/testing-focused version
+
+Version History
+
+This lets you save different versions of the prompt as you engineer it.
+
+Some things you can do with it include:
+
+Save versions
+
+Reuse versions
+
+Review versions
+
+Clear versions
+
+This is useful if you're experimenting with different prompt variations.
+
+History
+
+Enhanced prompts can be saved in browser history for later reference.
+
+Some things you can do with it include:
+
+Search
+
+Prompt scores
+
+Favorites
+
+Copy enhanced prompts
+
+Clear history
+
+Note that this does not save your enhanced prompt data in the cloud.
+
+Undo / Redo
+
+The prompt editor contains undo and redo controls so that you can easily go back to a previous version of your prompt.
+
+Credit Saver
+
+The "Engineer" tab also contains a "Credit Saver" mode that lets you convert English prompts to Chinese.
+
+The idea is to experiment with shorter token lengths for providers that charge per token.
+
+Note that token savings will vary depending on the model, language, tokenizer, and prompt.
+
+The commonly-quoted "60% savings" is only an approximation and should be treated as such.
 
 Quick Start
 
-Use the live version
+There are two ways to try out Vibe Check: the deployed website and the local version.
 
-Open the deployed app and start typing:
+Option 1: Deployed Website
+
+Go to the deployed website:
 
 https://enhance-prompts.vercel.app/
 
 Then:
 
-Enter your prompt.
+Type in a rough prompt.
 
-Select or let the app detect your stack.
+Review the detected technology/platform.
 
-Click Enhance Prompt.
+Click "Enhance Prompt."
 
-Review the result.
+Review the prompt score.
 
-Copy it into your AI coding tool.
+Copy the enhanced prompt to your clipboard.
 
-Run it locally
+Use it in your favorite dev-assist coding tool.
 
-Clone the repository:
+Option 2: Local Version
 
-git clone https://github.com/tallurisai9346-beep/Enhance-Prompts.git
+This tool is designed to be a lightweigh browser app.
 
-Go into the project:
+To set up the local version:
+
+Clone the repo:
+
+git clone https: //github.com/tallurisai9346-beep/Enhance-Prompts.git
 
 cd Enhance-Prompts
 
-The project is built with plain HTML, CSS, and JavaScript, so the basic app doesn't require you to have a frontend framework or a big build setup.
+Then open the file:
 
-You can open the HTML file directly in a browser.
+index.html
 
-If you are using the API enhancement functionality, you will also need to configure the API/serverless endpoint that is used by your version of the project.
+in your browser.
+
+If your version uses a serverless enhancement endpoint, configure it as needed.
+
+Example
+
+Before
+
+make me a cool dashboard
+
+After
+
+Build a modern responsive admin dashboard for managing tasks.
+
+Requirements:
+
+- Desktop, tablet, and mobile responsive layout
+
+- Sidebar navigation
+
+- Dashboard overview cards
+
+- Task list with status and priority
+
+- Search and filtering
+
+- Loading, empty, and error states
+
+- Accessible keyboard navigation
+
+- Clean reusable components
+
+- Maintainable project structure
+
+Acceptance criteria:
+
+- All dashboard interactions work
+
+- The layout remains usable on small screens
+
+- Components are reusable and easy to maintain
+
+- Existing functionality is not changed unless explicitly requested
+
+Note that the specific output will vary depending on the prompt and the enhancement settings used.
+
+Supported AI Coding Tools
+
+Vibe Check is designed to prepare prompts for a variety of dev-assist coding tools, including:
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+v0
+
+Bolt
+
+Lovable
+
+Cursor
+
+Replit
+
+Claude
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+Tool
+
+ChatGPT
+
+Gemini
+
+Perplexity
+
+DeepSeek
+
+Windsurf
+
+GitHub Copilot
+
+CodeSandbox
+
+StackBlitz
+
+Phind
+
+The enhanced prompt is then copied into whichever tool you want to use.
+
+Privacy & Data
+
+Vibe Check favors browser-based storage for user data.
+
+Depending on your deployment/configuration, this can include things like:
+
+Prompt history
+
+Saved versions
+
+Settings
+
+Data export
+
+Clearing prompt history or versions is also possible.
+
+If you're using an external enhancement endpoint, data sent to it is subject to the receiving server's privacy policy.
+
+Settings
+
+The settings panel lets you configure things like:
+
+Automatic technology detection
+
+Token efficiency analysis
+
+Before/after comparison
+
+Data export
+
+Clearing history/data
+
+External enhancement endpoints, if available
 
 Tech Stack
 
-I made sure to keep the project simple.
+Vibe Check is deliberately lightweight when it comes to the tech stack.
 
 HTML
 
@@ -418,57 +1230,15 @@ Vanilla JavaScript
 
 CSS Custom Properties
 
-Browser localStorage
+Browser Local Storage
 
-Vercel serverless API for optional AI enhancement
+Serverless API / Vercel (if using an external enhancement endpoint)
 
-There is no React or Next.js frontend. The basic application is a browser app.
-
-Privacy
-
-The goal is to keep the basic app local.
-
-Prompt history, saved versions, and settings can be stored in your browser using localStorage.
-
-There is no account system required for the core features.
-
-If you connect an external AI enhancement API, prompts that are sent to that service will obviously be handled by that service, so be sure to read its privacy policy before using sensitive information.
-
-Why I built it
-
-I am 17, and I use AI coding tools a lot.
-
-I was always running into the same problem: I would have an idea, type a short prompt, and get back something that technically followed my prompt but wasn't what I had in mind.
-
-Then I would have to spend several more prompts explaining things that I could have mentioned in my first.
-
-After doing that a few times, I started noticing that I was writing the same types of instructions:
-
-Explain the goal.
-
-Mention the tech stack.
-
-Describe the UI.
-
-Add responsive behavior.
-
-Include error states.
-
-Don't break the existing code.
-
-Define what "done" means.
-
-That's how I got the idea to create Vibe Check.
-
-I wanted a small tool that could help with that initial request instead of making me re-write it every time.
-
-It is not meant to replace Cursor, Claude, v0, Bolt, or any other AI tool.
-
-It is simply the step before them.
+There is no need for a heavier front-end framework or node_modules just to run a simple browser app.
 
 Project Structure
 
-The project is small.
+A basic project structure could look like this:
 
 Enhance-Prompts/
 
@@ -478,80 +1248,174 @@ Enhance-Prompts/
 
 └── ...
 
-Additional files may be included depending on the version of the project and if the optional API functionality is being used.
+Depending on your needs, additional JS modules, assets, or API files can be added.
+
+Why I Built This
+
+I got tired of typing in prompts such as:
+
+make me a cool dashboard
+
+into Cursor and getting a dashboard that's technically cool, but nowhere near what I actually asked for.
+
+The issue is rarely the coding assistant; it's the prompt.
+
+I had to spend hours rewriting prompts myself:
+
+Add in the tech stack.
+
+State out requirements.
+
+Specify responsive behavior.
+
+Mention edge cases.
+
+Add acceptance criteria.
+
+Tell the assistant what not to change.
+
+Eventually, I got frustrated and asked myself:
+
+Why am I doing this every single time?
+
+That's when I decided to build Vibe Check.
+
+The goal with this tool is not to replace dev-assist coding tools.
+
+The point is to improve the prompts we give them.
+
+Recommended Workflow
+
+Rough Idea
+
+│
+
+▼
+
+┌─────────────┐
+
+│ Vibe Check │
+
+│ Prompt Edit │
+
+└──────┬──────┘
+
+│
+
+▼
+
+Enhancement
+
+│
+
+▼
+
+Score + Checks
+
+│
+
+▼
+
+Review / Edit
+
+│
+
+▼
+
+Copy
+
+│
+
+▼
+
+AI Coding Tool
+
+An example workflow might look like this:
+
+Idea
+
+↓
+
+"make a task app"
+
+↓
+
+Enhance
+
+↓
+
+Add requirements + constraints + states
+
+↓
+
+Review score
+
+↓
+
+Engineer if needed
+
+↓
+
+Copy
+
+↓
+
+Cursor / Claude / v0 / Bolt / etc.
 
 Contributing
 
-If you find a bug or have an idea, feel free to open an issue or submit a pull request.
+Contributions are welcome.
 
-I would especially appreciate contributions around:
+If you find a bug:
 
-New AI coding platform support
+Open an issue.
 
-Better stack detection
+Describe what happened.
 
-More useful templates
+Include the prompt or the steps needed to reproduce the issue.
 
-Better scoring rules
+Include a screenshot/console log, if available.
 
-Better prompt enhancement rules
+Want to contribute something bigger, like adding support for another AI coding platform?
 
-UI improvements
+The stack detection and platform tips can be extended. Feel free to open a pull request.
 
-Bug fixes
+Ideas for Future Versions
 
-If you want to add another AI coding tool, the stack detection and tips are designed to be fairly easy to extend.
+Some ideas for future versions include:
 
-Things I'd like to add
+More AI platform profiles
 
-There are still many things that I want to improve.
+More prompt templates
 
-Some ideas:
+More prompt comparison options
 
-More AI coding tool profiles
-
-More templates
-
-Better prompt scoring
+More advanced scoring system
 
 Custom scoring rules
 
-More detailed prompt diffs
+Improved import/export
 
-Better token analysis
+More enhancement strategies
 
-Import/export improvements
+More token analysis
 
 Custom platform profiles
 
-More enhancement modes
-
-More useful prompt suggestions
-
-If you have an idea, open an issue. I would rather hear what people actually want than add random features.
+Shareable prompt presets
 
 License
 
 MIT License.
 
-You can use, modify, and build on this project according to the license.
+The code can be freely used, modified, and distributed per the terms of the license.
+
+Author
+
+This tool was created to help developers, students, designers, and creators improve their results when using AI.
 
 Links
 
-GitHub:
+Repository: https://github.com/tallurisai9346-beep/Enhance-Prompts
 
-https://github.com/tallurisai9346-beep/Enhance-Prompts
-
-Live Demo:
-
-https://enhance-prompts.vercel.app/
-
-Final note
-
-Vibe Check started with a simple problem:
-
-I don't want to spend five minutes rewriting a prompt before I can spend five minutes building the thing.
-
-If it saves you from having to write the same explanation over and over, then it is doing what I made it for.
-
-Write the rough idea. Make the prompt better. Get back to building.
+Live Demo: https://enhance-prompts.vercel.app/
