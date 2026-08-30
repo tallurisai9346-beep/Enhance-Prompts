@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -773,213 +772,45 @@ footer{
 </style>
 
 <style>
-/* -----------------------------------------------------------
-   Black theme
-   These rules intentionally stay small and easy to edit.
-   ----------------------------------------------------------- */
-
-html,
-body {
-    background: #000;
-    color: #f2f2f2;
-}
-
-body::before {
-    display: none;
-}
-
-.topbar {
-    background: #000;
-    border-bottom-color: #242424;
-}
-
-.workspace,
-.box,
-.card,
-.compare > div,
-.history-row,
-.modal-card,
-.toast {
-    background: #090909;
-    border-color: #2a2a2a;
-}
-
-.workspace-head,
-.bottom-tip {
-    background: #0d0d0d;
-    border-color: #242424;
-}
-
-textarea,
-input[type="text"] {
-    background: #050505;
-    color: #f2f2f2;
-    border-color: #303030;
-}
-
-textarea::placeholder,
-input::placeholder {
-    color: #666;
-}
-
-textarea:focus,
-input[type="text"]:focus {
-    border-color: #777;
-    box-shadow: 0 0 0 2px #151515;
-}
-
-.primary,
-.enhance {
-    background: #f2f2f2;
-    border-color: #f2f2f2;
-    color: #000;
-}
-
-.primary:hover,
-.enhance:hover:not(:disabled) {
-    background: #d8d8d8;
-}
-
-.brand-mark,
-.app-mark {
-    background: #f2f2f2;
-    color: #000;
-}
-
-.main-nav button.active::after {
-    background: #f2f2f2;
-}
-
-.workspace-tabs button.active {
-    color: #fff;
-    border-bottom-color: #fff;
-}
-
-.small-icon,
-.secondary,
-.copy-btn,
-.chip,
-.micro-btn {
-    background: #080808;
-    color: #aaa;
-    border-color: #303030;
-}
-
-.small-icon:hover,
-.secondary:hover,
-.copy-btn:hover,
-.chip:hover,
-.micro-btn:hover {
-    background: #171717;
-    color: #fff;
-}
-
-.chip.active {
-    background: #181818;
-    color: #fff;
-    border-color: #444;
-}
-
-.stack {
-    background: #101010;
-    border-left-color: #fff;
-}
-
-.stack .dot,
-.dot {
-    background: #fff;
-}
-
-.tipbox {
-    background: #101010;
-    border-left-color: #777;
-}
-
-.score {
-    background: #0d0d0d;
-    border-color: #2a2a2a;
-}
-
-.score-value,
-.hero h1 span,
-.info-title span {
-    color: #fff;
-}
-
-.track {
-    background: #242424;
-}
-
-.fill {
-    background: #fff;
-}
-
-.before h4 {
-    color: #ff7777;
-}
-
-.after h4 {
-    color: #fff;
-}
-
-.tech,
-.template-grid .card {
-    background: #080808;
-    border-color: #292929;
-}
-
-.tech:hover,
-.card:hover {
-    background: #121212;
-    border-color: #444;
-}
-
-.tech.selected {
-    background: #151515;
-    border-color: #fff;
-}
-
-.selected .tech-mark {
-    background: #fff;
-    border-color: #fff;
-}
-
-.check.pass {
-    background: #101610;
-    border-left-color: #777;
-}
-
-.check.fail {
-    background: #170f0f;
-    border-left-color: #ff7777;
-}
-
-.modal-bg {
-    background: rgba(0, 0, 0, .75);
-}
-
-.modal-card {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .8);
-}
-
-.slider {
-    background: #333;
-}
-
-.switch input:checked + .slider {
-    background: #777;
-}
-
-.toast {
-    box-shadow: 0 12px 35px rgba(0, 0, 0, .65);
-}
-
-footer {
-    background: #000;
-    border-top-color: #242424;
-}
+/* Black theme overrides */
+html,body{background:#000;color:#f2f2f2}
+body::before{display:none}
+.topbar{background:#000;border-bottom-color:#242424}
+.workspace,.box,.card,.compare>div,.history-row,.modal-card,.toast{background:#090909;border-color:#2a2a2a}
+.workspace-head,.bottom-tip{background:#0d0d0d;border-color:#242424}
+textarea,input[type="text"]{background:#050505;color:#f2f2f2;border-color:#303030}
+textarea::placeholder,input::placeholder{color:#666}
+textarea:focus,input[type="text"]:focus{border-color:#777;box-shadow:0 0 0 2px #151515}
+.primary,.enhance{background:#f2f2f2;border-color:#f2f2f2;color:#000}
+.primary:hover,.enhance:hover:not(:disabled){background:#d8d8d8}
+.brand-mark,.app-mark{background:#f2f2f2;color:#000}
+.main-nav button.active::after{background:#f2f2f2}
+.workspace-tabs button.active{color:#fff;border-bottom-color:#fff}
+.small-icon,.secondary,.copy-btn,.chip,.micro-btn{background:#080808;color:#aaa;border-color:#303030}
+.small-icon:hover,.secondary:hover,.copy-btn:hover,.chip:hover,.micro-btn:hover{background:#171717;color:#fff}
+.chip.active{background:#181818;color:#fff;border-color:#444}
+.stack{background:#101010;border-left-color:#fff}
+.stack .dot,.dot{background:#fff}
+.tipbox{background:#101010;border-left-color:#777}
+.score{background:#0d0d0d;border-color:#2a2a2a}
+.score-value,.hero h1 span,.info-title span{color:#fff}
+.track{background:#242424}
+.fill{background:#fff}
+.before h4{color:#ff7777}
+.after h4{color:#fff}
+.tech,.template-grid .card{background:#080808;border-color:#292929}
+.tech:hover,.card:hover{background:#121212;border-color:#444}
+.tech.selected{background:#151515;border-color:#fff}
+.selected .tech-mark{background:#fff;border-color:#fff}
+.check.pass{background:#101610;border-left-color:#777}
+.check.fail{background:#170f0f;border-left-color:#ff7777}
+.modal-bg{background:rgba(0,0,0,.75)}
+.modal-card{box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.slider{background:#333}
+.switch input:checked+.slider{background:#777}
+.toast{box-shadow:0 12px 35px rgba(0,0,0,.65)}
+footer{background:#000;border-top-color:#242424}
 </style>
-
 </head>
 <body>
 <header class="topbar">
@@ -1018,6 +849,7 @@ footer {
 
   <section class="panel active" id="panel-enhance">
     <div class="stack hidden" id="stack-badge"><span class="dot"></span><small>Detected stack:</small><strong id="stack-name"></strong></div>
+    <div class="tipbox" style="border-left-color:#777">Local rewrite only — prompts are improved with simple rules in your browser.</div>
     <div class="tipbox hidden" id="stack-tips"><strong>Useful reminders</strong><span id="tips-stack-name"></span><ul id="tips-list"></ul></div>
 
     <div class="box">
@@ -1132,12 +964,12 @@ footer {
     </div>
 
     <div class="box">
-      <div class="section-head"><span class="section-label">Credit saver</span><span class="section-sub">English → Chinese</span></div>
-      <p style="margin:7px 0 10px;color:#999;font-size:10px">Chinese can use fewer tokens for some prompts. Compare provider-specific usage before relying on the estimate.</p>
-      <textarea id="credit-input" maxlength="5000" placeholder="Paste your English prompt..."></textarea>
+      <div class="section-head"><span class="section-label">Prompt compressor</span><span class="section-sub">Local cleanup</span></div>
+      <p style="margin:7px 0 10px;color:#999;font-size:10px">Removes common filler locally. Actual token savings depend on the model and provider.</p>
+      <textarea id="credit-input" maxlength="5000" placeholder="Paste a prompt to clean up..."></textarea>
       <div class="meta"><span id="credit-word-count">0 words · 0 characters</span><span>estimate only</span></div>
       <div class="row" style="margin-top:10px"><button class="enhance grow" id="btn-credit-transform" disabled><span class="label">Transform</span><span class="spinner"></span></button></div>
-      <div class="box hidden" id="credit-result"><div class="result-head"><span class="result-title">Chinese prompt</span><button class="copy-btn" id="btn-copy-credit">Copy</button></div><pre class="result-text" id="credit-text"></pre></div>
+      <div class="box hidden" id="credit-result"><div class="result-head"><span class="result-title">Compressed prompt</span><button class="copy-btn" id="btn-copy-credit">Copy</button></div><pre class="result-text" id="credit-text"></pre></div>
     </div>
   </section>
 
@@ -1172,7 +1004,7 @@ footer {
 </section>
 </main>
 
-<footer>Vibe Check — Prompt Workshop · made with intent, not a template</footer>
+<footer>Vibe Check — Prompt Workshop · local rules, editable prompts</footer>
 
 <div class="modal hidden" id="settings-modal">
   <div class="modal-bg" id="settings-backdrop"></div>
@@ -1291,8 +1123,6 @@ function initApp() {
     return clean ? clean.split(/\s+/).length : 0;
   }
 
-  // Small, intentionally opinionated touches: local drafts, a surprise prompt,
-  // keyboard-first enhancement, and a character runway. No dependencies.
   const surprisePrompts = [
     "Redesign this dashboard so the important actions are obvious, fast, and accessible.",
     "Refactor this component without changing its public API or existing behavior.",
@@ -1377,7 +1207,6 @@ function initApp() {
     const changes = [];
     const lower = original.toLowerCase();
 
-    // Read the prompt first. Different jobs deserve different advice.
     const requirements = [];
     const acceptance = [];
 
@@ -1567,7 +1396,6 @@ function initApp() {
       changes.push("Added practical accessibility guidance");
     }
 
-    // Unknown requests still get useful help, but not a giant generic template.
     if (!requirements.length) {
       const subject = extractSubject(original);
 
@@ -1586,7 +1414,6 @@ function initApp() {
       }
     }
 
-    // Don't repeat things the user has already said.
     const usefulRequirements = requirements.filter(requirement => {
       const importantWords = requirement
         .toLowerCase()
@@ -1645,29 +1472,111 @@ function initApp() {
     return "";
   }
 
-  async function improve(prompt, mode = "enhance") {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
-
-    try {
-      const response = await fetch("/api/enhance", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({prompt, mode}),
-        signal: controller.signal
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.enhanced) {
-          return {enhanced:data.enhanced, improvements:data.improvements || []};
-        }
-      }
-    } catch (_) {
-      // Fall through to the offline rewrite.
-    } finally {
-      clearTimeout(timeout);
-    }
+  function improve(prompt, mode = "enhance") {
+    // Deliberately local: no model call, no network request, no hidden AI service.
+    if (mode === "compress") return compressPrompt(prompt);
     return localRewrite(prompt);
+  }
+
+  function compressPrompt(input) {
+    const original = input.trim();
+    if (!original) return {enhanced:"", improvements:[]};
+
+    const swaps = [
+      [/\bplease\b/gi, ""],
+      [/\bkindly\b/gi, ""],
+      [/\bvery\b/gi, ""],
+      [/\breally\b/gi, ""],
+      [/\bbasically\b/gi, ""],
+      [/\bsimply\b/gi, ""],
+      [/\bjust\b/gi, ""],
+      [/\bobviously\b/gi, ""],
+      [/\bactually\b/gi, ""]
+    ];
+
+    let compact = original;
+    swaps.forEach(([pattern, value]) => { compact = compact.replace(pattern, value); });
+    compact = compact
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/^\s+|\s+$/g, "");
+
+    return {
+      enhanced: compact,
+      improvements: compact !== original ? ["Removed repeated filler words"] : ["No obvious filler to remove"]
+    };
+  }
+
+  function localRewrite(input) {
+    const original = input.trim();
+    if (!original) return {enhanced:"", improvements:[]};
+
+    const lower = original.toLowerCase();
+    const parts = [];
+    const changes = [];
+
+    const actionMatch = original.match(
+      /\b(build|create|make|implement|fix|design|write|develop|add|update|remove|refactor|change|redesign|review)\b[^.!?]*/i
+    );
+
+    parts.push(actionMatch ? actionMatch[0].trim() : `Goal: ${original}`);
+    if (!actionMatch) changes.push("Turned the opening into a clear goal");
+
+    const additions = [];
+    const add = (text, note) => {
+      additions.push(text);
+      changes.push(note);
+    };
+
+    if (/\b(ui|interface|frontend|website|webpage|page|component|layout)\b/i.test(lower)) {
+      add("Keep the existing visual language consistent and make controls usable with keyboard focus.", "Added practical UI guidance");
+    }
+
+    if (/\b(dashboard|admin panel|analytics|metrics|table|charts?)\b/i.test(lower)) {
+      add("Account for loading, empty, and failed-data states.", "Added dashboard state handling");
+    }
+
+    if (/\b(form|input|textarea|select|checkbox|radio|submit|validation)\b/i.test(lower)) {
+      add("Validate user input and show the problem beside the relevant field.", "Added form validation guidance");
+    }
+
+    if (/\b(api|endpoint|backend|server|request|response|http|fetch|axios|graphql)\b/i.test(lower)) {
+      add("Validate incoming data and return a predictable error response when a request fails.", "Added request/error handling");
+    }
+
+    if (/\b(database|sql|postgres|mysql|mongodb|schema|query|migration)\b/i.test(lower)) {
+      add("Keep relationships explicit and handle missing records without breaking the flow.", "Added data-safety guidance");
+    }
+
+    if (/\b(bug|broken|error|fix|issue|crash|debug|problem|not working)\b/i.test(lower)) {
+      add("Reproduce the reported problem first, then make the smallest change that fixes it.", "Added a focused debugging step");
+    }
+
+    if (/\b(react|next\.?js|nextjs|vue|svelte)\b/i.test(lower)) {
+      add("Follow the project's existing component patterns and preserve public behavior unless the request requires a change.", "Added framework-aware guidance");
+    }
+
+    if (/\b(css|stylesheet|styling|styles|scss|sass|tailwind|animation|transition|grid|flexbox)\b/i.test(lower)) {
+      add("Prefer reusable styles and preserve the current spacing, type, and interaction patterns.", "Added styling guidance");
+    }
+
+    if (additions.length) {
+      parts.push("", "Notes:", ...additions.map(item => `- ${item}`));
+    } else {
+      parts.push("", "Notes:", "- Keep the change limited to the requested outcome.");
+      changes.push("Added a scope guard");
+    }
+
+    parts.push(
+      "",
+      "Done when:",
+      "- The requested behavior works.",
+      "- Existing working behavior is unchanged unless the request says otherwise."
+    );
+    changes.push("Added two simple completion checks");
+
+    return {enhanced: parts.join("\n").replace(/\n{3,}/g, "\n\n").trim(),
+            improvements:[...new Set(changes)]};
   }
 
   function stackFor(prompt) {
@@ -1943,7 +1852,7 @@ function initApp() {
     button.disabled = true;
 
     try {
-      const result = await improve(prompt, "chinese");
+      const result = improve(prompt, "compress");
       el("credit-text").textContent = result.enhanced;
       el("credit-result").classList.remove("hidden");
     } finally {
@@ -2040,9 +1949,9 @@ function initApp() {
     if (!prompt) return notify("Enter a prompt first");
 
     const variants = [
-      `${prompt}\n\nKeep the change focused and prefer the smallest reliable implementation.`,
-      `${prompt}\n\nBefore coding, identify the important requirements and assumptions. Then return a production-ready solution.`,
-      `${prompt}\n\nThink through the normal path, likely failure cases, and important edge cases before implementing the final solution.`
+      `${prompt}\n\nScope: change only what is needed for this request.`,
+      `${prompt}\n\nChecks: verify the main path, error handling, and existing behavior.`,
+      `${prompt}\n\nOutput: state the files changed, the reason for each change, and any follow-up needed.`
     ];
 
     el("variants-container").innerHTML = variants.map((value, index) =>
