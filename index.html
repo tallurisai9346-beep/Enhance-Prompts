@@ -1,2671 +1,2616 @@
 <!doctype html>
-<html lang="en" data-theme="ink">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Check — Prompt Workbench</title>
-<meta name="description" content="A local, offline workbench for shaping prompts before you hand them to a coding assistant.">
-
+<title>Vibe Check — Prompt Workshop</title>
 <style>
-/* =========================================================================
-   VIBE CHECK — stylesheet
-   Written by hand. Order matters, so it goes:
-     01 tokens · 02 reset · 03 type · 04 layout · 05 controls · 06 fields
-     07 chrome · 08 workbench · 09 features · 10 overlays · 11 responsive
-   ========================================================================= */
-
-/* ---- 01 · tokens -------------------------------------------------------- */
-
-:root{
-  color-scheme:dark;
-
-  /* surfaces, darkest to lightest */
-  --bg:#0b0c0e;
-  --bg-tint:#101216;
-  --surface:#14171b;
-  --surface-hi:#191d23;
-  --sunken:#0a0b0d;
-
-  /* hairlines */
-  --line:#262b32;
-  --line-soft:#1b1f25;
-
-  /* ink */
-  --ink:#e8eaed;
-  --ink-2:#a5adb7;
-  --ink-3:#6d7681;
-
-  /* one accent, used sparingly */
-  --accent:#e0a34a;
-  --accent-soft:rgba(224,163,74,.14);
-  --accent-line:rgba(224,163,74,.42);
-  --on-accent:#1a1206;
-
-  /* semantic */
-  --good:#74c69d;
-  --good-soft:rgba(116,198,157,.12);
-  --warn:#d9b25c;
-  --bad:#e8817a;
-  --bad-soft:rgba(232,129,122,.12);
-
-  /* type */
-  --display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-  --ui:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-
-  /* geometry */
-  --r-lg:12px;
-  --r-md:8px;
-  --r-sm:5px;
-  --pad:clamp(14px,2.2vw,22px);
-  --gutter:clamp(16px,5vw,64px);
-  --shadow:0 18px 44px rgba(0,0,0,.45);
-  --shadow-sm:0 6px 18px rgba(0,0,0,.3);
-  --ease:cubic-bezier(.2,.7,.3,1);
+:root {
+  --black:#090909;
+  --surface:#10100f;
+  --surface-2:#151514;
+  --surface-3:#1b1b19;
+  --text:#f3f1eb;
+  --muted:#a3a19a;
+  --dim:#6f6d67;
+  --line:#2a2a27;
+  --line-light:#3c3c37;
+  --white:#fff;
+  --green:#7eb18a;
+  --red:#d77b73;
+  --yellow:#c7a762;
+  --focus:#d7d4cb;
+  --radius:3px;
+  --ease:180ms cubic-bezier(.22,.61,.36,1);
 }
 
-[data-theme="paper"]{
-  color-scheme:light;
-  --bg:#f4f1ea;
-  --bg-tint:#efebe1;
-  --surface:#fffdf8;
-  --surface-hi:#faf7f0;
-  --sunken:#f7f4ec;
-  --line:#ddd6c7;
-  --line-soft:#e8e2d5;
-  --ink:#1d1f22;
-  --ink-2:#575d64;
-  --ink-3:#8a8f96;
-  --accent:#a2670f;
-  --accent-soft:rgba(162,103,15,.10);
-  --accent-line:rgba(162,103,15,.35);
-  --on-accent:#fffdf8;
-  --good:#2f7d54;
-  --good-soft:rgba(47,125,84,.10);
-  --warn:#8a6a12;
-  --bad:#b23f38;
-  --bad-soft:rgba(178,63,56,.10);
-  --shadow:0 18px 44px rgba(60,50,30,.14);
-  --shadow-sm:0 6px 18px rgba(60,50,30,.09);
+*,
+*::before,
+*::after {
+  box-sizing:border-box;
 }
 
-/* ---- 02 · reset --------------------------------------------------------- */
+html {
+  scroll-behavior:smooth;
+}
 
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{
+body {
   margin:0;
-  min-height:100dvh;
-  background:var(--bg);
-  color:var(--ink);
-  font:400 14px/1.6 var(--ui);
+  min-height:100vh;
+  color:var(--text);
+  background:var(--black);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;
+  line-height:1.5;
   overflow-x:hidden;
 }
-h1,h2,h3,h4,p,ul,ol,figure,pre{margin:0}
-ul{padding:0;list-style:none}
-img,svg{display:block;max-width:100%}
-button,input,textarea,select{font:inherit;color:inherit}
-button{background:none;border:0;padding:0;cursor:pointer}
-a{color:inherit;text-decoration:none}
-:focus-visible{
-  outline:2px solid var(--accent);
-  outline-offset:2px;
-  border-radius:3px;
-}
-::selection{background:var(--accent);color:var(--on-accent)}
-[hidden],.is-hidden{display:none !important}
 
-/* thin scrollbars where the browser lets us */
-*{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-*::-webkit-scrollbar{width:9px;height:9px}
-*::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-*::-webkit-scrollbar-track{background:transparent}
-
-/* ---- 03 · type ---------------------------------------------------------- */
-
-.display{font-family:var(--display);font-weight:400;letter-spacing:-.03em;line-height:.98}
-.eyebrow{
-  font-size:10px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:var(--ink-3);
-  font-weight:700;
-}
-.lede{color:var(--ink-2);font-size:16px;line-height:1.65}
-.micro{font-size:11px;color:var(--ink-3)}
-kbd{
-  font:600 10px/1 var(--mono);
-  padding:3px 5px;
-  border:1px solid var(--line);
-  border-bottom-width:2px;
-  border-radius:4px;
-  background:var(--sunken);
-  color:var(--ink-2);
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.055;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.45) 0 1px,transparent 1px 4px);
+  mix-blend-mode:screen;
 }
 
-/* ---- 04 · layout -------------------------------------------------------- */
+::selection {
+  background:#e7e4dc;
+  color:#111;
+}
 
-.wrap{width:min(1080px,100% - (var(--gutter) * 2));margin-inline:auto}
-.stack-8 > * + *{margin-top:8px}
-.stack-12 > * + *{margin-top:12px}
-.stack-16 > * + *{margin-top:16px}
-.row{display:flex;align-items:center;gap:8px}
-.row-between{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.grow{flex:1;min-width:0}
-.rule{height:1px;background:var(--line);border:0}
+button,
+input,
+textarea {
+  font:inherit;
+}
 
-/* ---- 05 · controls ------------------------------------------------------ */
+button {
+  cursor:pointer;
+}
 
-.btn{
-  display:inline-flex;
+a {
+  color:inherit;
+}
+
+.hidden {
+  display:none!important;
+}
+
+/* Header */
+
+.topbar {
+  position:sticky;
+  top:0;
+  z-index:20;
+  min-height:62px;
+  padding:10px clamp(16px,4vw,52px);
+  display:flex;
   align-items:center;
-  justify-content:center;
-  gap:8px;
-  height:36px;
-  padding:0 14px;
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  background:var(--surface-hi);
-  color:var(--ink-2);
-  font-size:12px;
-  font-weight:600;
-  transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease),transform .08s var(--ease);
+  justify-content:space-between;
+  gap:18px;
+  background:rgba(9,9,9,.94);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px);
 }
-.btn:hover{background:var(--surface);color:var(--ink);border-color:var(--ink-3)}
-.btn:active{transform:translateY(1px)}
-.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
 
-.btn--solid{
-  background:var(--accent);
-  border-color:var(--accent);
-  color:var(--on-accent);
-  font-weight:700;
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  font-weight:800;
+  letter-spacing:-.025em;
 }
-.btn--solid:hover{background:var(--accent);border-color:var(--accent);color:var(--on-accent);filter:brightness(1.08)}
-.btn--lg{height:46px;padding:0 20px;font-size:13px}
-.btn--tiny{height:26px;padding:0 9px;font-size:10px;border-radius:var(--r-sm);letter-spacing:.02em}
-.btn--danger{color:var(--bad);border-color:var(--bad-soft)}
-.btn--danger:hover{color:var(--bad);border-color:var(--bad);background:var(--bad-soft)}
-.btn--ghost{border-color:transparent;background:transparent}
-.btn--ghost:hover{background:var(--surface-hi);border-color:var(--line)}
 
-.icon-btn{
-  width:34px;height:34px;
-  display:inline-grid;place-items:center;
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
+.brand-mark {
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border:1px solid #55544e;
+  color:#0a0a09;
+  background:#ddd9cf;
+  border-radius:2px;
+  font-size:10px;
+  transform:rotate(-3deg);
+  box-shadow:2px 2px 0 rgba(255,255,255,.06);
+}
+
+.main-nav {
+  display:flex;
+  gap:2px;
+}
+
+.main-nav button,
+.small-icon {
+  border:1px solid transparent;
   background:transparent;
-  color:var(--ink-3);
-  font-size:14px;
-  transition:background .16s var(--ease),color .16s var(--ease);
+  color:var(--muted);
+  border-radius:2px;
+  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease);
 }
-.icon-btn:hover{background:var(--surface-hi);color:var(--ink)}
 
-.pill{
+.main-nav button {
+  padding:7px 11px;
+  font-size:12px;
+}
+
+.main-nav button:hover {
+  color:var(--text);
+  background:var(--surface-2);
+}
+
+.main-nav button.active {
+  color:var(--text);
+  box-shadow:inset 0 -2px 0 var(--focus);
+}
+
+.top-actions {
+  display:flex;
+  gap:5px;
+}
+
+.small-icon {
+  width:33px;
+  height:33px;
+  display:inline-grid;
+  place-items:center;
+  border-color:var(--line);
+}
+
+.small-icon:hover {
+  color:var(--text);
+  background:var(--surface-2);
+  border-color:var(--line-light);
+  transform:translateY(-1px);
+}
+
+/* Intro */
+
+.hero {
+  position:relative;
+  max-width:850px;
+  margin:0 auto;
+  padding:92px 20px 78px;
+  text-align:center;
+}
+
+.badge {
   display:inline-flex;
   align-items:center;
   gap:7px;
-  height:26px;
-  padding:0 10px;
+  padding:4px 9px;
   border:1px solid var(--line);
-  border-radius:100px;
-  font-size:10px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  font-weight:700;
-  color:var(--ink-3);
+  border-radius:999px;
+  color:var(--muted);
   background:var(--surface);
-}
-.pill .dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-soft);
+  font-size:10px;
+  letter-spacing:.025em;
 }
 
-/* spinner for the two async-looking buttons */
-.spinner{
-  width:15px;height:15px;
-  border:2px solid color-mix(in srgb, var(--on-accent) 35%, transparent);
-  border-top-color:var(--on-accent);
+.dot {
+  width:6px;
+  height:6px;
+  flex:0 0 6px;
   border-radius:50%;
-  animation:spin .65s linear infinite;
+  background:var(--green);
 }
-@keyframes spin{to{transform:rotate(1turn)}}
-.is-busy .btn-label{display:none}
-.btn:not(.is-busy) .spinner{display:none}
 
-/* ---- 06 · fields -------------------------------------------------------- */
+.hero h1 {
+  margin:22px 0 17px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(48px,8vw,84px);
+  line-height:.9;
+  font-weight:500;
+  letter-spacing:-.07em;
+}
 
-.field{
-  width:100%;
-  padding:10px 12px;
+.hero h1 span {
+  font-style:italic;
+  color:#aaa79e;
+}
+
+.hero p {
+  max-width:550px;
+  margin:0 auto 28px;
+  color:var(--muted);
+  font-size:15px;
+}
+
+.primary {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 17px;
+  border:1px solid #dedbd2;
+  border-radius:2px;
+  background:#dedbd2;
+  color:#10100f;
+  font-weight:800;
+  box-shadow:2px 2px 0 rgba(255,255,255,.07);
+  transition:transform var(--ease),box-shadow var(--ease);
+}
+
+.primary:hover {
+  transform:translate(-1px,-1px);
+  box-shadow:4px 4px 0 rgba(255,255,255,.06);
+}
+
+.primary:active {
+  transform:none;
+  box-shadow:1px 1px 0 rgba(255,255,255,.05);
+}
+
+/* Main workspace */
+
+.shell {
+  width:min(950px,calc(100% - 24px));
+  margin:0 auto 82px;
+}
+
+.workspace {
+  position:relative;
+  overflow:hidden;
   border:1px solid var(--line);
-  border-radius:var(--r-md);
-  background:var(--sunken);
-  color:var(--ink);
-  transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
+  border-radius:4px;
+  background:var(--surface);
+  box-shadow:0 22px 50px rgba(0,0,0,.35);
 }
-.field::placeholder{color:var(--ink-3)}
-.field:focus{
-  outline:0;
-  border-color:var(--accent-line);
-  box-shadow:0 0 0 3px var(--accent-soft);
-}
-textarea.field{resize:vertical;font:13px/1.7 var(--mono)}
-.editor{min-height:190px;padding:14px}
-.search-field{height:38px;padding-block:0}
 
-/* the thin fill bar under the editor */
-.gauge{height:2px;background:var(--line-soft);border-radius:2px;overflow:hidden;margin-top:10px}
-.gauge > i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s var(--ease)}
-.gauge.is-full > i{background:var(--bad)}
-
-/* ---- 07 · chrome (header / hero / footer) ------------------------------- */
-
-.masthead{
-  position:sticky;
-  top:0;
-  z-index:40;
+.workspace-head {
   display:flex;
   align-items:center;
-  gap:26px;
-  height:60px;
-  padding-inline:var(--gutter);
-  background:color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter:blur(12px);
+  gap:16px;
+  min-height:51px;
+  padding:8px 12px;
   border-bottom:1px solid var(--line);
-}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
-.brand__mark{
-  display:grid;place-items:center;
-  width:28px;height:28px;
-  border-radius:7px;
-  background:var(--accent);
-  color:var(--on-accent);
-  font:800 13px/1 var(--display);
-  transform:rotate(-4deg);
-  transition:transform .25s var(--ease);
-}
-.brand:hover .brand__mark{transform:rotate(4deg) scale(1.05)}
-.brand__sub{color:var(--ink-3);font-weight:500;font-size:11px;letter-spacing:.02em}
-
-.nav{display:flex;gap:4px}
-.nav button{
-  position:relative;
-  height:32px;
-  padding:0 10px;
-  border-radius:var(--r-sm);
-  font-size:12px;
-  font-weight:600;
-  color:var(--ink-3);
-  transition:color .16s var(--ease);
-}
-.nav button::after{
-  content:"";
-  position:absolute;
-  left:10px;right:10px;bottom:-14px;
-  height:2px;
-  background:var(--accent);
-  transform:scaleX(0);
-  transform-origin:left;
-  transition:transform .22s var(--ease);
-}
-.nav button:hover{color:var(--ink)}
-.nav button.is-active{color:var(--ink)}
-.nav button.is-active::after{transform:scaleX(1)}
-.masthead__end{margin-left:auto;display:flex;gap:6px;align-items:center}
-.kbd-hint{
-  display:flex;align-items:center;gap:5px;
-  padding:0 10px;height:34px;
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  color:var(--ink-3);
-  font-size:11px;
-}
-.kbd-hint:hover{color:var(--ink);background:var(--surface-hi)}
-
-/* hero, with a ruled rail on the left */
-.hero{position:relative;padding:96px 0 72px}
-.hero__rail{
-  position:absolute;
-  left:calc(var(--gutter) - 22px);
-  top:104px;
-  bottom:96px;
-  width:9px;
-  background:
-    linear-gradient(var(--line),var(--line)) left/1px 100% no-repeat,
-    repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 22px) left/9px 100% no-repeat;
-  opacity:.8;
-}
-.hero h1{
-  font-family:var(--display);
-  font-size:clamp(52px,9.5vw,104px);
-  font-weight:400;
-  letter-spacing:-.045em;
-  line-height:.92;
-  margin:20px 0 22px;
-  max-width:15ch;
-}
-.hero h1 em{font-style:italic;color:var(--accent)}
-.hero .lede{max-width:56ch}
-.hero__cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-
-.facts{
-  display:flex;flex-wrap:wrap;gap:0;
-  margin-top:52px;
-  border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-}
-.fact{
-  flex:1 1 180px;
-  padding:18px 20px 18px 0;
-  border-right:1px solid var(--line);
-}
-.fact:last-child{border-right:0}
-.fact b{display:block;font:400 26px/1 var(--display);color:var(--ink)}
-.fact span{font-size:11px;color:var(--ink-3)}
-
-.section{padding:72px 0}
-.section__head{max-width:60ch;margin-bottom:34px}
-.section h2{
-  font-family:var(--display);
-  font-size:clamp(26px,4vw,40px);
-  font-weight:400;
-  letter-spacing:-.03em;
-  margin:12px 0 10px;
-}
-.section h2 em{font-style:italic;color:var(--accent)}
-
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
-.step{background:var(--bg);padding:26px 22px;min-height:180px}
-.step__n{font:400 34px/1 var(--display);color:var(--accent);opacity:.65}
-.step h3{font-size:14px;margin:14px 0 6px}
-.step p{color:var(--ink-2);font-size:12.5px}
-
-.chip-cloud{display:flex;flex-wrap:wrap;gap:6px}
-.chip-cloud span{
-  padding:6px 11px;
-  border:1px solid var(--line);
-  border-radius:100px;
-  font-size:11px;
-  color:var(--ink-2);
-  background:var(--surface);
+  background:#0e0e0d;
 }
 
-.colophon{
-  border-top:1px solid var(--line);
-  padding:26px 0 44px;
-  color:var(--ink-3);
-  font-size:11px;
-  display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
+.app-id {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  white-space:nowrap;
+  color:#d4d1c9;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.11em;
 }
 
-/* ---- 08 · workbench ----------------------------------------------------- */
-
-.bench{
-  position:relative;
-  border:1px solid var(--line);
-  border-radius:var(--r-lg);
-  background:var(--surface);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-/* small corner ticks — a detail I like */
-.bench::before,.bench::after{
-  content:"";
-  position:absolute;
-  width:12px;height:12px;
-  border:1px solid var(--accent-line);
-  pointer-events:none;
-  opacity:.7;
-}
-.bench::before{top:9px;left:9px;border-right:0;border-bottom:0}
-.bench::after{bottom:9px;right:9px;border-left:0;border-top:0}
-
-.bench__bar{
-  display:flex;align-items:center;gap:16px;
-  min-height:54px;
-  padding:0 16px;
-  border-bottom:1px solid var(--line);
-  background:var(--bg-tint);
-}
-.bench__id{
-  display:flex;align-items:center;gap:8px;
-  font:800 9px/1 var(--ui);
-  letter-spacing:.18em;
-  color:var(--ink-3);
-  flex:0 0 auto;
-}
-.bench__id i{width:8px;height:8px;border-radius:2px;background:var(--accent);transform:rotate(45deg)}
-.bench__tabs{display:flex;gap:2px;overflow-x:auto;flex:1}
-.bench__tabs::-webkit-scrollbar{display:none}
-.bench__tabs button{
-  flex:0 0 auto;
-  height:34px;padding:0 12px;
-  border-radius:var(--r-sm);
-  font-size:11.5px;font-weight:600;
-  color:var(--ink-3);
-  transition:background .16s var(--ease),color .16s var(--ease);
-}
-.bench__tabs button:hover{color:var(--ink);background:var(--surface-hi)}
-.bench__tabs button.is-active{color:var(--ink);background:var(--surface-hi);box-shadow:inset 0 -2px 0 var(--accent)}
-.bench__state{margin-left:auto;font-size:10px;color:var(--ink-3);white-space:nowrap}
-
-.panel{padding:var(--pad)}
-.panel:not(.is-active){display:none}
-
-.card{
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  background:var(--bg-tint);
-  padding:var(--pad);
-}
-.card--flush{padding:0;overflow:hidden}
-.card__head{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:11px 14px;
-  border-bottom:1px solid var(--line);
-  background:var(--surface-hi);
-}
-.card__title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--ink-3)}
-.card__body{padding:14px}
-
-.note{
-  display:flex;gap:10px;
-  padding:11px 13px;
-  border:1px solid var(--line);
-  border-left:2px solid var(--accent);
-  border-radius:var(--r-sm);
-  background:var(--accent-soft);
-  color:var(--ink-2);
-  font-size:11.5px;
-}
-.note b{color:var(--ink)}
-
-.meta-row{
-  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
-  margin-top:10px;
-  font-size:10.5px;color:var(--ink-3);
-}
-.meta-row .sep{width:1px;height:11px;background:var(--line)}
-.tier{
-  padding:2px 8px;border-radius:100px;
-  font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-  border:1px solid var(--line);
-}
-.tier--thin{color:var(--bad);border-color:var(--bad-soft);background:var(--bad-soft)}
-.tier--mid{color:var(--warn);border-color:var(--line);background:var(--surface-hi)}
-.tier--full{color:var(--good);border-color:var(--good-soft);background:var(--good-soft)}
-
-.toolstrip{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px}
-.toolstrip__label{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
-
-/* ---- 09 · features ------------------------------------------------------ */
-
-/* score dial + bars */
-.score{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
-.dial{
-  --v:0;
-  position:relative;
-  width:96px;height:96px;
-  border-radius:50%;
-  background:conic-gradient(var(--accent) calc(var(--v) * 1%), var(--line-soft) 0);
-  transition:background .5s var(--ease);
-  flex:0 0 96px;
-}
-.dial::after{
-  content:"";
-  position:absolute;inset:8px;
-  border-radius:50%;
-  background:var(--bg-tint);
-  border:1px solid var(--line-soft);
-}
-.dial__value{
-  position:absolute;inset:0;
-  display:grid;place-items:center;
-  z-index:1;
-  font:400 30px/1 var(--display);
-  color:var(--ink);
-}
-.dial__value small{font:600 9px/1 var(--ui);color:var(--ink-3);letter-spacing:.1em}
-.score__title{font-size:14px;font-weight:700;margin-bottom:10px}
-.bar{display:grid;grid-template-columns:88px 1fr 30px;align-items:center;gap:10px;margin:6px 0;font-size:10.5px;color:var(--ink-3)}
-.bar__track{height:5px;border-radius:5px;background:var(--line-soft);overflow:hidden}
-.bar__fill{display:block;height:100%;border-radius:5px;background:var(--accent);width:0;transition:width .5s var(--ease)}
-.bar__num{text-align:right;font:600 10px/1 var(--mono);color:var(--ink-2)}
-.score__note{
-  grid-column:1/-1;
-  margin-top:14px;padding-top:12px;
-  border-top:1px dashed var(--line);
-  font-size:11.5px;color:var(--ink-2);
+.app-mark {
+  width:23px;
+  height:23px;
+  display:grid;
+  place-items:center;
+  border:1px solid #484741;
+  border-radius:2px;
+  background:#d8d5cc;
+  color:#111;
+  font-size:8px;
 }
 
-/* lint */
-.lint{display:grid;gap:5px}
-.lint__item{
-  display:grid;grid-template-columns:16px 1fr auto;gap:10px;align-items:baseline;
-  padding:8px 10px;
-  border-radius:var(--r-sm);
-  background:var(--surface-hi);
-  border-left:2px solid var(--line);
-  font-size:11.5px;
-}
-.lint__item[data-level="warn"]{border-left-color:var(--warn)}
-.lint__item[data-level="info"]{border-left-color:var(--accent)}
-.lint__item[data-level="ok"]{border-left-color:var(--good);color:var(--ink-2)}
-.lint__mark{font:700 11px/1 var(--mono);color:var(--ink-3)}
-.lint__item[data-level="warn"] .lint__mark{color:var(--warn)}
-.lint__item[data-level="ok"] .lint__mark{color:var(--good)}
-.lint__hint{font-size:10.5px;color:var(--ink-3);text-align:right;max-width:44%}
-.lint__words{font-family:var(--mono);color:var(--ink)}
-
-/* result + diff */
-.result{
-  margin:0;
-  padding:14px;
-  max-height:320px;
+.workspace-tabs {
+  display:flex;
+  flex:1;
+  gap:2px;
   overflow:auto;
-  white-space:pre-wrap;
-  word-break:break-word;
-  font:12.5px/1.75 var(--mono);
-  color:var(--ink);
-  background:var(--sunken);
-}
-.changes{display:grid;gap:4px;padding:12px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-2)}
-.changes div::before{content:"+ ";color:var(--good);font-family:var(--mono)}
-
-.diff{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.diff__pane{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--sunken)}
-.diff__head{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:9px 12px;
-  border-bottom:1px solid var(--line);
-  background:var(--surface-hi);
-  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;
-}
-.diff__pane--before .diff__head{color:var(--bad)}
-.diff__pane--after .diff__head{color:var(--good)}
-.diff__body{max-height:280px;overflow:auto;padding:8px 0;font:11.5px/1.65 var(--mono)}
-.diff__line{
-  padding:1px 12px 1px 10px;
-  border-left:2px solid transparent;
-  white-space:pre-wrap;
-  word-break:break-word;
-  min-height:1.65em;
-}
-.diff__line[data-kind="same"]{color:var(--ink-3)}
-.diff__line[data-kind="add"]{background:var(--good-soft);border-left-color:var(--good);color:var(--ink)}
-.diff__line[data-kind="del"]{background:var(--bad-soft);border-left-color:var(--bad);color:var(--ink-2);text-decoration:line-through;text-decoration-color:var(--bad)}
-
-/* efficiency */
-.eff__toggle{
-  display:flex;align-items:center;gap:10px;width:100%;
-  padding:13px 14px;
-  font-size:12px;font-weight:700;color:var(--ink);
-}
-.eff__toggle .caret{margin-left:auto;color:var(--ink-3);transition:transform .2s var(--ease)}
-.eff__toggle[aria-expanded="true"] .caret{transform:rotate(180deg)}
-.eff__pct{font:600 10px/1 var(--mono);color:var(--ink-3);letter-spacing:.04em}
-.eff__body{display:flex;gap:18px;padding:0 14px 16px;align-items:flex-start}
-.eff__body .dial{width:70px;height:70px;flex-basis:70px}
-.eff__body .dial__value{font-size:17px}
-.tokens{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 12px}
-.tokens li{
-  font:600 10px/1 var(--mono);
-  padding:4px 8px;
-  border-radius:100px;
-  background:var(--bad-soft);
-  color:var(--bad);
+  scrollbar-width:none;
 }
 
-/* templates */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tile{
-  display:flex;flex-direction:column;gap:6px;
+.workspace-tabs::-webkit-scrollbar {
+  display:none;
+}
+
+.workspace-tabs button {
+  flex:0 0 auto;
+  padding:7px 11px;
+  border:0;
+  border-radius:2px;
+  color:var(--dim);
+  background:transparent;
+  font-size:11px;
+  transition:background var(--ease),color var(--ease);
+}
+
+.workspace-tabs button:hover {
+  color:var(--text);
+  background:var(--surface-2);
+}
+
+.workspace-tabs button.active {
+  color:var(--text);
+  box-shadow:inset 0 -2px 0 var(--focus);
+}
+
+.panel {
+  padding:16px;
+}
+
+.panel:not(.active) {
+  display:none;
+}
+
+/* Form controls */
+
+.box {
+  margin-bottom:10px;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--surface-2);
+}
+
+textarea,
+input[type=text] {
+  width:100%;
+  border:1px solid #3a3a35;
+  outline:none;
+  border-radius:2px;
+  color:var(--text);
+  background:#0b0b0a;
+  transition:border-color var(--ease),box-shadow var(--ease);
+}
+
+textarea:focus,
+input[type=text]:focus {
+  border-color:#77756d;
+  box-shadow:0 0 0 2px rgba(255,255,255,.055);
+}
+
+textarea {
+  resize:vertical;
+}
+
+#prompt-input {
+  min-height:145px;
+  padding:12px;
+  font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+.meta {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:7px;
+  color:var(--dim);
+  font-size:10px;
+}
+
+.level {
+  padding:2px 7px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:750;
+}
+
+.level.simple {
+  color:#bbb8b0;
+  background:#252522;
+}
+
+.level.moderate {
+  color:#c0a9c6;
+  background:#28232a;
+}
+
+.level.detailed {
+  color:#8ec09a;
+  background:#172119;
+}
+
+.row {
+  display:flex;
+  gap:7px;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.grow {
+  flex:1;
+}
+
+.secondary,
+.copy-btn,
+.micro-btn {
+  border:1px solid var(--line);
+  border-radius:2px;
+  color:var(--muted);
+  background:transparent;
+  transition:background var(--ease),border-color var(--ease),color var(--ease),transform var(--ease);
+}
+
+.secondary {
+  padding:6px 10px;
+  font-size:10px;
+}
+
+.secondary:hover,
+.copy-btn:hover,
+.micro-btn:hover {
+  color:var(--text);
+  border-color:var(--line-light);
+  background:var(--surface-3);
+}
+
+.enhance {
+  width:100%;
+  height:43px;
+  border:1px solid #d8d5cc;
+  border-radius:2px;
+  color:#11110f;
+  background:#d8d5cc;
+  font-weight:800;
+  box-shadow:2px 2px 0 rgba(255,255,255,.05);
+  transition:transform var(--ease),box-shadow var(--ease),opacity var(--ease);
+}
+
+.enhance:hover:not(:disabled) {
+  transform:translate(-1px,-1px);
+  box-shadow:4px 4px 0 rgba(255,255,255,.05);
+}
+
+.enhance:disabled {
+  cursor:not-allowed;
+  opacity:.38;
+  box-shadow:none;
+}
+
+.busy .label {
+  display:none;
+}
+
+.busy .spinner {
+  display:block;
+}
+
+.spinner {
+  display:none;
+  width:15px;
+  height:15px;
+  margin:auto;
+  border:2px solid rgba(0,0,0,.25);
+  border-top-color:#111;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform:rotate(360deg); }
+}
+
+/* Small feedback blocks */
+
+.stack {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:9px;
+  padding:7px 9px;
+  border:1px solid #2f4034;
+  border-radius:2px;
+  background:#111811;
+  font-size:10px;
+}
+
+.stack strong {
+  color:var(--text);
+}
+
+.stack small {
+  color:var(--dim);
+}
+
+.tipbox {
+  margin-bottom:9px;
+  padding:10px;
+  border:1px solid #40342f;
+  border-left:2px solid #aaa59b;
+  border-radius:2px;
+  background:#171311;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.tipbox strong {
+  display:block;
+  margin-bottom:4px;
+  color:var(--text);
+}
+
+.tipbox ul {
+  margin:5px 0 0 17px;
+  padding:0;
+}
+
+.tipbox li {
+  margin:2px 0;
+}
+
+/* Results */
+
+.score {
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:14px;
+  margin-bottom:10px;
   padding:14px;
-  text-align:left;
   border:1px solid var(--line);
-  border-radius:var(--r-md);
-  background:var(--surface-hi);
-  transition:border-color .16s var(--ease),transform .12s var(--ease),background .16s var(--ease);
-}
-.tile:hover{border-color:var(--accent-line);background:var(--surface);transform:translateY(-1px)}
-.tile b{font-size:12.5px}
-.tile p{font-size:11px;color:var(--ink-2);line-height:1.55}
-.tile__foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
-.tag{
-  font:800 8px/1 var(--ui);letter-spacing:.12em;
-  padding:4px 7px;border-radius:3px;
-  border:1px solid var(--line);color:var(--ink-3);
+  border-radius:var(--radius);
+  background:var(--surface-2);
 }
 
-/* checklist + techniques */
-.checks{display:grid;gap:4px}
-.check{
-  display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;
-  padding:9px 11px;border-radius:var(--r-sm);
-  font-size:11.5px;
-  background:var(--surface-hi);
-  border-left:2px solid var(--line);
-}
-.check[data-ok="true"]{background:var(--good-soft);border-left-color:var(--good)}
-.check[data-ok="false"]{background:var(--bad-soft);border-left-color:var(--bad)}
-.check__mark{font:800 11px/1 var(--mono)}
-.check[data-ok="true"] .check__mark{color:var(--good)}
-.check[data-ok="false"] .check__mark{color:var(--bad)}
-.check__fix{font-size:10px;color:var(--ink-3);text-align:right;max-width:50%}
-
-.tech{
-  display:flex;gap:10px;align-items:flex-start;
-  padding:11px;text-align:left;
-  border:1px solid var(--line);border-radius:var(--r-md);
-  background:var(--surface-hi);
-  transition:border-color .16s var(--ease),background .16s var(--ease);
-}
-.tech:hover{border-color:var(--ink-3)}
-.tech[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.tech__box{
-  flex:0 0 15px;width:15px;height:15px;margin-top:2px;
-  border:1px solid var(--ink-3);border-radius:4px;
-  display:grid;place-items:center;
-  font:800 9px/1 var(--mono);color:transparent;
-}
-.tech[aria-pressed="true"] .tech__box{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.tech b{display:block;font-size:11.5px}
-.tech small{display:block;font-size:10px;color:var(--ink-3);line-height:1.5}
-
-/* list rows (history / versions / variants) */
-.rowcard{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;
-  border:1px solid var(--line);border-radius:var(--r-md);
-  background:var(--surface-hi);
-  transition:border-color .16s var(--ease),background .16s var(--ease);
-}
-.rowcard + .rowcard{margin-top:6px}
-.rowcard:hover{border-color:var(--accent-line);background:var(--surface)}
-.rowcard__text{
-  flex:1;min-width:0;
-  font-size:11.5px;color:var(--ink-2);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  text-align:left;
-}
-.rowcard__score{
-  font:700 10px/1 var(--mono);
-  padding:5px 7px;border-radius:4px;
-  background:var(--surface);border:1px solid var(--line);
-  color:var(--ink-3);
-}
-.star{width:26px;height:26px;display:grid;place-items:center;border-radius:5px;color:var(--ink-3);font-size:12px}
-.star:hover{background:var(--surface);color:var(--ink)}
-.star.is-on{color:var(--accent)}
-
-.empty{
-  padding:28px 18px;text-align:center;
-  color:var(--ink-3);font-size:11.5px;
-  border:1px dashed var(--line);border-radius:var(--r-md);
+.score-value {
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:42px;
+  line-height:1;
+  font-weight:500;
+  letter-spacing:-.04em;
 }
 
-.tipbar{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 16px;
-  border-top:1px solid var(--line);
-  background:var(--bg-tint);
-  font-size:11px;color:var(--ink-2);
+.score-caption {
+  margin-bottom:7px;
+  font-weight:750;
 }
-.tipbar p{flex:1;text-align:center}
-.tipbar button{width:26px;height:26px;border-radius:5px;color:var(--ink-3)}
-.tipbar button:hover{background:var(--surface);color:var(--ink)}
 
-/* ---- 10 · overlays ------------------------------------------------------ */
+.meter {
+  display:grid;
+  grid-template-columns:70px 1fr 28px;
+  align-items:center;
+  gap:7px;
+  margin:4px 0;
+  color:var(--muted);
+  font-size:10px;
+}
 
-.overlay{position:fixed;inset:0;z-index:60;display:grid;padding:16px}
-.overlay__scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px)}
-[data-theme="paper"] .overlay__scrim{background:rgba(40,34,22,.35)}
-.overlay--center{place-items:center}
-.overlay--top{place-items:start center;padding-top:12vh}
-.sheet{
-  position:relative;
-  width:min(480px,100%);
-  max-height:78vh;
-  display:flex;flex-direction:column;
-  border:1px solid var(--line);
-  border-radius:var(--r-lg);
-  background:var(--surface);
-  box-shadow:var(--shadow);
-  animation:sheet-in .18s var(--ease);
+.track {
+  height:4px;
   overflow:hidden;
+  border-radius:999px;
+  background:#292925;
 }
-@keyframes sheet-in{from{opacity:0;transform:translateY(-8px) scale(.99)}}
-.sheet__head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
-.sheet__head b{font-size:13px}
-.sheet__body{padding:8px 16px 16px;overflow:auto}
-.sheet__foot{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px;border-top:1px solid var(--line);background:var(--bg-tint)}
 
-.setting{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
-.setting:last-child{border-bottom:0}
-.setting p{font-size:12px}
-.setting small{display:block;color:var(--ink-3);font-size:10.5px;margin-top:2px}
-.switch{position:relative;flex:0 0 42px;width:42px;height:24px}
-.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.switch i{
-  position:absolute;inset:0;
-  border-radius:100px;background:var(--line);
-  transition:background .18s var(--ease);
+.fill {
+  height:100%;
+  border-radius:inherit;
+  background:#d2cfc6;
+  transition:width .4s var(--ease);
 }
-.switch i::after{
+
+.score-note {
+  grid-column:1/-1;
+  padding-top:8px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:10px;
+}
+
+.result-head,
+.section-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.result-head {
+  padding:10px 12px 0;
+}
+
+.result-title,
+.section-label {
+  color:#d2cfc7;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+
+.copy-btn {
+  padding:4px 8px;
+  font-size:9px;
+}
+
+.copy-btn.done {
+  color:var(--green);
+  border-color:var(--green);
+}
+
+.result-text,
+.compare pre {
+  margin:0;
+  padding:10px 12px;
+  overflow:auto;
+  color:var(--text);
+  white-space:pre-wrap;
+  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+.result-text {
+  max-height:250px;
+}
+
+.improvements,
+.changes {
+  padding:0 12px 10px;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.improvements div,
+.changes div {
+  padding:2px 0;
+}
+
+.compare {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.compare>div {
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--surface-2);
+}
+
+.compare h4 {
+  margin:0;
+  padding:7px 9px;
+  border-bottom:1px solid var(--line);
+  font-size:9px;
+  text-transform:uppercase;
+}
+
+.before h4 {
+  color:var(--red);
+}
+
+.after h4 {
+  color:var(--green);
+}
+
+.compare pre {
+  max-height:165px;
+  padding:9px;
+}
+
+.efficiency {
+  overflow:hidden;
+  padding:0;
+}
+
+.eff-head {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:10px 11px;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:750;
+}
+
+.eff-head span:last-child {
+  margin-left:auto;
+  color:var(--dim);
+  font-size:9px;
+}
+
+.eff-body {
+  display:flex;
+  gap:12px;
+  padding:0 11px 11px;
+}
+
+.ring {
+  position:relative;
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
+}
+
+.ring svg {
+  transform:rotate(-90deg);
+}
+
+.ring-label {
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size:10px;
+  font-weight:800;
+}
+
+.mini-list {
+  margin:4px 0 7px;
+  padding:0;
+  list-style:none;
+  color:var(--dim);
+  font:9px/1.5 ui-monospace,monospace;
+}
+
+.bottom-tip {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:9px 11px;
+  border-top:1px solid var(--line);
+  color:var(--dim);
+  background:#0e0e0d;
+  font-size:9px;
+}
+
+.bottom-tip span {
+  flex:1;
+  text-align:center;
+}
+
+.bottom-tip button {
+  border:0;
+  background:none;
+  color:var(--dim);
+  font-size:17px;
+}
+
+.bottom-tip button:hover {
+  color:var(--text);
+}
+
+/* Templates / engineering */
+
+.template-tools {
+  display:flex;
+  gap:5px;
+  overflow:auto;
+  margin-bottom:8px;
+}
+
+.chip {
+  padding:5px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--dim);
+  background:transparent;
+  white-space:nowrap;
+  font-size:9px;
+}
+
+.chip.active {
+  color:#111;
+  background:#d7d4cb;
+  border-color:#d7d4cb;
+}
+
+.search {
+  margin-bottom:8px;
+  padding:8px 10px;
+  font-size:11px;
+}
+
+.template-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.card {
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:var(--surface-2);
+  cursor:pointer;
+  transition:border-color var(--ease),background var(--ease),transform var(--ease);
+}
+
+.card:hover {
+  border-color:var(--line-light);
+  background:var(--surface-3);
+  transform:translateY(-2px);
+}
+
+.card b {
+  display:block;
+  margin-bottom:3px;
+  font-size:11px;
+}
+
+.card p {
+  margin:0;
+  color:var(--dim);
+  font-size:9px;
+  line-height:1.5;
+}
+
+.tag {
+  display:inline-block;
+  margin-top:7px;
+  padding:2px 6px;
+  border-radius:999px;
+  color:var(--muted);
+  background:#252522;
+  font-size:8px;
+}
+
+.section-head {
+  margin-bottom:7px;
+}
+
+.section-sub {
+  color:var(--dim);
+  font-size:9px;
+}
+
+#engineer-input,
+#credit-input {
+  padding:10px;
+  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+#engineer-input {
+  min-height:100px;
+}
+
+#credit-input {
+  min-height:76px;
+}
+
+.checks {
+  display:grid;
+  gap:2px;
+}
+
+.check {
+  display:grid;
+  grid-template-columns:19px 1fr auto;
+  gap:6px;
+  align-items:center;
+  padding:6px 7px;
+  border-radius:2px;
+  font-size:10px;
+}
+
+.check.pass {
+  background:rgba(126,177,138,.055);
+}
+
+.check.fail {
+  background:rgba(215,123,115,.055);
+}
+
+.check-icon {
+  width:17px;
+  height:17px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  font-size:9px;
+  font-weight:800;
+}
+
+.pass .check-icon {
+  color:var(--green);
+  background:rgba(126,177,138,.13);
+}
+
+.fail .check-icon {
+  color:var(--red);
+  background:rgba(215,123,115,.13);
+}
+
+.check-fix {
+  max-width:170px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--dim);
+  font-size:8px;
+}
+
+.tech-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.tech {
+  display:flex;
+  gap:7px;
+  padding:9px;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:var(--surface-2);
+  cursor:pointer;
+  transition:border-color var(--ease),background var(--ease);
+}
+
+.tech:hover {
+  border-color:var(--line-light);
+}
+
+.tech.selected {
+  border-color:#77756d;
+  background:#1c1c19;
+}
+
+.tech-mark {
+  width:13px;
+  height:13px;
+  flex:0 0 13px;
+  margin-top:1px;
+  border:1px solid #55544e;
+  border-radius:2px;
+}
+
+.selected .tech-mark {
+  background:#d8d5cc;
+  border-color:#d8d5cc;
+}
+
+.tech b {
+  display:block;
+  font-size:10px;
+}
+
+.tech small {
+  display:block;
+  color:var(--dim);
+  font-size:8px;
+}
+
+.history-row {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:9px 10px;
+  margin-bottom:5px;
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:var(--surface-2);
+  transition:border-color var(--ease),background var(--ease);
+}
+
+.history-row:hover {
+  border-color:var(--line-light);
+  background:var(--surface-3);
+}
+
+.history-text {
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.history-score {
+  color:#ddd9d0;
+  font-size:9px;
+}
+
+.plain {
+  padding:3px;
+  border:0;
+  background:none;
+  color:var(--dim);
+}
+
+.plain.starred {
+  color:var(--yellow);
+}
+
+.empty {
+  padding:22px;
+  text-align:center;
+  color:var(--dim);
+  font-size:10px;
+}
+
+/* Lower page */
+
+.info-section {
+  width:min(880px,calc(100% - 32px));
+  margin:0 auto;
+  padding:66px 0;
+}
+
+.info-title {
+  margin:0 0 31px;
+  text-align:center;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(29px,4vw,40px);
+  line-height:1;
+  font-weight:500;
+  letter-spacing:-.045em;
+}
+
+.info-title span {
+  color:#aaa79f;
+  font-style:italic;
+}
+
+.steps {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.step {
+  padding:19px;
+  border-top:1px solid var(--line-light);
+  background:transparent;
+  transition:transform var(--ease),border-color var(--ease);
+}
+
+.step:hover {
+  transform:translateY(-2px);
+  border-color:#66645d;
+}
+
+.step-num {
+  color:#d2cfc7;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:22px;
+}
+
+.step h3 {
+  margin:8px 0 4px;
+  font-size:13px;
+}
+
+.step p {
+  margin:0;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.platforms {
+  padding-top:10px;
+  text-align:center;
+}
+
+.platform-list {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px;
+  margin-top:14px;
+}
+
+.platform-list span {
+  padding:5px 10px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--muted);
+  background:transparent;
+  font-size:10px;
+}
+
+footer {
+  padding:27px;
+  border-top:1px solid var(--line);
+  color:var(--dim);
+  text-align:center;
+  font-size:10px;
+}
+
+/* Modal */
+
+.modal {
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+
+.modal-bg {
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(5px);
+}
+
+.modal-card {
+  position:relative;
+  width:min(420px,100%);
+  max-height:80vh;
+  overflow:auto;
+  padding:18px;
+  border:1px solid var(--line-light);
+  border-radius:3px;
+  background:#121210;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+
+.modal-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:15px;
+  font-weight:800;
+}
+
+.modal-close {
+  border:0;
+  background:none;
+  color:var(--dim);
+}
+
+.modal-close:hover {
+  color:var(--text);
+}
+
+.setting {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:9px 0;
+  font-size:11px;
+}
+
+.switch {
+  position:relative;
+  width:36px;
+  height:20px;
+}
+
+.switch input {
+  width:0;
+  height:0;
+  opacity:0;
+}
+
+.slider {
+  position:absolute;
+  inset:0;
+  background:#34342f;
+  border-radius:999px;
+  transition:background var(--ease);
+}
+
+.slider:before {
   content:"";
-  position:absolute;top:3px;left:3px;
-  width:18px;height:18px;border-radius:50%;
-  background:var(--surface);
-  box-shadow:var(--shadow-sm);
-  transition:transform .18s var(--ease);
+  position:absolute;
+  left:3px;
+  top:3px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:#e8e5dc;
+  transition:transform var(--ease);
 }
-.switch input:checked + i{background:var(--accent)}
-.switch input:checked + i::after{transform:translateX(18px)}
-.switch input:focus-visible + i{outline:2px solid var(--accent);outline-offset:2px}
 
-/* command palette */
-.palette__input{
-  width:100%;border:0;border-bottom:1px solid var(--line);
-  background:transparent;padding:16px;font-size:15px;
+.switch input:checked+.slider {
+  background:#77756d;
 }
-.palette__input:focus{outline:0}
-.palette__list{max-height:52vh;overflow:auto;padding:8px}
-.palette__item{
-  display:flex;align-items:center;gap:12px;width:100%;
-  padding:10px 12px;border-radius:var(--r-sm);
-  text-align:left;font-size:12.5px;color:var(--ink-2);
-}
-.palette__item[aria-selected="true"]{background:var(--accent-soft);color:var(--ink)}
-.palette__item span{margin-left:auto;font-size:10px;color:var(--ink-3);font-family:var(--mono)}
 
-/* toasts */
-.toasts{position:fixed;z-index:80;right:16px;bottom:16px;display:grid;gap:8px;max-width:320px}
-.toast{
-  padding:11px 14px;
-  border:1px solid var(--line);border-left:2px solid var(--accent);
-  border-radius:var(--r-md);
-  background:var(--surface);
-  box-shadow:var(--shadow);
-  font-size:11.5px;
+.switch input:checked+.slider:before {
+  transform:translateX(16px);
+}
+
+.modal-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+}
+
+.toast-area {
+  position:fixed;
+  top:72px;
+  right:14px;
+  z-index:80;
+  display:grid;
+  gap:6px;
+}
+
+.toast {
+  padding:9px 11px;
+  border:1px solid var(--line-light);
+  border-radius:2px;
+  color:var(--text);
+  background:#171715;
+  box-shadow:0 8px 20px rgba(0,0,0,.3);
+  font-size:10px;
   animation:toast-in .2s var(--ease);
 }
-.toast.is-out{animation:toast-out .2s var(--ease) forwards}
-@keyframes toast-in{from{opacity:0;transform:translateY(8px)}}
-@keyframes toast-out{to{opacity:0;transform:translateX(12px)}}
 
-/* ---- 11 · responsive & motion ------------------------------------------ */
+@keyframes toast-in {
+  from { opacity:0; transform:translateY(-4px); }
+  to { opacity:1; transform:none; }
+}
 
-@media (max-width:900px){
-  .steps{grid-template-columns:1fr}
-  .diff,.grid-2{grid-template-columns:1fr}
+#draft-status {
+  min-width:74px;
+  color:var(--dim);
+  text-align:right;
+  font-size:9px;
 }
-@media (max-width:720px){
-  :root{--gutter:16px}
-  .nav{display:none}
-  .kbd-hint{display:none}
-  .hero{padding:64px 0 48px}
-  .hero__rail{display:none}
-  .facts{margin-top:36px}
-  .fact{border-right:0;border-bottom:1px solid var(--line);flex-basis:100%;padding-right:0}
-  .fact:last-child{border-bottom:0}
-  .score{grid-template-columns:1fr;gap:14px}
-  .score__note{grid-column:auto}
-  .lint__hint{display:none}
-  .check__fix{max-width:38%}
-  .toasts{left:12px;right:12px;max-width:none}
-  .bench__state{display:none}
+
+#draft-status.saved {
+  color:var(--green);
 }
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation-duration:.01ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:.01ms !important;
-    scroll-behavior:auto !important;
+
+#draft-status.hot {
+  color:#d8d5cc;
+}
+
+.prompt-toolbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+  margin-bottom:7px;
+}
+
+.prompt-toolbar .micro-actions {
+  display:flex;
+  gap:4px;
+}
+
+.micro-btn {
+  padding:4px 7px;
+  font-size:8px;
+}
+
+.char-meter {
+  height:2px;
+  overflow:hidden;
+  margin-top:7px;
+  border-radius:2px;
+  background:#292925;
+}
+
+.char-meter i {
+  display:block;
+  width:0;
+  height:100%;
+  background:#d3d0c7;
+  transition:width .2s;
+}
+
+.shortcut-hint {
+  margin-top:6px;
+  color:var(--dim);
+  font-size:8px;
+}
+
+.shortcut-hint kbd {
+  padding:2px 4px;
+  border:1px solid var(--line-light);
+  border-bottom-color:#171715;
+  border-radius:2px;
+  color:#c8c5bd;
+  background:#171715;
+}
+
+@media(max-width:760px) {
+  .main-nav {
+    display:none;
+  }
+
+  .topbar {
+    padding:9px 12px;
+  }
+
+  .hero {
+    padding:70px 16px 58px;
+  }
+
+  .shell {
+    width:calc(100% - 16px);
+  }
+
+  .workspace-head {
+    padding:8px;
+  }
+
+  .panel {
+    padding:10px;
+  }
+
+  .template-grid,
+  .tech-grid,
+  .compare,
+  .steps {
+    grid-template-columns:1fr;
+  }
+
+  .score {
+    grid-template-columns:1fr;
+  }
+
+  .score-note {
+    grid-column:auto;
+  }
+
+  .info-section {
+    width:calc(100% - 24px);
+  }
+
+  .prompt-toolbar {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .prompt-toolbar .micro-actions {
+    width:100%;
+  }
+
+  .micro-btn {
+    flex:1;
+  }
+
+  .toast-area {
+    left:10px;
+    right:10px;
+    top:68px;
   }
 }
-@media print{
-  .masthead,.hero,.section,.colophon,.tipbar,.toasts{display:none}
-  .bench{box-shadow:none;border:0}
+
+@media(prefers-reduced-motion:reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:auto!important;
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
 }
 </style>
 </head>
-
 <body>
 
-<header class="masthead">
-  <a class="brand" href="#top">
-    <span class="brand__mark">V</span>
-    <span>Vibe&nbsp;Check <span class="brand__sub">/ workbench</span></span>
-  </a>
-
-  <nav class="nav" aria-label="Sections">
-    <button data-tab="enhance" class="is-active">Enhance</button>
+<header class="topbar">
+  <a class="brand" href="#"><span class="brand-mark">◆</span><span>Vibe Check</span></a>
+  <nav class="main-nav" aria-label="Main">
+    <button class="active" data-tab="enhance">Enhance</button>
     <button data-tab="templates">Templates</button>
     <button data-tab="engineer">Engineer</button>
-    <button data-tab="history">Library</button>
+    <button data-tab="history">History</button>
   </nav>
-
-  <div class="masthead__end">
-    <button class="kbd-hint" id="btn-palette" type="button">Commands <kbd id="mod-key">Ctrl</kbd><kbd>K</kbd></button>
-    <button class="icon-btn" id="btn-theme" type="button" title="Switch theme" aria-label="Switch theme">◐</button>
-    <button class="icon-btn" id="btn-settings" type="button" title="Settings" aria-label="Settings">⚙</button>
+  <div class="top-actions">
+    <a class="small-icon" href="#workspace" aria-label="Open workspace">◆</a>
+    <button class="small-icon" id="settings-btn" aria-label="Settings">⚙</button>
   </div>
 </header>
 
-<main id="top">
+<main>
+<section class="hero">
+  <div class="badge"><span class="dot"></span>Prompt workshop for AI coding tools</div>
+  <h1>Write <span>better</span><br>prompts.</h1>
+  <p>Improve, score, test, and organize prompts before you hand them to your coding assistant.</p>
+  <a class="primary" href="#workspace">Start writing →</a>
+</section>
 
-  <!-- ── hero ───────────────────────────────────────────────────────────── -->
-  <section class="hero">
-    <div class="hero__rail" aria-hidden="true"></div>
-    <div class="wrap">
-      <span class="pill"><i class="dot"></i>Runs entirely in your browser</span>
-      <h1 class="display">Sharpen the <em>ask</em>, not the answer.</h1>
-      <p class="lede">
-        A workbench for the ten minutes before you hit send. Draft, lint, score,
-        diff and file your prompts — then paste them into whichever assistant you
-        happen to be arguing with today.
-      </p>
-      <div class="hero__cta">
-        <a class="btn btn--solid btn--lg" href="#bench">Open the bench →</a>
-        <button class="btn btn--lg" id="btn-hero-demo" type="button">Load an example</button>
+<section class="shell" id="workspace">
+<div class="workspace">
+  <div class="workspace-head">
+    <div class="app-id"><span class="app-mark">◆</span>VIBE CHECK</div>
+    <nav class="workspace-tabs">
+      <button class="active" data-tab="enhance">Enhance</button>
+      <button data-tab="templates">Templates</button>
+      <button data-tab="engineer">Engineer</button>
+      <button data-tab="history">History</button>
+    </nav>
+  </div>
+
+  <section class="panel active" id="panel-enhance">
+    <div class="stack hidden" id="stack-badge"><span class="dot"></span><small>Detected stack:</small><strong id="stack-name"></strong></div>
+    <div class="tipbox hidden" id="stack-tips"><strong>Useful reminders</strong><span id="tips-stack-name"></span><ul id="tips-list"></ul></div>
+
+    <div class="box">
+      <div class="prompt-toolbar">
+        <span id="draft-status">Ready</span>
+        <div class="micro-actions">
+          <button class="micro-btn" id="btn-random-prompt" type="button">Surprise me</button>
+          <button class="micro-btn" id="btn-clear-prompt" type="button">Clear</button>
+        </div>
       </div>
+      <textarea id="prompt-input" maxlength="5000" placeholder="Type or paste your prompt here..."></textarea>
+      <div class="char-meter" aria-hidden="true"><i id="char-meter-fill"></i></div>
+      <div class="meta">
+        <span id="word-count">0 words · 0 characters</span>
+        <span id="complexity-badge" class="level hidden"></span>
+      </div>
+      <div class="shortcut-hint">Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to enhance</div>
+    </div>
 
-      <div class="facts">
-        <div class="fact"><b>0</b><span>network requests made</span></div>
-        <div class="fact"><b>4</b><span>quality dimensions scored</span></div>
-        <div class="fact"><b>16</b><span>starter templates</span></div>
-        <div class="fact"><b>∞</b><span>drafts, stored locally</span></div>
+    <div class="row">
+      <button class="enhance grow" id="btn-enhance" disabled>
+        <span class="label">Enhance prompt</span><span class="spinner"></span>
+      </button>
+      <button class="small-icon hidden" id="btn-undo" title="Undo">↶</button>
+      <button class="small-icon hidden" id="btn-redo" title="Redo">↷</button>
+    </div>
+
+    <div class="score hidden" id="score-display">
+      <div><span class="score-value" id="score-number">0</span><span style="color:var(--dim)"> / 100</span></div>
+      <div><div class="score-caption" id="score-label"></div><div id="score-bars"></div></div>
+      <div class="score-note" id="score-feedback"></div>
+    </div>
+
+    <div class="box hidden" id="enhanced-area" style="padding:0;border-left:2px solid #d8d5cc">
+      <div class="result-head"><span class="result-title">✓ Enhanced</span><button class="copy-btn" id="btn-copy-enhanced">Copy</button></div>
+      <pre class="result-text" id="enhanced-text"></pre>
+      <div class="improvements" id="improvements-list"></div>
+    </div>
+
+    <div class="compare hidden" id="before-after">
+      <div class="before">
+        <h4>Before <button class="copy-btn" id="btn-copy-before" type="button">Copy</button></h4>
+        <pre id="before-text"></pre>
+      </div>
+      <div class="after">
+        <h4>After <button class="copy-btn" id="btn-copy-after" type="button">Copy</button></h4>
+        <pre id="after-text"></pre>
+      </div>
+      <div class="changes" id="changes-list" style="grid-column:1/-1"></div>
+    </div>
+
+    <div class="box efficiency hidden" id="token-efficiency">
+      <div class="eff-head" id="efficiency-toggle">▥ <span>Token efficiency</span><span id="efficiency-pct"></span>⌄</div>
+      <div class="eff-body hidden" id="efficiency-body">
+        <div class="ring">
+          <svg width="58" height="58" viewBox="0 0 58 58">
+            <circle cx="29" cy="29" r="24" fill="none" stroke="#292925" stroke-width="4"/>
+            <circle id="efficiency-ring" cx="29" cy="29" r="24" fill="none" stroke="#d8d5cc" stroke-width="4" stroke-dasharray="150.8" stroke-linecap="round"/>
+          </svg>
+          <span class="ring-label" id="ring-percent">100%</span>
+        </div>
+        <div>
+          <div id="filler-count" style="color:var(--muted);font-size:11px"></div>
+          <ul class="mini-list" id="filler-list"></ul>
+          <button class="secondary" id="btn-strip-filler">Strip filler</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ── the bench ──────────────────────────────────────────────────────── -->
-  <section class="wrap" id="bench">
-    <div class="bench">
+  <section class="panel" id="panel-templates">
+    <div class="template-tools" id="templates-category-tabs">
+      <button class="chip active" data-category="ui-components">UI</button>
+      <button class="chip" data-category="full-apps">Apps</button>
+      <button class="chip" data-category="fixes">Fixes</button>
+      <button class="chip" data-category="api-backend">API</button>
+      <button class="chip" data-category="ai-prompts">AI</button>
+    </div>
+    <input class="search" id="template-search" type="text" placeholder="Search templates...">
+    <div class="template-grid" id="templates-grid"></div>
+  </section>
 
-      <div class="bench__bar">
-        <div class="bench__id"><i></i>WORKBENCH</div>
-        <nav class="bench__tabs" aria-label="Workbench">
-          <button data-tab="enhance" class="is-active">Enhance</button>
-          <button data-tab="templates">Templates</button>
-          <button data-tab="engineer">Engineer</button>
-          <button data-tab="history">Library</button>
-        </nav>
-        <div class="bench__state" id="bench-state">Ready</div>
-      </div>
+  <section class="panel" id="panel-engineer">
+    <div class="box">
+      <div class="section-head"><span class="section-label">Source prompt</span><button class="secondary" id="btn-engineer-from-enhance">Use last enhanced</button></div>
+      <textarea id="engineer-input" maxlength="5000" placeholder="Paste or type your prompt to engineer..."></textarea>
+      <div class="meta"><span id="engineer-word-count">0 words · 0 characters</span></div>
+    </div>
 
-      <!-- ── panel: enhance ── -->
-      <section class="panel is-active" id="panel-enhance">
-        <div class="stack-12">
+    <div class="box">
+      <div class="section-head"><span class="section-label">Quality checklist</span><span id="checklist-score" class="section-sub"></span></div>
+      <div class="checks" id="checklist-grid"></div>
+    </div>
 
-          <div class="note">
-            <span aria-hidden="true">◆</span>
-            <span><b>Local rules only.</b> Nothing here calls a model. Every rewrite is
-            plain pattern-matching you can read in the page source — treat it as a
-            checklist that types for you.</span>
-          </div>
+    <div class="box">
+      <div class="section-head"><span class="section-label">Apply techniques</span><button class="secondary" id="btn-apply-techniques">Apply selected</button></div>
+      <div class="tech-grid" id="techniques-grid"></div>
+    </div>
 
-          <div class="note is-hidden" id="stack-note">
-            <span aria-hidden="true">⌘</span>
-            <span><b id="stack-name"></b> detected — the rewrite will tell the assistant
-            to stay inside the conventions you already have.</span>
-          </div>
+    <div class="box">
+      <div class="section-head"><span class="section-label">Prompt variants</span><button class="secondary" id="btn-generate-variants">Generate</button></div>
+      <div id="variants-container"><div class="empty">Click Generate to create 3 variations</div></div>
+    </div>
 
-          <!-- editor -->
-          <div class="card">
-            <div class="toolstrip">
-              <span class="toolstrip__label">Insert block</span>
-              <button class="btn btn--tiny" data-block="context" type="button">Context</button>
-              <button class="btn btn--tiny" data-block="constraints" type="button">Constraints</button>
-              <button class="btn btn--tiny" data-block="done" type="button">Done when</button>
-              <button class="btn btn--tiny" data-block="format" type="button">Output format</button>
+    <div class="box">
+      <div class="section-head"><span class="section-label">Version history</span><span><button class="secondary" id="btn-save-version">Save</button> <button class="secondary" id="btn-clear-versions">Clear</button></span></div>
+      <div id="versions-list"><div class="empty">No versions saved</div></div>
+    </div>
 
-              <span class="grow"></span>
-
-              <button class="btn btn--tiny" id="btn-undo" type="button" disabled title="Undo">↶</button>
-              <button class="btn btn--tiny" id="btn-redo" type="button" disabled title="Redo">↷</button>
-              <button class="btn btn--tiny" id="btn-surprise" type="button">Surprise me</button>
-              <button class="btn btn--tiny" id="btn-clear" type="button">Clear</button>
-            </div>
-
-            <label class="is-hidden" for="prompt-input">Your prompt</label>
-            <textarea class="field editor" id="prompt-input" maxlength="6000"
-              placeholder="Describe what you want built, fixed or reviewed…&#10;&#10;Rough is fine. That's the point."></textarea>
-
-            <div class="gauge" id="gauge"><i></i></div>
-
-            <div class="meta-row">
-              <span id="count-words">0 words</span><span class="sep"></span>
-              <span id="count-chars">0 characters</span><span class="sep"></span>
-              <span id="count-tokens" title="Rough estimate: characters ÷ 4">~0 tokens (est.)</span>
-              <span class="grow"></span>
-              <span class="tier is-hidden" id="tier"></span>
-            </div>
-
-            <div class="meta-row">
-              <span>Press <kbd id="mod-key-2">Ctrl</kbd> + <kbd>↵</kbd> to enhance</span>
-              <span class="grow"></span>
-              <span id="draft-state">Draft saved locally</span>
-            </div>
-          </div>
-
-          <!-- lint -->
-          <div class="card card--flush is-hidden" id="lint-card">
-            <div class="card__head">
-              <span class="card__title">Reader's notes</span>
-              <span class="micro" id="lint-summary"></span>
-            </div>
-            <div class="card__body"><div class="lint" id="lint-list"></div></div>
-          </div>
-
-          <button class="btn btn--solid btn--lg" id="btn-enhance" style="width:100%" disabled>
-            <span class="btn-label">Enhance prompt</span><span class="spinner"></span>
-          </button>
-
-          <!-- score -->
-          <div class="card is-hidden" id="score-card">
-            <div class="score">
-              <div class="dial" id="score-dial">
-                <div class="dial__value"><span><span id="score-number">0</span><small> /100</small></span></div>
-              </div>
-              <div>
-                <div class="score__title" id="score-title"></div>
-                <div id="score-bars"></div>
-              </div>
-              <p class="score__note" id="score-note"></p>
-            </div>
-          </div>
-
-          <!-- result -->
-          <div class="card card--flush is-hidden" id="result-card">
-            <div class="card__head">
-              <span class="card__title">Enhanced</span>
-              <span class="row">
-                <button class="btn btn--tiny" id="btn-download" type="button">Save .md</button>
-                <button class="btn btn--tiny" id="btn-send-engineer" type="button">Open in Engineer</button>
-                <button class="btn btn--tiny" id="btn-copy-result" type="button">Copy</button>
-              </span>
-            </div>
-            <pre class="result" id="result-text"></pre>
-            <div class="changes" id="changes"></div>
-          </div>
-
-          <!-- diff -->
-          <div class="diff is-hidden" id="diff-card">
-            <div class="diff__pane diff__pane--before">
-              <div class="diff__head">Before <button class="btn btn--tiny" id="btn-copy-before" type="button">Copy</button></div>
-              <div class="diff__body" id="diff-before"></div>
-            </div>
-            <div class="diff__pane diff__pane--after">
-              <div class="diff__head">After <button class="btn btn--tiny" id="btn-copy-after" type="button">Copy</button></div>
-              <div class="diff__body" id="diff-after"></div>
-            </div>
-          </div>
-
-          <!-- efficiency -->
-          <div class="card card--flush is-hidden" id="eff-card">
-            <button class="eff__toggle" id="eff-toggle" type="button" aria-expanded="false" aria-controls="eff-body">
-              <span aria-hidden="true">▤</span>
-              <span>Padding check</span>
-              <span class="eff__pct" id="eff-pct"></span>
-              <span class="caret" aria-hidden="true">⌄</span>
-            </button>
-            <div class="eff__body is-hidden" id="eff-body">
-              <div class="dial" id="eff-dial"><div class="dial__value" id="eff-value">100%</div></div>
-              <div class="grow">
-                <p class="micro" id="filler-count"></p>
-                <ul class="tokens" id="filler-list"></ul>
-                <button class="btn btn--tiny" id="btn-strip" type="button">Strip filler from result</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ── panel: templates ── -->
-      <section class="panel" id="panel-templates">
-        <div class="stack-12">
-          <div class="toolstrip" id="template-cats">
-            <button class="btn btn--tiny is-active" data-cat="ui" aria-pressed="true">Interface</button>
-            <button class="btn btn--tiny" data-cat="apps" aria-pressed="false">Whole apps</button>
-            <button class="btn btn--tiny" data-cat="fixes" aria-pressed="false">Repairs</button>
-            <button class="btn btn--tiny" data-cat="api" aria-pressed="false">API &amp; data</button>
-            <button class="btn btn--tiny" data-cat="think" aria-pressed="false">Thinking</button>
-            <button class="btn btn--tiny" data-cat="mine" aria-pressed="false">Mine</button>
-            <span class="grow"></span>
-            <button class="btn btn--tiny" id="btn-save-template" type="button">Save editor as template</button>
-          </div>
-
-          <input class="field search-field" id="template-search" type="search" placeholder="Search templates…">
-          <div class="grid-2" id="templates-grid"></div>
-        </div>
-      </section>
-
-      <!-- ── panel: engineer ── -->
-      <section class="panel" id="panel-engineer">
-        <div class="stack-12">
-
-          <div class="card">
-            <div class="row-between" style="margin-bottom:10px">
-              <span class="card__title">Source prompt</span>
-              <button class="btn btn--tiny" id="btn-from-enhance" type="button">Pull last enhanced</button>
-            </div>
-            <textarea class="field" id="engineer-input" rows="6" maxlength="6000"
-              placeholder="Paste the prompt you want to work over…"></textarea>
-            <div class="meta-row"><span id="engineer-count">0 words · 0 characters</span></div>
-          </div>
-
-          <div class="card">
-            <div class="row-between" style="margin-bottom:10px">
-              <span class="card__title">Quality checklist</span>
-              <span class="micro" id="checklist-score"></span>
-            </div>
-            <div class="checks" id="checklist"></div>
-          </div>
-
-          <div class="card">
-            <div class="row-between" style="margin-bottom:10px">
-              <span class="card__title">Techniques</span>
-              <button class="btn btn--tiny" id="btn-apply-tech" type="button">Apply selected</button>
-            </div>
-            <div class="grid-2" id="techniques"></div>
-          </div>
-
-          <div class="card">
-            <div class="row-between" style="margin-bottom:10px">
-              <span class="card__title">Variants</span>
-              <button class="btn btn--tiny" id="btn-variants" type="button">Generate three</button>
-            </div>
-            <div id="variants"><div class="empty">Three angles on the same request: tight scope, verification-first, and report-style output.</div></div>
-          </div>
-
-          <div class="card">
-            <div class="row-between" style="margin-bottom:10px">
-              <span class="card__title">Versions</span>
-              <span class="row">
-                <button class="btn btn--tiny" id="btn-save-version" type="button">Snapshot</button>
-                <button class="btn btn--tiny btn--danger" id="btn-clear-versions" type="button">Clear</button>
-              </span>
-            </div>
-            <div id="versions"></div>
-          </div>
-
-          <div class="card">
-            <div class="row-between" style="margin-bottom:8px">
-              <span class="card__title">Compressor</span>
-              <span class="micro">filler removal, nothing clever</span>
-            </div>
-            <p class="micro" style="margin-bottom:10px">
-              Strips hedges and politeness padding. Real token savings depend on the
-              tokenizer — this is a readability tool first.
-            </p>
-            <textarea class="field" id="compress-input" rows="4" maxlength="6000" placeholder="Paste a wordy prompt…"></textarea>
-            <div class="meta-row"><span id="compress-count">0 words · 0 characters</span></div>
-            <button class="btn btn--solid" id="btn-compress" style="width:100%;margin-top:12px" disabled>
-              <span class="btn-label">Compress</span><span class="spinner"></span>
-            </button>
-            <div class="card card--flush is-hidden" id="compress-result" style="margin-top:12px">
-              <div class="card__head">
-                <span class="card__title">Result <span class="micro" id="compress-delta"></span></span>
-                <button class="btn btn--tiny" id="btn-copy-compress" type="button">Copy</button>
-              </div>
-              <pre class="result" id="compress-text"></pre>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ── panel: library ── -->
-      <section class="panel" id="panel-history">
-        <div class="stack-12">
-          <div class="row">
-            <input class="field search-field grow" id="history-search" type="search" placeholder="Search your prompts…">
-            <button class="btn btn--tiny" id="btn-starred" type="button" aria-pressed="false">★ Starred only</button>
-          </div>
-          <div id="history-list"></div>
-          <button class="btn btn--tiny btn--danger" id="btn-clear-history" type="button">Empty the library</button>
-        </div>
-      </section>
-
-      <div class="tipbar">
-        <button id="tip-prev" type="button" aria-label="Previous tip">‹</button>
-        <p id="tip-text"></p>
-        <button id="tip-next" type="button" aria-label="Next tip">›</button>
-      </div>
-
+    <div class="box">
+      <div class="section-head"><span class="section-label">Credit saver</span><span class="section-sub">English → Chinese</span></div>
+      <p style="margin:7px 0 10px;color:var(--muted);font-size:10px">Chinese can use fewer tokens for some prompts. Compare provider-specific usage before relying on the estimate.</p>
+      <textarea id="credit-input" maxlength="5000" placeholder="Paste your English prompt..."></textarea>
+      <div class="meta"><span id="credit-word-count">0 words · 0 characters</span><span>estimate only</span></div>
+      <div class="row" style="margin-top:10px"><button class="enhance grow" id="btn-credit-transform" disabled><span class="label">Transform</span><span class="spinner"></span></button></div>
+      <div class="box hidden" id="credit-result" style="margin:10px 0 0"><div class="result-head"><span class="result-title">Chinese prompt</span><button class="copy-btn" id="btn-copy-credit">Copy</button></div><pre class="result-text" id="credit-text"></pre></div>
     </div>
   </section>
 
-  <!-- ── how it works ───────────────────────────────────────────────────── -->
-  <section class="section wrap">
-    <div class="section__head">
-      <span class="eyebrow">The method</span>
-      <h2 class="display">Three passes, then <em>get out of the way</em>.</h2>
-      <p class="lede">Most bad output starts as a vague request. Fix that first — it's cheaper than fixing the code.</p>
-    </div>
-    <div class="steps">
-      <article class="step">
-        <div class="step__n">01</div>
-        <h3>Say the outcome</h3>
-        <p>Not the vibe, not the adjectives. What should be true when this is finished?</p>
-      </article>
-      <article class="step">
-        <div class="step__n">02</div>
-        <h3>Add the walls</h3>
-        <p>Constraints, edge states, and what must <em>not</em> change. This is where the score moves.</p>
-      </article>
-      <article class="step">
-        <div class="step__n">03</div>
-        <h3>Ship it and file it</h3>
-        <p>Copy into your assistant. The prompt stays in the library for the next time.</p>
-      </article>
-    </div>
+  <section class="panel" id="panel-history">
+    <input class="search" id="history-search" type="text" placeholder="Search prompts...">
+    <div id="history-list"></div>
+    <button class="secondary" id="btn-clear-history" style="margin-top:7px;color:var(--bad)">Clear all history</button>
   </section>
 
-  <section class="section wrap">
-    <div class="section__head">
-      <span class="eyebrow">Portable</span>
-      <h2 class="display">Plain text goes <em>everywhere</em>.</h2>
-      <p class="lede">No integrations, no API keys, no lock-in. The output is a prompt.</p>
-    </div>
-    <div class="chip-cloud">
-      <span>v0</span><span>Bolt</span><span>Lovable</span><span>Cursor</span><span>ChatGPT</span>
-      <span>Claude</span><span>Gemini</span><span>Copilot</span><span>Windsurf</span><span>Replit</span>
-      <span>DeepSeek</span><span>Zed</span><span>Cody</span><span>Aider</span><span>StackBlitz</span>
-    </div>
-  </section>
+  <div class="bottom-tip"><button id="tip-prev">‹</button><span id="tip-text"></span><button id="tip-next">›</button></div>
+</div>
+</section>
 
-  <footer class="colophon wrap">
-    <span>Vibe Check — a prompt workbench. Local rules, editable output, no telemetry.</span>
-    <span>Everything you type stays in this browser.</span>
-  </footer>
+<section class="info-section">
+  <div class="badge" style="display:flex;width:max-content;margin:auto">How it works</div>
+  <h2 class="info-title">Three steps to <span>better prompts</span></h2>
+  <div class="steps">
+    <article class="step"><div class="step-num">01</div><h3>Write the rough idea</h3><p>Start with the outcome you want. The first draft does not need to be polished.</p></article>
+    <article class="step"><div class="step-num">02</div><h3>Improve the request</h3><p>Use scoring, structure, constraints, techniques, and stack detection to tighten it.</p></article>
+    <article class="step"><div class="step-num">03</div><h3>Copy and build</h3><p>Take the resulting prompt into the coding assistant you actually use.</p></article>
+  </div>
+</section>
+
+<section class="info-section platforms">
+  <div class="badge" style="display:flex;width:max-content;margin:auto">Works with</div>
+  <h2 class="info-title" style="font-size:30px">Any AI coding <span>platform</span></h2>
+  <div class="platform-list">
+    <span>v0</span><span>Bolt</span><span>Lovable</span><span>Cursor</span><span>ChatGPT</span>
+    <span>Claude</span><span>Gemini</span><span>Perplexity</span><span>DeepSeek</span><span>Replit</span>
+    <span>StackBlitz</span><span>GitHub Copilot</span><span>Phind</span><span>Windsurf</span><span>Cody</span>
+  </div>
+</section>
 </main>
 
-<!-- ── settings ─────────────────────────────────────────────────────────── -->
-<div class="overlay overlay--center is-hidden" id="modal-settings" role="dialog" aria-modal="true" aria-label="Settings">
-  <div class="overlay__scrim" data-close></div>
-  <div class="sheet">
-    <div class="sheet__head">
-      <b>Settings</b>
-      <button class="icon-btn" type="button" data-close aria-label="Close">✕</button>
-    </div>
-    <div class="sheet__body">
-      <div class="setting">
-        <p>Detect the stack<small>Adds framework-aware lines to the rewrite</small></p>
-        <label class="switch"><input type="checkbox" id="set-stack" checked><i></i></label>
-      </div>
-      <div class="setting">
-        <p>Live scoring<small>Re-score as you type instead of on enhance</small></p>
-        <label class="switch"><input type="checkbox" id="set-live" checked><i></i></label>
-      </div>
-      <div class="setting">
-        <p>Show the diff<small>Line-by-line before/after comparison</small></p>
-        <label class="switch"><input type="checkbox" id="set-diff" checked><i></i></label>
-      </div>
-      <div class="setting">
-        <p>Padding check<small>Flag filler words in the result</small></p>
-        <label class="switch"><input type="checkbox" id="set-eff" checked><i></i></label>
-      </div>
-    </div>
-    <div class="sheet__foot">
-      <button class="btn btn--tiny" id="btn-export" type="button">Export JSON</button>
-      <button class="btn btn--tiny" id="btn-import" type="button">Import JSON</button>
-      <input type="file" id="file-import" accept="application/json" class="is-hidden">
-      <span class="grow"></span>
-      <button class="btn btn--tiny" id="btn-reset" type="button">Reset settings</button>
-      <button class="btn btn--tiny btn--danger" id="btn-wipe" type="button">Erase everything</button>
+<footer>Vibe Check — Prompt Workshop · made with intent, not a template</footer>
+
+<div class="modal hidden" id="settings-modal">
+  <div class="modal-bg" id="settings-backdrop"></div>
+  <div class="modal-card">
+    <div class="modal-head"><span>Settings</span><button class="modal-close" id="settings-close">✕</button></div>
+    <div class="setting"><span>Auto-detect stack</span><label class="switch"><input type="checkbox" id="setting-auto-stack" checked><span class="slider"></span></label></div>
+    <div class="setting"><span>Token efficiency</span><label class="switch"><input type="checkbox" id="setting-token-eff" checked><span class="slider"></span></label></div>
+    <div class="setting"><span>Before / after</span><label class="switch"><input type="checkbox" id="setting-before-after" checked><span class="slider"></span></label></div>
+    <div class="modal-actions">
+      <button class="secondary" id="btn-export">Export data</button>
+      <button class="secondary" id="btn-clear-data" style="color:var(--bad)">Clear all data</button>
+      <button class="secondary" id="btn-reset-settings">Reset settings</button>
     </div>
   </div>
 </div>
 
-<!-- ── command palette ──────────────────────────────────────────────────── -->
-<div class="overlay overlay--top is-hidden" id="modal-palette" role="dialog" aria-modal="true" aria-label="Commands">
-  <div class="overlay__scrim" data-close></div>
-  <div class="sheet">
-    <input class="palette__input" id="palette-input" type="text" placeholder="Type a command…" autocomplete="off" spellcheck="false">
-    <div class="palette__list" id="palette-list" role="listbox"></div>
-  </div>
-</div>
-
-<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="toast-area" id="toast-container"></div>
 
 <script>
-/* =========================================================================
-   VIBE CHECK — application script
-   Plain ES2020, no build step, no network. Sections:
-     01 helpers · 02 state · 03 content · 04 analysis · 05 rewriter
-     06 diff · 07 render · 08 panels · 09 palette · 10 wiring · 11 boot
-   ========================================================================= */
-(function () {
+function initApp() {
   "use strict";
 
-  /* ---- 01 · helpers ----------------------------------------------------- */
-
-  const $  = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const el = id => document.getElementById(id);
-
-  const esc = str => String(str).replace(/[&<>"']/g, c =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
-
-  const wordCount = str => {
-    const t = str.trim();
-    return t ? t.split(/\s+/).length : 0;
-  };
-
-  const tokenGuess = str => (str.trim() ? Math.max(1, Math.round(str.length / 4)) : 0);
-
-  const unique = arr => Array.from(new Set(arr));
-
-  function debounce(fn, wait) {
-    let t;
-    return function (...args) {
-      clearTimeout(t);
-      t = setTimeout(() => fn.apply(this, args), wait);
-    };
-  }
-
-  const disk = {
-    get(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw === null ? fallback : JSON.parse(raw);
-      } catch (_) { return fallback; }
+  const q = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const store = {
+    read(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+      catch { return fallback; }
     },
-    set(key, value) {
-      try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
-    },
-    drop(key) { try { localStorage.removeItem(key); } catch (_) {} }
+    write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
   };
 
-  function toast(message) {
-    const node = document.createElement("div");
-    node.className = "toast";
-    node.textContent = message;
-    el("toasts").appendChild(node);
-    setTimeout(() => {
-      node.classList.add("is-out");
-      setTimeout(() => node.remove(), 220);
-    }, 2400);
-  }
-
-  async function copyText(text, button) {
-    if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch (_) {
-      // Older browsers, or a page without clipboard permission.
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand("copy"); } catch (__) {}
-      ta.remove();
-    }
-    if (button) {
-      const original = button.textContent;
-      button.textContent = "Copied";
-      setTimeout(() => { button.textContent = original; }, 1200);
-    }
-    toast("Copied to clipboard");
-  }
-
-  function setState(text) {
-    el("bench-state").textContent = text;
-  }
-
-  /* ---- 02 · state ------------------------------------------------------- */
-
-  const state = {
-    settings: Object.assign(
-      { stack: true, live: true, diff: true, eff: true },
-      disk.get("vc.settings", {})
-    ),
-    library: disk.get("vc.library", []),
-    versions: disk.get("vc.versions", []),
-    mine: disk.get("vc.mine", []),
-    lastResult: disk.get("vc.last", ""),
-    lastSource: "",
-    starredOnly: false,
-    tab: "enhance",
-    tip: 0,
-    picked: new Set()
+  const app = {
+    history: store.read("vibe_history", []),
+    versions: store.read("vibe_versions", []),
+    settings: store.read("vibe_settings", {
+      autoStack: true, tokenEff: true, beforeAfter: true
+    }),
+    lastEnhanced: localStorage.getItem("vibe_last_enhanced") || "",
+    original: "",
+    tip: 0
   };
-
-  // Editor undo stack — separate from the browser's, so programmatic
-  // inserts (templates, blocks) are undoable too.
-  const edits = { list: [""], at: 0 };
-
-  function pushEdit(value) {
-    if (edits.list[edits.at] === value) return;
-    edits.list = edits.list.slice(0, edits.at + 1);
-    edits.list.push(value);
-    if (edits.list.length > 80) edits.list.shift();
-    edits.at = edits.list.length - 1;
-    refreshUndo();
-  }
-
-  function refreshUndo() {
-    el("btn-undo").disabled = edits.at <= 0;
-    el("btn-redo").disabled = edits.at >= edits.list.length - 1;
-  }
-
-  /* ---- 03 · content ----------------------------------------------------- */
 
   const tips = [
-    "If you can't name what \"done\" looks like, the model can't either.",
-    "Say what must not change. That single line prevents most collateral damage.",
-    "\"Modern\" and \"clean\" are not requirements. Spacing, contrast and states are.",
-    "Paste the actual error text. Paraphrased errors cost you a whole round trip.",
-    "One deliverable per prompt. Two requests share one answer and both get worse.",
-    "Name the file. \"Fix the header\" is a guess; \"fix Header.tsx\" is an instruction.",
-    "Ask for the diagnosis before the code — you'll catch wrong assumptions early."
+    "Name the outcome instead of describing a vague intention.",
+    "Include constraints, edge cases, and completion criteria.",
+    "Mention the framework or environment when it changes the solution.",
+    "Ask for accessible and responsive behavior when building UI.",
+    "For larger jobs, split the request into clear deliverables."
   ];
 
-  const templates = {
-    ui: [
-      ["Dashboard shell", "Build a dashboard shell with a persistent sidebar, a top bar, a responsive card grid, and a data table. Include loading skeletons, an empty state, and an error state for each data region.", "UI"],
-      ["Landing page", "Create a marketing landing page: hero with one primary call to action, a three-item feature row, social proof, pricing, FAQ, and footer. Typography and spacing must scale down rather than the layout simply shrinking.", "UI"],
-      ["Accessible modal", "Build a reusable modal: focus is trapped while open, Escape closes it, focus returns to the trigger on close, the background does not scroll, and it is labelled for screen readers.", "UI"],
-      ["Data table", "Build a table with column sorting, text filtering, pagination, row selection, and a visible count of the filtered results. Include empty, loading, and error states.", "UI"]
+  const library = {
+    "ui-components": [
+      ["Responsive dashboard","Build a responsive dashboard with navigation, cards, tables, filters, and loading states.","UI"],
+      ["Landing page","Create a modern responsive landing page with a hero, features, testimonials, CTA, and footer.","UI"],
+      ["Accessible modal","Create a reusable modal with keyboard support, focus management, and sensible animation.","UI"],
+      ["Data table","Build a responsive table with sorting, filtering, pagination, and empty states.","UI"]
     ],
-    apps: [
-      ["SaaS starter", "Build a SaaS starter: email authentication, a protected dashboard, an account settings page, and a billing placeholder. State clearly which parts are stubbed.", "APP"],
-      ["Task manager", "Create a task manager with projects, tasks, priorities, due dates, and filtering. Persist to local storage and survive a page refresh.", "APP"],
-      ["Admin panel", "Build an admin panel with a user list, role editing, an audit log, and a settings page. Every destructive action needs confirmation.", "APP"],
-      ["Note-taking app", "Build a note app with a searchable list, markdown editing, autosave, and keyboard shortcuts for new/save/search.", "APP"]
+    "full-apps": [
+      ["SaaS starter","Build a production-ready SaaS app with authentication, dashboard, settings, billing, and responsive UI.","APP"],
+      ["Task manager","Create a task management app with projects, tasks, priorities, filters, and persistence.","APP"],
+      ["Admin panel","Build an admin panel with authentication, analytics, users, roles, and settings.","APP"]
     ],
     fixes: [
-      ["Responsive repair", "Fix the responsive layout at the breakpoints where it currently breaks. Do not change the visual design, copy, or behaviour on desktop.", "FIX"],
-      ["Runtime error", "Diagnose the runtime error below. Explain the root cause first, then apply the smallest change that fixes it. Do not refactor anything unrelated.\n\nError:\n", "FIX"],
-      ["Form validation", "Fix validation and submission handling: validate on blur, show the message next to the offending field, disable the submit button while the request is in flight, and keep the existing markup and styling.", "FIX"],
-      ["Performance pass", "Find what is causing the slow interaction. Measure or reason about it first, then propose the fewest changes with the largest effect. Rank them by impact.", "FIX"]
+      ["Responsive layout","Fix the responsive layout without changing the existing design or functionality.","FIX"],
+      ["JavaScript bug","Find and fix JavaScript errors and broken event handlers without changing the UI.","FIX"],
+      ["Form validation","Fix validation, error states, and submission handling while preserving the existing design.","FIX"]
     ],
-    api: [
-      ["REST endpoints", "Create REST endpoints for this resource with input validation, consistent error shapes, pagination, and appropriate status codes. Document each route with a one-line description.", "API"],
-      ["Database schema", "Design a normalised schema with primary keys, foreign keys, indexes on the columns actually queried, and migration-ready SQL. Explain any denormalisation you choose.", "API"],
-      ["Auth flow", "Implement session-based authentication: hashed passwords, server-side session validation, protected routes, and a clear signed-out state. Never log credentials.", "API"],
-      ["Background job", "Add a background job with retries, exponential backoff, idempotency, and a dead-letter path. Log enough to debug a failure without leaking user data.", "API"]
+    "api-backend": [
+      ["REST API","Create a REST API with validation, authentication, error handling, pagination, and clear endpoints.","API"],
+      ["Database schema","Design a normalized database schema with relationships, indexes, and migration-ready SQL.","API"],
+      ["Authentication","Implement secure authentication with sessions, password hashing, validation, and protected routes.","API"]
     ],
-    think: [
-      ["Code review", "Review this code for correctness, security, performance, accessibility, and maintainability. Give each finding a severity and a concrete fix. Skip style nitpicks.", "THINK"],
-      ["Root cause", "Debug this systematically: list the plausible causes, say how to distinguish them, then give the fix for the most likely one. Show your reasoning before the code.", "THINK"],
-      ["Refactor plan", "Propose a refactor as an ordered list of steps, each one independently shippable and behaviour-preserving. No step should take more than an hour.", "THINK"],
-      ["Trade-off memo", "Compare the options below against my constraints. Give a recommendation, the strongest argument against it, and what would change your mind.", "THINK"]
+    "ai-prompts": [
+      ["Code review","Review this code for correctness, security, performance, accessibility, and maintainability. Return actionable fixes.","AI"],
+      ["Debugging","Debug the issue systematically. Explain the root cause, then provide the smallest safe fix.","AI"],
+      ["Refactor","Refactor this code for readability and maintainability without changing its behavior.","AI"]
     ]
   };
 
   const techniques = [
-    ["Role", "Frame the assistant's perspective.", p =>
-      "Act as a senior engineer who has to maintain this code for the next two years.\n\n" + p],
-    ["Constraints", "Add explicit walls.", p => p +
-      "\n\nConstraints\n- Preserve existing behaviour unless this request changes it.\n- No new dependencies without saying why.\n- Keep the change reviewable in one sitting."],
-    ["Plan first", "Force ordered steps.", p => p +
-      "\n\nPlan\n1. Restate the goal in one sentence.\n2. Identify what needs to change and why.\n3. Make the smallest correct change.\n4. Say how you verified it."],
-    ["Done when", "Make completion measurable.", p => p +
-      "\n\nDone when\n- The described behaviour works end to end.\n- Nothing previously working has regressed.\n- Edge and error states are handled."],
-    ["Edge cases", "Name the unhappy paths.", p => p +
-      "\n\nCover the empty, loading, error, offline, slow-network, and small-screen cases."],
-    ["Output shape", "Pin the response format.", p => p +
-      "\n\nRespond as\n1. One-paragraph diagnosis.\n2. The changes, file by file.\n3. Complete code for anything you touched.\n4. Anything you were unsure about."]
+    ["Role","Define an expert perspective."],
+    ["Constraints","Add explicit rules and boundaries."],
+    ["Steps","Turn the work into ordered actions."],
+    ["Criteria","Define measurable completion checks."],
+    ["Edge cases","Cover failure and unusual states."],
+    ["Output format","Specify exactly how the answer should be returned."]
   ];
 
-  const blocks = {
-    context: "\n\nContext\n- Stack: \n- Files involved: \n- Must not change: \n",
-    constraints: "\n\nConstraints\n- \n- \n",
-    done: "\n\nDone when\n- \n- \n",
-    format: "\n\nRespond as\n1. Diagnosis\n2. Changes\n3. Code\n"
-  };
-
-  const examples = [
-    "the dashboard feels cluttered, make it better",
-    "fix it, the login page is broken on mobile",
-    "build a settings page for my react app with tabs and a save button",
-    "review this component and tell me what's wrong with it",
-    "add dark mode"
-  ];
-
-  /* ---- 04 · analysis ---------------------------------------------------- */
-
-  function scorePrompt(text) {
-    const low = text.toLowerCase();
-    const long = text.length;
-
-    const dims = [
-      ["Clarity", 30
-        + (/\b(build|create|implement|fix|design|write|refactor|review|add|remove|migrate)\b/.test(low) ? 30 : 0)
-        + (long > 80 ? 20 : long > 30 ? 10 : 0)
-        + (/[.!?\n]/.test(text) ? 10 : 0)
-        + (/\b(it|this|that)\b/.test(low) && long < 60 ? -15 : 10)],
-
-      ["Specificity", 20
-        + (/\b(react|next|vue|svelte|angular|node|python|typescript|tailwind|sql|postgres|api)\b/.test(low) ? 25 : 0)
-        + (/\.(tsx?|jsx?|css|html|py|go|rb|sql)\b/.test(low) ? 15 : 0)
-        + (long > 200 ? 25 : long > 100 ? 12 : 0)
-        + (/\b(responsive|mobile|desktop|accessible|keyboard|contrast)\b/.test(low) ? 20 : 0)],
-
-      ["Constraints", 15
-        + (/\b(must|should|required|without|only|avoid|never|do not|don't|instead of)\b/.test(low) ? 30 : 0)
-        + (/\b(performance|security|accessibility|validation|privacy)\b/.test(low) ? 20 : 0)
-        + (/\b(not change|preserve|keep the existing|leave.*alone)\b/.test(low) ? 25 : 0)],
-
-      ["Context", 15
-        + (/\b(user|users|customer|admin|visitor|team)\b/.test(low) ? 20 : 0)
-        + (/\b(existing|current|already|our|my|this project|codebase|repo)\b/.test(low) ? 30 : 0)
-        + (/\b(done when|acceptance|criteria|success|so that|because)\b/.test(low) ? 25 : 0)
-        + (long > 150 ? 10 : 0)]
-    ].map(([name, raw]) => [name, clamp(Math.round(raw), 0, 100)]);
-
-    const total = Math.round(dims.reduce((sum, d) => sum + d[1], 0) / dims.length);
-    return { total, dims };
+  function notify(message) {
+    const node = document.createElement("div");
+    node.className = "toast";
+    node.textContent = message;
+    el("toast-container").append(node);
+    setTimeout(() => node.remove(), 2200);
   }
 
-  const lintRules = [
-    {
-      level: "warn",
-      label: "Vague adjectives",
-      hint: "Name the concrete quality",
-      words: ["modern", "clean", "nice", "beautiful", "sleek", "professional",
-              "good", "cool", "awesome", "elegant", "polished", "intuitive"]
-    },
-    {
-      level: "warn",
-      label: "Open-ended lists",
-      hint: "Spell out what you need",
-      words: ["etc", "and so on", "stuff", "things", "and more", "whatever"]
-    },
-    {
-      level: "warn",
-      label: "Hedging",
-      hint: "State it as a requirement",
-      words: ["maybe", "perhaps", "possibly", "kind of", "sort of", "try to", "if possible", "i guess"]
-    },
-    {
-      level: "info",
-      label: "Politeness padding",
-      hint: "Harmless, but it is not free",
-      words: ["please", "kindly", "just", "simply", "basically", "actually", "really", "very"]
-    }
-  ];
-
-  function lintPrompt(text) {
-    const found = [];
-    const low = text.toLowerCase();
-
-    lintRules.forEach(rule => {
-      const hits = rule.words.filter(w =>
-        new RegExp("\\b" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(low));
-      if (hits.length) {
-        found.push({ level: rule.level, label: rule.label, detail: hits.slice(0, 5), hint: rule.hint });
+  async function copy(value, button) {
+    try {
+      await navigator.clipboard.writeText(value);
+      if (button) {
+        button.textContent = "Copied";
+        button.classList.add("done");
+        setTimeout(() => {
+          button.textContent = "Copy";
+          button.classList.remove("done");
+        }, 1100);
       }
-    });
-
-    if (/^\s*(fix|change|update|improve|redo)\s+(it|this|that)\b/i.test(text)) {
-      found.push({ level: "warn", label: "Unclear reference", detail: [], hint: "Name the file or component" });
+      notify("Copied to clipboard");
+    } catch {
+      notify("Clipboard access failed");
     }
-    if (wordCount(text) < 8 && text.trim()) {
-      found.push({ level: "warn", label: "Very short", detail: [], hint: "Add context and a definition of done" });
-    }
-    if (wordCount(text) > 450) {
-      found.push({ level: "info", label: "Very long", detail: [], hint: "Consider splitting into two prompts" });
-    }
-    if (!/\b(must|should|without|do not|don't|avoid|preserve|keep)\b/i.test(text) && wordCount(text) > 12) {
-      found.push({ level: "info", label: "No constraints", detail: [], hint: "Say what must not change" });
-    }
-    if (!found.length && text.trim()) {
-      found.push({ level: "ok", label: "Nothing obvious to flag", detail: [], hint: "Reads clean" });
-    }
-    return found;
   }
 
-  const fillerWords = ["very", "really", "basically", "simply", "just", "please",
-                       "kindly", "obviously", "actually", "literally", "definitely"];
-
-  function fillerReport(text) {
-    let count = 0;
-    const hits = [];
-    fillerWords.forEach(w => {
-      const found = text.match(new RegExp("\\b" + w + "\\b", "gi"));
-      if (found) { count += found.length; hits.push(w + (found.length > 1 ? " ×" + found.length : "")); }
-    });
-    const total = wordCount(text);
-    const pct = total ? clamp(Math.round((1 - count / total) * 100), 0, 100) : 100;
-    return { count, hits, pct };
+  function words(value) {
+    const clean = value.trim();
+    return clean ? clean.split(/\s+/).length : 0;
   }
 
-  function detectStack(text) {
-    const rules = [
-      ["Next.js", /\bnext\.?js\b|\bapp router\b/i],
-      ["React", /\breact\b|\bjsx\b|\buse(state|effect|memo)\b/i],
-      ["Vue", /\bvue\b|\bnuxt\b/i],
-      ["Svelte", /\bsvelte(kit)?\b/i],
-      ["Tailwind CSS", /\btailwind\b/i],
-      ["Node.js", /\bnode\.?js\b|\bexpress\b|\bfastify\b/i],
-      ["Python", /\bpython\b|\bdjango\b|\bflask\b|\bfastapi\b/i],
-      ["Rails", /\brails\b|\bruby on rails\b/i]
-    ];
-    const hit = rules.find(r => r[1].test(text));
-    return hit ? hit[0] : "";
-  }
+  // Small, intentionally opinionated touches: local drafts, a surprise prompt,
+  // keyboard-first enhancement, and a character runway. No dependencies.
+  const surprisePrompts = [
+    "Redesign this dashboard so the important actions are obvious, fast, and accessible.",
+    "Refactor this component without changing its public API or existing behavior.",
+    "Build a polished empty state that explains what happened and gives the user a useful next step.",
+    "Fix the responsive layout while preserving the current visual language and content.",
+    "Review this UI for accessibility, loading states, edge cases, and unnecessary complexity."
+  ];
 
-  /* ---- 05 · rewriter ---------------------------------------------------- */
-  /* Deliberately dumb and readable. Detect a few domains, attach the
-     requirements a human reviewer would have asked for anyway, and never
-     duplicate something the author already wrote.                          */
-
-  function rewrite(source) {
-    const src = source.trim();
-    if (!src) return { text: "", notes: [] };
-
-    const low = src.toLowerCase();
-    const notes = [];
-    const requirements = [];
-    const done = [];
-
-    const mentions = re => re.test(low);
-    const add = (list, items, note) => { list.push.apply(list, items); if (note) notes.push(note); };
-
-    const hasVerb = /\b(build|create|make|implement|fix|design|write|develop|add|update|remove|refactor|redesign|review|debug|migrate|optimi[sz]e)\b/i.test(src);
-
-    /* -- objective -- */
-    let objective = src;
-    if (!hasVerb) {
-      objective = "Deliver this outcome: " + src;
-      notes.push("Turned the opening into a direct instruction");
-    }
-
-    /* -- domain requirements -- */
-    if (mentions(/\b(ui|interface|frontend|front-end|website|page|screen|component|layout|design)\b/)) {
-      add(requirements, [
-        "Match the existing visual language — spacing, type scale, colour, and radius.",
-        "Give every interactive control a visible hover, focus, active, and disabled state."
-      ], "Interface expectations");
-    }
-
-    if (mentions(/\b(dashboard|admin|analytics|metrics|chart|table|report)\b/)) {
-      add(requirements, [
-        "Handle loading, empty, partial, and failed-data states explicitly.",
-        "Keep the primary metric readable before any scrolling happens."
-      ], "Data-view states");
-      done.push("Every data region has a defined loading and empty state.");
-    }
-
-    if (mentions(/\b(form|input|field|validation|submit|signup|sign up|checkout)\b/)) {
-      add(requirements, [
-        "Validate at the point the user can act on it, and show the message beside the field.",
-        "Block duplicate submissions while a request is in flight."
-      ], "Form behaviour");
-      done.push("Invalid input is rejected with a message the user can act on.");
-    }
-
-    if (mentions(/\b(login|log in|sign in|signin|auth|authentication|password|session|token)\b/)) {
-      add(requirements, [
-        "Cover signed-out, pending, signed-in, and failed states.",
-        "Never log, echo, or expose credentials or tokens."
-      ], "Authentication safety");
-      done.push("Failed authentication gives a safe, non-revealing message.");
-    }
-
-    if (mentions(/\b(api|endpoint|backend|server|request|response|http|rest|graphql|fetch)\b/)) {
-      add(requirements, [
-        "Validate incoming data before it reaches any business logic.",
-        "Return a consistent error shape and an appropriate status code on failure."
-      ], "Request handling");
-      done.push("Both the success and failure paths are handled.");
-    }
-
-    if (mentions(/\b(database|schema|sql|postgres|mysql|mongo|query|migration|index)\b/)) {
-      add(requirements, [
-        "Make relationships and required fields explicit.",
-        "Handle missing rows without throwing at the UI layer."
-      ], "Data safety");
-    }
-
-    if (mentions(/\b(bug|broken|error|crash|fails?|not working|doesn't work|issue|debug)\b/)) {
-      add(requirements, [
-        "State the root cause before writing the fix.",
-        "Make the smallest change that resolves it — no drive-by refactors."
-      ], "Debugging discipline");
-      done.push("The reported failure no longer reproduces.");
-    }
-
-    if (mentions(/\b(css|styling|styles|scss|sass|tailwind|animation|transition|grid|flex)\b/)) {
-      add(requirements, [
-        "Prefer reusable rules over one-off overrides.",
-        "Respect prefers-reduced-motion for anything that animates."
-      ], "Styling discipline");
-    }
-
-    if (mentions(/\b(test|tests|unit|integration|e2e|jest|vitest|playwright)\b/)) {
-      add(requirements, [
-        "Test behaviour, not implementation details.",
-        "Include at least one failure-path case."
-      ], "Testing expectations");
-    }
-
-    const responsive = /\b(responsive|mobile|tablet|breakpoint|small screen)\b/i.test(src);
-    const a11y = /\b(accessib|aria|screen reader|keyboard|focus|contrast)\b/i.test(src);
-    const isUI = /\b(ui|interface|page|screen|component|layout|design|frontend)\b/i.test(src);
-
-    if (isUI && !responsive) {
-      requirements.push("Work from 360px wide upwards; reflow rather than shrink.");
-      notes.push("Added a responsive floor");
-    }
-    if (isUI && !a11y) {
-      requirements.push("Keyboard reachable, visibly focused, and labelled for assistive tech.");
-      notes.push("Added baseline accessibility");
-    }
-
-    if (!requirements.length) {
-      requirements.push(
-        "Stay inside the scope described above.",
-        "Flag anything ambiguous instead of guessing at it."
-      );
-      notes.push("Added a scope guard");
-    }
-
-    /* -- drop anything the author already said -- */
-    const kept = requirements.filter(req => {
-      const keys = req.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/)
-        .filter(w => w.length > 6).slice(0, 3);
-      return !(keys.length && keys.every(k => low.includes(k)));
-    });
-
-    /* -- constraints -- */
-    const constraints = ["Do not change behaviour outside the scope of this request."];
-    const stack = state.settings.stack ? detectStack(src) : "";
-    if (stack) {
-      constraints.push("Stay within the existing " + stack + " setup and its conventions.");
-      notes.push("Pinned the request to " + stack);
-    }
-    if (!/\b(dependency|dependencies|library|package)\b/i.test(src)) {
-      constraints.push("Ask before adding a dependency.");
-    }
-
-    /* -- context prompt if none supplied -- */
-    const hasContext = /\b(existing|current|our|my|this project|codebase|repo|file|component named)\b/i.test(src);
-
-    /* -- done when -- */
-    if (!done.length) {
-      done.push("The described outcome works end to end.");
-    }
-    done.push("Previously working behaviour is unchanged.");
-    notes.push("Added completion criteria");
-
-    /* -- assemble -- */
-    const out = [];
-    out.push("## Objective", objective, "");
-
-    if (!hasContext) {
-      out.push("## Context",
-        "- TODO — framework and version:",
-        "- TODO — files or components involved:",
-        "- TODO — anything that must not be touched:",
-        "");
-      notes.push("Left three context blanks for you to fill");
-    }
-
-    out.push("## Requirements");
-    kept.forEach(r => out.push("- " + r));
-    out.push("");
-
-    out.push("## Constraints");
-    constraints.forEach(c => out.push("- " + c));
-    out.push("");
-
-    out.push("## Done when");
-    unique(done).forEach(d => out.push("- " + d));
-
-    return {
-      text: out.join("\n").replace(/\n{3,}/g, "\n\n").trim(),
-      notes: unique(notes)
-    };
-  }
-
-  function compress(source) {
-    const src = source.trim();
-    if (!src) return { text: "", notes: [] };
-
-    const swaps = [
-      [/\b(i would like you to|i want you to|can you please|could you please|i need you to)\b/gi, ""],
-      [/\b(please|kindly|obviously|literally|definitely|basically|actually|really|very|just|simply)\b/gi, ""],
-      [/\b(it would be great if you could|if you don't mind|when you get a chance)\b/gi, ""],
-      [/\bin order to\b/gi, "to"],
-      [/\bat this point in time\b/gi, "now"],
-      [/\bmake sure that\b/gi, "ensure"],
-      [/\ba large number of\b/gi, "many"]
-    ];
-
-    let out = src;
-    swaps.forEach(([re, to]) => { out = out.replace(re, to); });
-
-    out = out
-      .replace(/[ \t]{2,}/g, " ")
-      .replace(/ +([,.;:!?])/g, "$1")
-      .replace(/\n{3,}/g, "\n\n")
-      .split("\n").map(line => line.replace(/\s+$/, "")).join("\n")
-      .trim()
-      .replace(/^([a-z])/, m => m.toUpperCase());
-
-    return {
-      text: out,
-      notes: out === src ? ["Nothing obvious to trim"] : ["Removed filler and padding phrases"]
-    };
-  }
-
-  /* ---- 06 · diff -------------------------------------------------------- */
-  /* Classic LCS over lines. Small inputs, so the O(n·m) table is fine.      */
-
-  function diffLines(beforeText, afterText) {
-    const A = beforeText.split("\n");
-    const B = afterText.split("\n");
-    const n = A.length, m = B.length;
-
-    const table = [];
-    for (let i = 0; i <= n; i++) table.push(new Uint16Array(m + 1));
-
-    for (let i = n - 1; i >= 0; i--) {
-      for (let j = m - 1; j >= 0; j--) {
-        table[i][j] = A[i] === B[j]
-          ? table[i + 1][j + 1] + 1
-          : Math.max(table[i + 1][j], table[i][j + 1]);
+  function saveDraft(value) {
+    try {
+      localStorage.setItem("vibe_draft", value);
+      const status = el("draft-status");
+      if (status) {
+        status.textContent = value ? "Draft saved" : "Ready";
+        status.classList.add("saved");
+        setTimeout(() => status.classList.remove("saved"), 900);
       }
-    }
-
-    const out = [];
-    let i = 0, j = 0;
-    while (i < n && j < m) {
-      if (A[i] === B[j])            { out.push(["same", A[i]]); i++; j++; }
-      else if (table[i + 1][j] >= table[i][j + 1]) { out.push(["del", A[i]]); i++; }
-      else                          { out.push(["add", B[j]]); j++; }
-    }
-    while (i < n) out.push(["del", A[i++]]);
-    while (j < m) out.push(["add", B[j++]]);
-    return out;
+    } catch (_) {}
   }
 
-  function renderDiff(beforeText, afterText) {
-    const rows = diffLines(beforeText, afterText);
-    const line = ([kind, text]) =>
-      '<div class="diff__line" data-kind="' + kind + '">' + (esc(text) || "&nbsp;") + "</div>";
-
-    el("diff-before").innerHTML = rows.filter(r => r[0] !== "add").map(line).join("");
-    el("diff-after").innerHTML  = rows.filter(r => r[0] !== "del").map(line).join("");
+  function updatePromptMeter(value) {
+    const fill = el("char-meter-fill");
+    if (fill) fill.style.width = `${Math.min(100, (value.length / 5000) * 100)}%`;
   }
 
-  /* ---- 07 · render (enhance panel) -------------------------------------- */
-
-  function syncEditor(opts) {
-    const value = el("prompt-input").value;
-    const chars = value.length;
-
-    el("count-words").textContent  = wordCount(value) + " words";
-    el("count-chars").textContent  = chars + " characters";
-    el("count-tokens").textContent = "~" + tokenGuess(value) + " tokens (est.)";
-
-    const gauge = el("gauge");
-    gauge.firstElementChild.style.width = Math.min(100, (chars / 6000) * 100) + "%";
-    gauge.classList.toggle("is-full", chars > 5600);
-
-    const tier = el("tier");
-    const w = wordCount(value);
-    if (!w) {
-      tier.classList.add("is-hidden");
-    } else {
-      tier.classList.remove("is-hidden");
-      if (w < 20)       { tier.className = "tier tier--thin"; tier.textContent = "Thin"; }
-      else if (w < 90)  { tier.className = "tier tier--mid";  tier.textContent = "Workable"; }
-      else              { tier.className = "tier tier--full"; tier.textContent = "Detailed"; }
-    }
-
+  function syncPrompt(value, announce = false) {
     el("btn-enhance").disabled = !value.trim();
-    renderStackNote(value);
-    renderLint(value);
+    updateCount(el("prompt-input"), el("word-count"));
+    const [className, label] = complexity(value);
+    el("complexity-badge").textContent = label;
+    el("complexity-badge").className = `level ${className}${value ? "" : " hidden"}`;
+    updatePromptMeter(value);
+    showStack(value);
+    saveDraft(value);
+    if (announce) notify("Draft restored");
+  }
 
-    if (state.settings.live && value.trim()) renderScore(value);
-    else if (!value.trim()) el("score-card").classList.add("is-hidden");
+  function updateCount(input, output) {
+    const value = input.value.trim();
+    output.textContent = `${words(value)} words · ${value.length} characters`;
+  }
 
-    if (!opts || !opts.silent) {
-      disk.set("vc.draft", value);
-      el("draft-state").textContent = value ? "Draft saved locally" : "Nothing to save";
+  function complexity(value) {
+    const count = words(value);
+    if (count < 20) return ["simple", "Simple"];
+    if (count < 80) return ["moderate", "Moderate"];
+    return ["detailed", "Detailed"];
+  }
+
+  function score(value) {
+    const text = value.toLowerCase();
+    const measures = [
+      ["Clarity", 35 + (value.length > 80 ? 20 : 0) +
+        (/[.!?]/.test(value) ? 15 : 0) +
+        (/\b(build|create|make|fix|design|implement|write)\b/.test(text) ? 30 : 0)],
+      ["Specificity", 25 + (value.length > 150 ? 25 : 0) +
+        (/\b(react|next|vue|svelte|html|css|javascript|typescript|api|database)\b/.test(text) ? 25 : 0) +
+        (/\b(responsive|mobile|desktop|accessible)\b/.test(text) ? 25 : 0)],
+      ["Constraints", 20 +
+        (/\b(must|should|required|without|only|avoid|don't|do not)\b/.test(text) ? 35 : 0) +
+        (/\b(performance|security|accessibility|validation)\b/.test(text) ? 25 : 0) +
+        (text.includes("acceptance") ? 20 : 0)],
+      ["Context", 25 + (value.length > 100 ? 20 : 0) +
+        (/\b(user|users|customer|admin|developer)\b/.test(text) ? 20 : 0) +
+        (/\b(existing|current|project|app|website)\b/.test(text) ? 35 : 0)]
+    ];
+    measures.forEach(item => item[1] = Math.min(100, item[1]));
+    return {
+      total: Math.round(measures.reduce((sum, item) => sum + item[1], 0) / measures.length),
+      measures
+    };
+  }
+
+  function localRewrite(input) {
+    const original = input.trim();
+
+    if (!original) {
+      return { enhanced: "", improvements: [] };
     }
+
+    let result = original;
+    const changes = [];
+    const lower = original.toLowerCase();
+
+    // Read the prompt first. Different jobs deserve different advice.
+    const requirements = [];
+    const acceptance = [];
+
+    const hasAction =
+      /\b(goal|objective|build|create|make|implement|fix|design|write|develop|add|update|remove|refactor|change)\b/i
+        .test(original);
+
+    const isUI =
+      /\b(ui|interface|frontend|front-end|website|webpage|page|component|layout|design)\b/i
+        .test(lower);
+
+    const isDashboard =
+      /\b(dashboard|admin panel|analytics|metrics|statistics|charts|table|reporting)\b/i
+        .test(lower);
+
+    const isAuth =
+      /\b(login|log in|signin|sign in|signup|sign up|register|authentication|auth|password|account)\b/i
+        .test(lower);
+
+    const isForm =
+      /\b(form|input|textarea|select|checkbox|radio|submit|validation)\b/i
+        .test(lower);
+
+    const isAPI =
+      /\b(api|rest api|endpoint|backend|server|request|response|http|fetch|axios|graphql)\b/i
+        .test(lower);
+
+    const isDatabase =
+      /\b(database|db|sql|postgres|postgresql|mysql|mongodb|schema|query|migration|supabase|firebase)\b/i
+        .test(lower);
+
+    const isBug =
+      /\b(bug|broken|error|fix|issue|doesn't work|not working|crash|debug|problem)\b/i
+        .test(lower);
+
+    const isReact =
+      /\b(react|next\.?js|nextjs|jsx|tsx|hooks|usestate|useeffect)\b/i
+        .test(lower);
+
+    const isCSS =
+      /\b(css|stylesheet|styling|styles|scss|sass|tailwind|animation|transition|grid|flexbox)\b/i
+        .test(lower);
+
+    const isLanding =
+      /\b(landing page|marketing page|homepage|home page|hero|pricing page|portfolio)\b/i
+        .test(lower);
+
+    const mentionsResponsive =
+      /\b(responsive|mobile|tablet|desktop|phone|small screen)\b/i.test(lower);
+
+    const mentionsAccessibility =
+      /\b(accessib|aria|screen reader|keyboard|focus)\b/i.test(lower);
+
+    if (!hasAction) {
+      result = `Goal: ${original}`;
+      changes.push("Added a clear goal");
+    }
+
+    if (isUI) {
+      requirements.push(
+        "Keep the interface visually consistent and easy to understand.",
+        "Make interactive controls clear in normal, hover, focus, and disabled states."
+      );
+      changes.push("Added interface-specific guidance");
+    }
+
+    if (isDashboard) {
+      requirements.push(
+        "Make the most important metrics and actions easy to scan.",
+        "Handle loading, empty, no-data, and failed-data states clearly.",
+        "Keep tables, filters, cards, and charts usable on smaller screens."
+      );
+      acceptance.push(
+        "The important information is easy to find at a glance.",
+        "Empty and loading states explain what the user can do next."
+      );
+      changes.push("Added dashboard-specific guidance");
+    }
+
+    if (isAuth) {
+      requirements.push(
+        "Handle signed-out, signing-in, signed-in, and failed-authentication states.",
+        "Validate credentials without exposing sensitive information.",
+        "Keep password and account data handled securely."
+      );
+      acceptance.push(
+        "Authentication states work correctly.",
+        "Invalid credentials produce clear, safe feedback."
+      );
+      changes.push("Added authentication-specific guidance");
+    }
+
+    if (isForm) {
+      requirements.push(
+        "Validate fields at the appropriate point in the user flow.",
+        "Show useful feedback for missing or invalid values.",
+        "Prevent accidental duplicate submissions while a request is in progress."
+      );
+      acceptance.push(
+        "Valid data can be submitted successfully.",
+        "Invalid data receives clear feedback near the relevant field."
+      );
+      changes.push("Added form-specific guidance");
+    }
+
+    if (isAPI) {
+      requirements.push(
+        "Keep request and response behavior predictable for each relevant endpoint.",
+        "Validate incoming data before processing it.",
+        "Return useful error responses when requests fail."
+      );
+      acceptance.push(
+        "Successful and failed requests are handled correctly.",
+        "Invalid input produces a clear error response."
+      );
+      changes.push("Added API-specific guidance");
+    }
+
+    if (isDatabase) {
+      requirements.push(
+        "Keep the data model consistent and avoid unnecessary duplication.",
+        "Define relationships, validation, and useful indexes where appropriate.",
+        "Handle missing records and database failures safely."
+      );
+      acceptance.push(
+        "The required data can be stored and retrieved correctly.",
+        "Missing or invalid data does not break the application."
+      );
+      changes.push("Added database-specific guidance");
+    }
+
+    if (isBug) {
+      requirements.push(
+        "Identify the root cause before changing the implementation.",
+        "Make the smallest safe change that fixes the reported behavior.",
+        "Avoid unrelated refactoring unless it is necessary for the fix."
+      );
+      acceptance.push(
+        "The reported issue is reproducibly fixed.",
+        "Existing working behavior remains intact."
+      );
+      changes.push("Added debugging guidance");
+    }
+
+    if (isReact) {
+      requirements.push(
+        "Follow the existing component and state-management patterns in the project.",
+        "Keep component responsibilities clear and avoid unnecessary state.",
+        "Preserve existing props and public behavior unless a change is required."
+      );
+      changes.push("Added React-specific guidance");
+    }
+
+    if (isCSS) {
+      requirements.push(
+        "Keep styles consistent with the existing visual language.",
+        "Prefer reusable rules over unnecessary one-off declarations.",
+        "Make spacing, typography, states, and transitions feel intentional."
+      );
+      changes.push("Added CSS-specific guidance");
+    }
+
+    if (isLanding) {
+      requirements.push(
+        "Make the main message and primary call to action obvious.",
+        "Keep the visual hierarchy clear from the hero through the final CTA.",
+        "Use responsive typography and spacing instead of simply shrinking the desktop layout."
+      );
+      acceptance.push(
+        "The main value proposition is understandable immediately.",
+        "The primary CTA stays clear across screen sizes."
+      );
+      changes.push("Added landing-page guidance");
+    }
+
+    if (isUI && !mentionsResponsive) {
+      requirements.push(
+        "Consider sensible responsive behavior where the layout becomes constrained."
+      );
+      changes.push("Added responsive consideration");
+    }
+
+    if (isUI && !mentionsAccessibility) {
+      requirements.push(
+        "Keep interactive controls usable with keyboard navigation and visible focus."
+      );
+      changes.push("Added practical accessibility guidance");
+    }
+
+    // Unknown requests still get useful help, but not a giant generic template.
+    if (!requirements.length) {
+      const subject = extractSubject(original);
+
+      if (subject) {
+        requirements.push(
+          `Keep the implementation focused on the requested ${subject}.`,
+          "Avoid adding complexity that is unrelated to the requested outcome."
+        );
+        changes.push("Added guidance based on the requested subject");
+      } else {
+        requirements.push(
+          "Keep the implementation focused on the requested outcome.",
+          "Avoid unrelated changes outside the scope of the request."
+        );
+        changes.push("Added focused implementation guidance");
+      }
+    }
+
+    // Don't repeat things the user has already said.
+    const usefulRequirements = requirements.filter(requirement => {
+      const importantWords = requirement
+        .toLowerCase()
+        .replace(/[^\w\s]/g, "")
+        .split(/\s+/)
+        .filter(word => word.length > 5)
+        .slice(0, 3);
+
+      return !importantWords.every(word => lower.includes(word));
+    });
+
+    if (usefulRequirements.length) {
+      result += "\n\nRequirements:\n";
+      usefulRequirements.forEach(item => {
+        result += `- ${item}\n`;
+      });
+    }
+
+    if (!acceptance.length) {
+      acceptance.push(
+        "The requested result works end-to-end.",
+        "Preserve existing behavior unless the request explicitly changes it."
+      );
+    }
+
+    result += "\nAcceptance criteria:\n";
+    acceptance.forEach(item => {
+      result += `- ${item}\n`;
+    });
+
+    changes.push("Added task-specific acceptance criteria");
+
+    return {
+      enhanced: result.trim(),
+      improvements: [...new Set(changes)]
+    };
   }
 
-  function renderStackNote(value) {
-    const stack = state.settings.stack ? detectStack(value) : "";
-    const note = el("stack-note");
-    if (!stack) { note.classList.add("is-hidden"); return; }
-    el("stack-name").textContent = stack;
-    note.classList.remove("is-hidden");
+  function extractSubject(prompt) {
+    const clean = prompt.replace(/\s+/g, " ").trim();
+
+    const patterns = [
+      /\b(?:build|create|make|design|develop|implement)\s+(?:a|an|the)?\s*([^.!?]+)/i,
+      /\b(?:fix|update|improve|refactor|redesign)\s+(?:the|this|my)?\s*([^.!?]+)/i,
+      /\b(?:add|remove)\s+(?:a|an|the)?\s*([^.!?]+)/i
+    ];
+
+    for (const pattern of patterns) {
+      const match = clean.match(pattern);
+
+      if (match && match[1]) {
+        return match[1].trim().replace(/[,:;]+$/, "");
+      }
+    }
+
+    return "";
   }
 
-  function renderLint(value) {
-    const card = el("lint-card");
-    if (!value.trim()) { card.classList.add("is-hidden"); return; }
+  async function improve(prompt, mode = "enhance") {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
 
-    const items = lintPrompt(value);
-    const problems = items.filter(i => i.level !== "ok").length;
-
-    el("lint-summary").textContent = problems
-      ? problems + (problems === 1 ? " note" : " notes")
-      : "all clear";
-
-    el("lint-list").innerHTML = items.map(item => {
-      const mark = item.level === "ok" ? "✓" : item.level === "warn" ? "!" : "i";
-      const detail = item.detail.length
-        ? item.label + ' — <span class="lint__words">' + esc(item.detail.join(", ")) + "</span>"
-        : item.label;
-      return '<div class="lint__item" data-level="' + item.level + '">' +
-               '<span class="lint__mark">' + mark + "</span>" +
-               "<span>" + detail + "</span>" +
-               '<span class="lint__hint">' + esc(item.hint) + "</span>" +
-             "</div>";
-    }).join("");
-
-    card.classList.remove("is-hidden");
+    try {
+      const response = await fetch("/api/enhance", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({prompt, mode}),
+        signal: controller.signal
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.enhanced) {
+          return {enhanced:data.enhanced, improvements:data.improvements || []};
+        }
+      }
+    } catch (_) {
+      // Fall through to the offline rewrite.
+    } finally {
+      clearTimeout(timeout);
+    }
+    return localRewrite(prompt);
   }
 
-  function renderScore(value) {
-    const result = scorePrompt(value);
+  function stackFor(prompt) {
+    const rules = [
+      ["Next.js", /next\.?js|nextjs/],
+      ["React", /\breact\b/],
+      ["Vue", /\bvue\b/],
+      ["Svelte", /\bsvelte\b/],
+      ["Tailwind CSS", /tailwind/],
+      ["Node.js", /\bnode\.?js\b|express/],
+      ["Python", /\bpython\b|django|flask/]
+    ];
+    const lower = prompt.toLowerCase();
+    return rules.find(rule => rule[1].test(lower))?.[0] || "";
+  }
 
-    el("score-card").classList.remove("is-hidden");
+  function showStack(prompt) {
+    const found = app.settings.autoStack ? stackFor(prompt) : "";
+    const badge = el("stack-badge");
+    const tip = el("stack-tips");
+    if (!found) {
+      badge.classList.add("hidden");
+      tip.classList.add("hidden");
+      return;
+    }
+    el("stack-name").textContent = found;
+    el("tips-stack-name").textContent = `${found} is detected.`;
+    el("tips-list").innerHTML =
+      `<li>Use conventions already established by the project.</li>` +
+      `<li>Avoid introducing incompatible tooling without a reason.</li>`;
+    badge.classList.remove("hidden");
+    tip.classList.remove("hidden");
+  }
+
+  function fillerStats(value) {
+    const list = ["very","really","basically","just","simply","please","kindly","obviously","actually"];
+    const hits = list.filter(word => new RegExp(`\\b${word}\\b`, "i").test(value));
+    const count = hits.reduce((sum, word) => {
+      const found = value.match(new RegExp(`\\b${word}\\b`, "gi"));
+      return sum + (found ? found.length : 0);
+    }, 0);
+    return {hits, count, total:words(value)};
+  }
+
+  function updateEfficiency(value) {
+    if (!app.settings.tokenEff) {
+      el("token-efficiency").classList.add("hidden");
+      return;
+    }
+    const stats = fillerStats(value);
+    const pct = stats.total ? Math.max(0, Math.round((1 - stats.count / stats.total) * 100)) : 100;
+    el("token-efficiency").classList.remove("hidden");
+    el("efficiency-pct").textContent = `${pct}% efficient`;
+    el("ring-percent").textContent = `${pct}%`;
+    el("efficiency-ring").style.strokeDashoffset = 150.8 - 150.8 * pct / 100;
+    el("filler-count").textContent = stats.count ? `${stats.count} possible filler word(s)` : "No obvious filler found";
+    el("filler-list").innerHTML = stats.hits.map(item => `<li>${item}</li>`).join("");
+  }
+
+  function renderScore(prompt) {
+    const result = score(prompt);
+    el("score-display").classList.remove("hidden");
     el("score-number").textContent = result.total;
-    el("score-dial").style.setProperty("--v", result.total);
+    el("score-label").textContent =
+      result.total >= 80 ? "Strong prompt" :
+      result.total >= 60 ? "Good foundation" : "Needs more detail";
 
-    el("score-title").textContent =
-      result.total >= 82 ? "Ready to send" :
-      result.total >= 62 ? "Solid, needs edges" :
-      result.total >= 40 ? "Half a prompt" : "Mostly vibes";
-
-    el("score-bars").innerHTML = result.dims.map(([name, v]) =>
-      '<div class="bar"><span>' + name + "</span>" +
-      '<span class="bar__track"><span class="bar__fill" style="width:' + v + '%"></span></span>' +
-      '<span class="bar__num">' + v + "</span></div>"
+    el("score-bars").innerHTML = result.measures.map(([name, value]) =>
+      `<div class="meter"><span>${name}</span><span class="track"><span class="fill" style="width:${value}%"></span></span><span>${value}</span></div>`
     ).join("");
 
-    const weakest = result.dims.slice().sort((a, b) => a[1] - b[1])[0];
-    el("score-note").textContent = result.total >= 82
-      ? "Good shape. The remaining risk is ambiguity in the details, not the structure."
-      : "Weakest dimension: " + weakest[0].toLowerCase() + ". " + weakestAdvice(weakest[0]);
+    el("score-feedback").textContent = result.total < 80
+      ? "Add concrete requirements, context, and constraints."
+      : "Good structure. Acceptance criteria can make results more repeatable.";
 
     return result.total;
   }
 
-  function weakestAdvice(name) {
-    return ({
-      "Clarity": "Open with a verb and one sentence stating the outcome.",
-      "Specificity": "Name the framework, the files, and the visible behaviour you expect.",
-      "Constraints": "Add one line about what must not change.",
-      "Context": "Say where this lives and who it is for."
-    })[name] || "";
+  function saveHistory(original, enhanced) {
+    app.history.unshift({
+      id: Date.now(),
+      prompt: original,
+      enhanced,
+      score: score(original).total,
+      starred: false
+    });
+    app.history = app.history.slice(0, 30);
+    store.write("vibe_history", app.history);
+    renderHistory();
   }
 
-  function renderEfficiency(text) {
-    const card = el("eff-card");
-    if (!state.settings.eff) { card.classList.add("is-hidden"); return; }
+  function presentResult(original, data) {
+    app.original = original;
+    app.lastEnhanced = data.enhanced;
+    localStorage.setItem("vibe_last_enhanced", data.enhanced);
 
-    const report = fillerReport(text);
-    card.classList.remove("is-hidden");
-    el("eff-pct").textContent = report.pct + "% signal";
-    el("eff-value").textContent = report.pct + "%";
-    el("eff-dial").style.setProperty("--v", report.pct);
-    el("filler-count").textContent = report.count
-      ? report.count + " filler word" + (report.count === 1 ? "" : "s") + " in the result"
-      : "No filler found in the result.";
-    el("filler-list").innerHTML = report.hits.map(h => "<li>" + esc(h) + "</li>").join("");
-  }
+    el("enhanced-text").textContent = data.enhanced;
+    el("improvements-list").innerHTML = (data.improvements || [])
+      .map(item => `<div>• ${item}</div>`).join("");
+    el("enhanced-area").classList.remove("hidden");
 
-  function showResult(source, result) {
-    state.lastSource = source;
-    state.lastResult = result.text;
-    disk.set("vc.last", result.text);
-
-    el("result-text").textContent = result.text;
-    el("changes").innerHTML = (result.notes.length ? result.notes : ["Restructured"])
-      .map(n => "<div>" + esc(n) + "</div>").join("");
-    el("result-card").classList.remove("is-hidden");
-
-    if (state.settings.diff) {
-      renderDiff(source, result.text);
-      el("diff-card").classList.remove("is-hidden");
+    if (app.settings.beforeAfter) {
+      el("before-text").textContent = original;
+      el("after-text").textContent = data.enhanced;
+      el("changes-list").innerHTML = (data.improvements?.length
+        ? data.improvements
+        : ["Improved structure and specificity"])
+        .map(item => `<div>• ${item}</div>`).join("");
+      el("before-after").classList.remove("hidden");
     } else {
-      el("diff-card").classList.add("is-hidden");
+      el("before-after").classList.add("hidden");
     }
 
-    renderEfficiency(result.text);
-    fileToLibrary(source, result.text);
-    setState("Enhanced · " + wordCount(result.text) + " words out");
+    updateEfficiency(data.enhanced);
+    saveHistory(original, data.enhanced);
+    el("btn-undo").classList.remove("hidden");
+    el("btn-redo").classList.add("hidden");
   }
 
-  function runEnhance() {
-    const source = el("prompt-input").value.trim();
-    if (!source) return;
-
-    const button = el("btn-enhance");
-    button.classList.add("is-busy");
-    button.disabled = true;
-
-    // One frame of delay so the spinner is honest about the work happening.
-    requestAnimationFrame(() => {
-      try {
-        renderScore(source);
-        showResult(source, rewrite(source));
-        el("result-card").scrollIntoView({ behavior: "smooth", block: "nearest" });
-      } finally {
-        button.classList.remove("is-busy");
-        button.disabled = false;
-      }
-    });
-  }
-
-  /* ---- 08 · panels ------------------------------------------------------ */
-
-  function switchTab(name) {
-    state.tab = name;
-    $$("[data-tab]").forEach(b => b.classList.toggle("is-active", b.dataset.tab === name));
-    $$(".panel").forEach(p => p.classList.toggle("is-active", p.id === "panel-" + name));
-    if (name === "templates") renderTemplates();
-    if (name === "history") renderLibrary();
-    if (name === "engineer") syncEngineer();
-  }
-
-  /* templates */
-  let activeCat = "ui";
-
-  function templateSet(cat) {
-    if (cat === "mine") return state.mine.map(t => [t.title, t.body, "MINE"]);
-    return templates[cat] || [];
-  }
-
-  function renderTemplates() {
-    const query = el("template-search").value.trim().toLowerCase();
-    const list = templateSet(activeCat)
-      .filter(t => (t[0] + " " + t[1]).toLowerCase().includes(query));
-
-    if (!list.length) {
-      el("templates-grid").innerHTML =
-        '<div class="empty" style="grid-column:1/-1">' +
-        (activeCat === "mine"
-          ? "Nothing saved yet. Write something in the editor and hit “Save editor as template”."
-          : "No template matches that search.") + "</div>";
-      return;
-    }
-
-    el("templates-grid").innerHTML = list.map((t, i) =>
-      '<button class="tile" type="button" data-idx="' + i + '">' +
-        "<b>" + esc(t[0]) + "</b>" +
-        "<p>" + esc(t[1].length > 190 ? t[1].slice(0, 190) + "…" : t[1]) + "</p>" +
-        '<span class="tile__foot"><span class="tag">' + esc(t[2]) + "</span>" +
-        '<span class="micro">Load →</span></span>' +
-      "</button>"
+  function renderTemplates(category = "ui-components", search = "") {
+    const query = search.toLowerCase();
+    const data = (library[category] || []).filter(item =>
+      `${item[0]} ${item[1]}`.toLowerCase().includes(query)
+    );
+    el("templates-grid").innerHTML = data.map(item =>
+      `<article class="card" data-template="${escapeHtml(item[1])}">
+        <b>${escapeHtml(item[0])}</b><p>${escapeHtml(item[1])}</p><span class="tag">${item[2]}</span>
+      </article>`
     ).join("");
-
-    $$("#templates-grid .tile").forEach(tile => {
-      tile.addEventListener("click", () => {
-        const chosen = list[Number(tile.dataset.idx)];
-        setEditor(chosen[1]);
-        switchTab("enhance");
-        $("#bench").scrollIntoView({ behavior: "smooth", block: "start" });
-        toast("Loaded: " + chosen[0]);
-      });
-    });
   }
 
-  function setEditor(value) {
-    el("prompt-input").value = value;
-    pushEdit(value);
-    syncEditor();
+  function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, char => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[char]));
   }
 
-  /* engineer */
-  function syncEngineer() {
-    const value = el("engineer-input").value;
-    el("engineer-count").textContent = wordCount(value) + " words · " + value.length + " characters";
-    renderChecklist(value);
-  }
-
-  function renderChecklist(text) {
-    const low = text.toLowerCase();
-    const rows = [
-      ["Clear objective",   /\b(build|create|implement|fix|design|write|refactor|review|add)\b/.test(low), "Open with the verb"],
-      ["Concrete context",  text.length > 90, "Name the stack and the files"],
-      ["Explicit constraints", /\b(must|should|without|avoid|do not|don't|preserve|keep)\b/.test(low), "Say what must not change"],
-      ["Edge states",       /\b(error|loading|empty|invalid|offline|validation|fail)\b/.test(low), "Cover the unhappy paths"],
-      ["Definition of done", /\b(done when|acceptance|criteria|success|verify|passes)\b/.test(low), "Add measurable criteria"],
-      ["Output shape",      /\b(respond|format|return|reply with|as a list|step by step)\b/.test(low), "Say how to answer"]
+  function checklist(prompt) {
+    const lower = prompt.toLowerCase();
+    const checks = [
+      ["Clear objective", /\b(build|create|make|implement|fix|design|write)\b/, "State the desired outcome"],
+      ["Specific context", prompt.length > 80, "Add project or context details"],
+      ["Constraints", /\b(must|should|required|without|avoid|don't|do not)\b/, "Add explicit constraints"],
+      ["Edge states", /\b(error|loading|empty|validation)\b/, "Define failure and loading states"],
+      ["Acceptance criteria", /\b(acceptance|criteria|done when|must include)\b/, "Add measurable completion criteria"]
     ];
+    const passed = checks.filter(item =>
+      typeof item[1] === "boolean" ? item[1] : item[1].test(lower)
+    ).length;
 
-    const passed = rows.filter(r => r[1]).length;
-    el("checklist-score").textContent = passed + " of " + rows.length;
-    el("checklist").innerHTML = rows.map(([label, ok, fix]) =>
-      '<div class="check" data-ok="' + ok + '">' +
-        '<span class="check__mark">' + (ok ? "✓" : "!") + "</span>" +
-        "<span>" + label + "</span>" +
-        '<span class="check__fix">' + (ok ? "good" : fix) + "</span>" +
-      "</div>"
-    ).join("");
+    el("checklist-score").textContent = `${passed}/${checks.length}`;
+    el("checklist-grid").innerHTML = checks.map(item => {
+      const ok = typeof item[1] === "boolean" ? item[1] : item[1].test(lower);
+      return `<div class="check ${ok ? "pass" : "fail"}">
+        <span class="check-icon">${ok ? "✓" : "!"}</span>
+        <span>${item[0]}</span><span class="check-fix">${ok ? "Good" : item[2]}</span>
+      </div>`;
+    }).join("");
   }
 
   function renderTechniques() {
-    el("techniques").innerHTML = techniques.map((t, i) =>
-      '<button class="tech" type="button" data-tech="' + i + '" aria-pressed="false">' +
-        '<span class="tech__box">✓</span>' +
-        "<span><b>" + esc(t[0]) + "</b><small>" + esc(t[1]) + "</small></span>" +
-      "</button>"
+    el("techniques-grid").innerHTML = techniques.map((item, index) =>
+      `<div class="tech" data-tech="${index}">
+        <span class="tech-mark"></span><div><b>${item[0]}</b><small>${item[1]}</small></div>
+      </div>`
     ).join("");
   }
 
   function applyTechniques() {
-    const input = el("engineer-input");
-    let value = input.value.trim();
-    if (!value) { toast("Add a prompt first"); return; }
-    if (!state.picked.size) { toast("Select at least one technique"); return; }
+    let prompt = el("engineer-input").value.trim();
+    if (!prompt) return notify("Enter a prompt first");
 
-    // Apply in declaration order so the result reads consistently.
-    techniques.forEach((t, i) => { if (state.picked.has(i)) value = t[2](value); });
+    const selected = q(".tech.selected").map(node => techniques[Number(node.dataset.tech)][0]);
 
-    input.value = value;
-    syncEngineer();
-    toast(state.picked.size + " technique" + (state.picked.size === 1 ? "" : "s") + " applied");
+    if (selected.includes("Role"))
+      prompt = `Act as an experienced implementation engineer.\n\n${prompt}`;
+    if (selected.includes("Constraints"))
+      prompt += "\n\nConstraints:\n- Preserve existing behavior unless explicitly requested.\n- Keep the implementation maintainable.";
+    if (selected.includes("Steps"))
+      prompt += "\n\nImplementation plan:\n1. Inspect the existing implementation.\n2. Identify the required change or root cause.\n3. Make the smallest correct change.\n4. Verify the result.";
+    if (selected.includes("Criteria"))
+      prompt += "\n\nAcceptance criteria:\n- Works end-to-end.\n- No regressions.\n- Responsive and accessible.";
+    if (selected.includes("Edge cases"))
+      prompt += "\n\nCover loading, empty, validation, error, and mobile states.";
+    if (selected.includes("Output format"))
+      prompt += "\n\nResponse format:\n1. Brief diagnosis.\n2. Exact changes.\n3. Complete code where appropriate.";
+
+    el("engineer-input").value = prompt;
+    updateEngineer();
+    notify("Selected techniques applied");
+  }
+
+  function updateEngineer() {
+    updateCount(el("engineer-input"), el("engineer-word-count"));
+    checklist(el("engineer-input").value);
   }
 
   function renderVersions() {
-    const box = el("versions");
-    if (!state.versions.length) {
-      box.innerHTML = '<div class="empty">No snapshots yet. Save one before a risky edit.</div>';
+    const target = el("versions-list");
+    if (!app.versions.length) {
+      target.innerHTML = '<div class="empty">No versions saved</div>';
       return;
     }
-    box.innerHTML = state.versions.map(v =>
-      '<div class="rowcard">' +
-        '<button class="rowcard__text" type="button" data-use="' + v.id + '">' + esc(v.text) + "</button>" +
-        '<span class="micro">' + esc(v.when) + "</span>" +
-        '<button class="star" type="button" data-drop="' + v.id + '" title="Delete">✕</button>' +
-      "</div>"
+    target.innerHTML = app.versions.map(version =>
+      `<div class="history-row">
+        <span class="history-text">${escapeHtml(version.text)}</span>
+        <button class="secondary" data-version="${version.id}">Use</button>
+      </div>`
     ).join("");
   }
 
-  function renderVariants() {
-    const base = el("engineer-input").value.trim();
-    if (!base) { toast("Add a prompt first"); return; }
-
-    const variants = [
-      ["Tight scope", base + "\n\nScope\n- Change only what this request requires.\n- List anything you deliberately left alone."],
-      ["Verify first", base + "\n\nBefore coding\n- Restate the goal in one sentence.\n- Name the one assumption most likely to be wrong.\n\nAfter coding\n- Say how you verified the result."],
-      ["Report style", base + "\n\nRespond as\n1. Diagnosis — one paragraph.\n2. Files changed and why.\n3. Full code for each file touched.\n4. Follow-up work you would recommend."]
-    ];
-
-    el("variants").innerHTML = variants.map((v, i) =>
-      '<div class="rowcard" style="align-items:flex-start">' +
-        '<span class="rowcard__text" style="white-space:normal"><b>' + esc(v[0]) + "</b><br>" +
-        '<span class="micro">' + esc(v[1].slice(base.length).trim().split("\n")[0]) + "…</span></span>" +
-        '<button class="btn btn--tiny" type="button" data-variant="' + i + '">Use</button>' +
-      "</div>"
-    ).join("");
-
-    $$("#variants [data-variant]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        el("engineer-input").value = variants[Number(btn.dataset.variant)][1];
-        syncEngineer();
-        toast("Variant applied");
-      });
-    });
+  function saveVersion() {
+    const text = el("engineer-input").value.trim();
+    if (!text) return notify("Nothing to save");
+    app.versions.unshift({id:Date.now(), text, date:new Date().toLocaleString()});
+    app.versions = app.versions.slice(0, 20);
+    store.write("vibe_versions", app.versions);
+    renderVersions();
+    notify("Version saved");
   }
 
-  /* library */
-  function fileToLibrary(source, result) {
-    state.library.unshift({
-      id: Date.now(),
-      source: source,
-      result: result,
-      score: scorePrompt(source).total,
-      when: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-      star: false
-    });
-    state.library = state.library.slice(0, 60);
-    disk.set("vc.library", state.library);
-    renderLibrary();
-  }
-
-  function renderLibrary() {
-    const query = el("history-search").value.trim().toLowerCase();
-    const rows = state.library
-      .filter(r => !state.starredOnly || r.star)
-      .filter(r => r.source.toLowerCase().includes(query));
-
-    if (!rows.length) {
-      el("history-list").innerHTML = '<div class="empty">' +
-        (state.library.length ? "Nothing matches that filter." : "Enhanced prompts land here automatically.") +
-        "</div>";
+  function renderHistory(filter = "") {
+    const query = filter.toLowerCase();
+    const entries = app.history.filter(item => item.prompt.toLowerCase().includes(query));
+    if (!entries.length) {
+      el("history-list").innerHTML = '<div class="empty">No prompts yet.</div>';
       return;
     }
 
-    el("history-list").innerHTML = rows.map(r =>
-      '<div class="rowcard" data-id="' + r.id + '">' +
-        '<button class="rowcard__text" type="button" data-load="' + r.id + '">' + esc(r.source) + "</button>" +
-        '<span class="micro">' + esc(r.when) + "</span>" +
-        '<span class="rowcard__score">' + r.score + "</span>" +
-        '<button class="star ' + (r.star ? "is-on" : "") + '" type="button" data-star="' + r.id + '" aria-label="Star">★</button>' +
-        '<button class="star" type="button" data-copy="' + r.id + '" aria-label="Copy result">⧉</button>' +
-        '<button class="star" type="button" data-drop="' + r.id + '" aria-label="Delete">✕</button>' +
-      "</div>"
+    el("history-list").innerHTML = entries.map(item =>
+      `<div class="history-row" data-id="${item.id}">
+        <span class="history-text">${escapeHtml(item.prompt)}</span>
+        <span class="history-score">${item.score}</span>
+        <button class="plain ${item.starred ? "starred" : ""}" data-star="${item.id}">★</button>
+        <button class="plain" data-copy="${item.id}">Copy</button>
+      </div>`
     ).join("");
   }
 
-  /* ---- 09 · command palette --------------------------------------------- */
+  function switchTab(name) {
+    q("[data-tab]").forEach(button => button.classList.toggle("active", button.dataset.tab === name));
+    q(".panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
 
-  const commands = [
-    ["Enhance the current prompt", "enhance", () => { switchTab("enhance"); runEnhance(); }],
-    ["Clear the editor", "editor", () => { setEditor(""); el("prompt-input").focus(); }],
-    ["Load a rough example", "editor", loadExample],
-    ["Copy the enhanced result", "result", () => copyText(state.lastResult)],
-    ["Save the result as Markdown", "result", downloadResult],
-    ["Strip filler from the result", "result", stripFiller],
-    ["Save editor as a template", "templates", saveTemplate],
-    ["Go to Enhance", "nav", () => switchTab("enhance")],
-    ["Go to Templates", "nav", () => switchTab("templates")],
-    ["Go to Engineer", "nav", () => switchTab("engineer")],
-    ["Go to Library", "nav", () => switchTab("history")],
-    ["Toggle theme", "view", toggleTheme],
-    ["Open settings", "view", openSettings],
-    ["Export all data", "data", exportData]
-  ];
-
-  let paletteRows = [];
-  let paletteAt = 0;
-
-  function openPalette() {
-    el("modal-palette").classList.remove("is-hidden");
-    el("palette-input").value = "";
-    renderPalette("");
-    el("palette-input").focus();
+    if (name === "templates") renderTemplates();
+    if (name === "history") renderHistory();
+    if (name === "engineer") updateEngineer();
   }
 
-  function closePalette() {
-    el("modal-palette").classList.add("is-hidden");
-  }
+  async function runEnhance() {
+    const input = el("prompt-input");
+    const prompt = input.value.trim();
+    if (!prompt) return;
 
-  function renderPalette(query) {
-    const q = query.trim().toLowerCase();
-    paletteRows = commands.filter(c => (c[0] + " " + c[1]).toLowerCase().includes(q));
-    paletteAt = 0;
-    if (!paletteRows.length) {
-      el("palette-list").innerHTML = '<div class="empty">No command matches.</div>';
-      return;
+    const button = el("btn-enhance");
+    button.classList.add("busy");
+    button.disabled = true;
+    renderScore(prompt);
+
+    try {
+      presentResult(prompt, await improve(prompt));
+    } finally {
+      button.classList.remove("busy");
+      button.disabled = false;
     }
-    paintPalette();
   }
 
-  function paintPalette() {
-    el("palette-list").innerHTML = paletteRows.map((c, i) =>
-      '<button class="palette__item" type="button" role="option" data-i="' + i + '" ' +
-      'aria-selected="' + (i === paletteAt) + '">' + esc(c[0]) +
-      "<span>" + esc(c[1]) + "</span></button>"
-    ).join("");
-  }
+  async function transformCredit() {
+    const prompt = el("credit-input").value.trim();
+    if (!prompt) return;
 
-  function runPalette(index) {
-    const cmd = paletteRows[index];
-    if (!cmd) return;
-    closePalette();
-    cmd[2]();
-  }
+    const button = el("btn-credit-transform");
+    button.classList.add("busy");
+    button.disabled = true;
 
-  /* ---- 10 · wiring ------------------------------------------------------ */
-
-  function loadExample() {
-    const pick = examples[Math.floor(Math.random() * examples.length)];
-    switchTab("enhance");
-    setEditor(pick);
-    el("prompt-input").focus();
-    toast("A deliberately bad prompt, for contrast");
-  }
-
-  function downloadResult() {
-    if (!state.lastResult) { toast("Enhance something first"); return; }
-    const blob = new Blob(["<!-- vibe check -->\n\n" + state.lastResult + "\n"], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "prompt-" + new Date().toISOString().slice(0, 10) + ".md";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast("Saved as Markdown");
-  }
-
-  function stripFiller() {
-    if (!state.lastResult) { toast("Nothing to strip"); return; }
-    const cleaned = state.lastResult
-      .replace(new RegExp("\\b(" + fillerWords.join("|") + ")\\b", "gi"), "")
-      .replace(/[ \t]{2,}/g, " ")
-      .replace(/ +([,.;:])/g, "$1")
-      .replace(/\n[ \t]+/g, "\n")
-      .trim();
-
-    state.lastResult = cleaned;
-    disk.set("vc.last", cleaned);
-    el("result-text").textContent = cleaned;
-    if (state.settings.diff) renderDiff(state.lastSource, cleaned);
-    renderEfficiency(cleaned);
-    toast("Filler removed");
-  }
-
-  function saveTemplate() {
-    const body = el("prompt-input").value.trim();
-    if (!body) { toast("The editor is empty"); return; }
-    const title = window.prompt("Name this template:", body.slice(0, 40));
-    if (!title) return;
-    state.mine.unshift({ title: title.trim(), body: body });
-    state.mine = state.mine.slice(0, 40);
-    disk.set("vc.mine", state.mine);
-    activeCat = "mine";
-    $$("#template-cats [data-cat]").forEach(b => {
-      const on = b.dataset.cat === "mine";
-      b.classList.toggle("is-active", on);
-      b.setAttribute("aria-pressed", String(on));
-    });
-    switchTab("templates");
-    renderTemplates();
-    toast("Saved to your templates");
-  }
-
-  function exportData() {
-    const payload = JSON.stringify({
-      exported: new Date().toISOString(),
-      settings: state.settings,
-      library: state.library,
-      versions: state.versions,
-      mine: state.mine
-    }, null, 2);
-    const blob = new Blob([payload], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "vibe-check-backup.json";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast("Backup downloaded");
-  }
-
-  function importData(file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const data = JSON.parse(String(reader.result));
-        if (Array.isArray(data.library)) {
-          state.library = data.library.concat(state.library).slice(0, 60);
-          disk.set("vc.library", state.library);
-        }
-        if (Array.isArray(data.versions)) {
-          state.versions = data.versions.concat(state.versions).slice(0, 40);
-          disk.set("vc.versions", state.versions);
-        }
-        if (Array.isArray(data.mine)) {
-          state.mine = data.mine.concat(state.mine).slice(0, 40);
-          disk.set("vc.mine", state.mine);
-        }
-        if (data.settings) {
-          state.settings = Object.assign(state.settings, data.settings);
-          disk.set("vc.settings", state.settings);
-          reflectSettings();
-        }
-        renderLibrary(); renderVersions(); renderTemplates();
-        toast("Backup merged in");
-      } catch (_) {
-        toast("That file wasn't readable JSON");
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  function toggleTheme() {
-    const next = document.documentElement.dataset.theme === "ink" ? "paper" : "ink";
-    document.documentElement.dataset.theme = next;
-    disk.set("vc.theme", next);
-    el("btn-theme").textContent = next === "ink" ? "◐" : "◑";
-    toast(next === "ink" ? "Ink" : "Paper");
+    try {
+      const result = await improve(prompt, "chinese");
+      el("credit-text").textContent = result.enhanced;
+      el("credit-result").classList.remove("hidden");
+    } finally {
+      button.classList.remove("busy");
+      button.disabled = false;
+    }
   }
 
   function openSettings() {
-    reflectSettings();
-    el("modal-settings").classList.remove("is-hidden");
+    el("settings-modal").classList.remove("hidden");
+    el("setting-auto-stack").checked = app.settings.autoStack;
+    el("setting-token-eff").checked = app.settings.tokenEff;
+    el("setting-before-after").checked = app.settings.beforeAfter;
   }
 
-  function reflectSettings() {
-    el("set-stack").checked = state.settings.stack;
-    el("set-live").checked  = state.settings.live;
-    el("set-diff").checked  = state.settings.diff;
-    el("set-eff").checked   = state.settings.eff;
-  }
-
-  function readSettings() {
-    state.settings = {
-      stack: el("set-stack").checked,
-      live:  el("set-live").checked,
-      diff:  el("set-diff").checked,
-      eff:   el("set-eff").checked
+  function updateSettings() {
+    app.settings = {
+      autoStack: el("setting-auto-stack").checked,
+      tokenEff: el("setting-token-eff").checked,
+      beforeAfter: el("setting-before-after").checked
     };
-    disk.set("vc.settings", state.settings);
-    syncEditor({ silent: true });
-    if (state.lastResult) renderEfficiency(state.lastResult);
-    el("diff-card").classList.toggle("is-hidden", !state.settings.diff || !state.lastResult);
+    store.write("vibe_settings", app.settings);
+    showStack(el("prompt-input").value);
+    updateEfficiency(app.lastEnhanced);
   }
 
-  function showTip() { el("tip-text").textContent = tips[state.tip]; }
+  q("[data-tab]").forEach(button =>
+    button.addEventListener("click", () => switchTab(button.dataset.tab))
+  );
 
-  function wire() {
-    /* tabs */
-    $$("[data-tab]").forEach(btn =>
-      btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+  el("prompt-input").addEventListener("input", event => {
+    syncPrompt(event.target.value);
+  });
 
-    /* editor */
-    const editor = el("prompt-input");
-    const remember = debounce(() => pushEdit(editor.value), 500);
-    editor.addEventListener("input", () => { syncEditor(); remember(); });
+  el("btn-enhance").addEventListener("click", runEnhance);
+  el("btn-copy-enhanced").addEventListener("click", () => copy(el("enhanced-text").textContent, el("btn-copy-enhanced")));
+  el("btn-copy-before").addEventListener("click", () => copy(el("before-text").textContent));
+  el("btn-copy-after").addEventListener("click", () => copy(el("after-text").textContent));
+  el("btn-copy-credit").addEventListener("click", () => copy(el("credit-text").textContent, el("btn-copy-credit")));
 
-    el("btn-undo").addEventListener("click", () => {
-      if (edits.at <= 0) return;
-      edits.at--;
-      editor.value = edits.list[edits.at];
-      syncEditor();
-      refreshUndo();
-    });
-    el("btn-redo").addEventListener("click", () => {
-      if (edits.at >= edits.list.length - 1) return;
-      edits.at++;
-      editor.value = edits.list[edits.at];
-      syncEditor();
-      refreshUndo();
-    });
+  el("btn-undo").addEventListener("click", () => {
+    if (!app.original) return;
+    el("prompt-input").value = app.original;
+    el("btn-undo").classList.add("hidden");
+    el("btn-redo").classList.remove("hidden");
+    el("btn-enhance").disabled = false;
+    syncPrompt(el("prompt-input").value);
+  });
 
-    $$("[data-block]").forEach(btn => btn.addEventListener("click", () => {
-      const snippet = blocks[btn.dataset.block];
-      const start = editor.selectionStart ?? editor.value.length;
-      editor.value = editor.value.slice(0, start) + snippet + editor.value.slice(start);
-      const caret = start + snippet.length;
-      editor.focus();
-      editor.setSelectionRange(caret, caret);
-      pushEdit(editor.value);
-      syncEditor();
-    }));
+  el("btn-redo").addEventListener("click", () => {
+    if (!app.lastEnhanced) return;
+    el("prompt-input").value = app.lastEnhanced;
+    el("btn-redo").classList.add("hidden");
+    el("btn-undo").classList.remove("hidden");
+    syncPrompt(el("prompt-input").value);
+  });
 
-    el("btn-surprise").addEventListener("click", loadExample);
-    el("btn-hero-demo").addEventListener("click", () => {
-      loadExample();
-      $("#bench").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    el("btn-clear").addEventListener("click", () => {
-      setEditor("");
-      editor.focus();
-      toast("Editor cleared");
-    });
+  q(".chip").forEach(button => button.addEventListener("click", () => {
+    q(".chip").forEach(item => item.classList.remove("active"));
+    button.classList.add("active");
+    renderTemplates(button.dataset.category, el("template-search").value);
+  }));
 
-    el("btn-enhance").addEventListener("click", runEnhance);
-    el("btn-copy-result").addEventListener("click", e => copyText(el("result-text").textContent, e.currentTarget));
-    el("btn-copy-before").addEventListener("click", e => copyText(state.lastSource, e.currentTarget));
-    el("btn-copy-after").addEventListener("click", e => copyText(state.lastResult, e.currentTarget));
-    el("btn-download").addEventListener("click", downloadResult);
-    el("btn-send-engineer").addEventListener("click", () => {
-      if (!state.lastResult) return;
-      el("engineer-input").value = state.lastResult;
-      switchTab("engineer");
-      syncEngineer();
-      toast("Moved to Engineer");
-    });
+  el("template-search").addEventListener("input", () =>
+    renderTemplates(document.querySelector(".chip.active").dataset.category, el("template-search").value)
+  );
 
-    el("eff-toggle").addEventListener("click", () => {
-      const open = el("eff-body").classList.toggle("is-hidden");
-      el("eff-toggle").setAttribute("aria-expanded", String(!open));
-    });
-    el("btn-strip").addEventListener("click", stripFiller);
+  el("templates-grid").addEventListener("click", event => {
+    const card = event.target.closest("[data-template]");
+    if (!card) return;
+    el("prompt-input").value = card.dataset.template;
+    el("btn-enhance").disabled = false;
+    updateCount(el("prompt-input"), el("word-count"));
+    showStack(card.dataset.template);
+    switchTab("enhance");
+    document.querySelector("#workspace").scrollIntoView({behavior:"smooth", block:"start"});
+  });
 
-    /* templates */
-    $$("#template-cats [data-cat]").forEach(btn => btn.addEventListener("click", () => {
-      activeCat = btn.dataset.cat;
-      $$("#template-cats [data-cat]").forEach(b => {
-        const on = b === btn;
-        b.classList.toggle("is-active", on);
-        b.setAttribute("aria-pressed", String(on));
-      });
-      renderTemplates();
-    }));
-    el("template-search").addEventListener("input", renderTemplates);
-    el("btn-save-template").addEventListener("click", saveTemplate);
+  el("engineer-input").addEventListener("input", updateEngineer);
+  el("btn-engineer-from-enhance").addEventListener("click", () => {
+    if (!app.lastEnhanced) return notify("Enhance a prompt first");
+    el("engineer-input").value = app.lastEnhanced;
+    updateEngineer();
+    notify("Loaded last enhanced prompt");
+  });
+  el("btn-apply-techniques").addEventListener("click", applyTechniques);
+  el("techniques-grid").addEventListener("click", event => {
+    const card = event.target.closest(".tech");
+    if (card) card.classList.toggle("selected");
+  });
 
-    /* engineer */
-    el("engineer-input").addEventListener("input", syncEngineer);
-    el("btn-from-enhance").addEventListener("click", () => {
-      if (!state.lastResult) { toast("Enhance something first"); return; }
-      el("engineer-input").value = state.lastResult;
-      syncEngineer();
-      toast("Pulled the last result");
-    });
+  el("btn-generate-variants").addEventListener("click", () => {
+    const prompt = el("engineer-input").value.trim();
+    if (!prompt) return notify("Enter a prompt first");
 
-    el("techniques").addEventListener("click", e => {
-      const btn = e.target.closest(".tech");
-      if (!btn) return;
-      const i = Number(btn.dataset.tech);
-      const on = btn.getAttribute("aria-pressed") === "true";
-      btn.setAttribute("aria-pressed", String(!on));
-      if (on) state.picked.delete(i); else state.picked.add(i);
-    });
-    el("btn-apply-tech").addEventListener("click", applyTechniques);
-    el("btn-variants").addEventListener("click", renderVariants);
+    const variants = [
+      `${prompt}\n\nKeep the change focused and prefer the smallest reliable implementation.`,
+      `${prompt}\n\nBefore coding, identify the important requirements and assumptions. Then return a production-ready solution.`,
+      `${prompt}\n\nThink through the normal path, likely failure cases, and important edge cases before implementing the final solution.`
+    ];
 
-    el("btn-save-version").addEventListener("click", () => {
-      const text = el("engineer-input").value.trim();
-      if (!text) { toast("Nothing to snapshot"); return; }
-      state.versions.unshift({
-        id: Date.now(),
-        text: text,
-        when: new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })
-      });
-      state.versions = state.versions.slice(0, 25);
-      disk.set("vc.versions", state.versions);
-      renderVersions();
-      toast("Snapshot saved");
-    });
-    el("btn-clear-versions").addEventListener("click", () => {
-      state.versions = [];
-      disk.drop("vc.versions");
-      renderVersions();
-    });
-    el("versions").addEventListener("click", e => {
-      const use = e.target.closest("[data-use]");
-      const drop = e.target.closest("[data-drop]");
-      if (use) {
-        const found = state.versions.find(v => String(v.id) === use.dataset.use);
-        if (found) { el("engineer-input").value = found.text; syncEngineer(); toast("Snapshot restored"); }
-      }
-      if (drop) {
-        state.versions = state.versions.filter(v => String(v.id) !== drop.dataset.drop);
-        disk.set("vc.versions", state.versions);
-        renderVersions();
-      }
-    });
+    el("variants-container").innerHTML = variants.map((value, index) =>
+      `<div class="card" style="margin-bottom:8px">
+        <b>Variant ${index + 1}</b><p>${escapeHtml(value)}</p>
+        <button class="secondary" data-variant="${index}" style="margin-top:8px">Use</button>
+      </div>`
+    ).join("");
 
-    /* compressor */
-    el("compress-input").addEventListener("input", e => {
-      const v = e.target.value;
-      el("compress-count").textContent = wordCount(v) + " words · " + v.length + " characters";
-      el("btn-compress").disabled = !v.trim();
-    });
-    el("btn-compress").addEventListener("click", () => {
-      const src = el("compress-input").value.trim();
-      if (!src) return;
-      const out = compress(src);
-      el("compress-text").textContent = out.text;
-      const saved = src.length - out.text.length;
-      el("compress-delta").textContent = saved > 0
-        ? "− " + saved + " characters"
-        : "no change";
-      el("compress-result").classList.remove("is-hidden");
-    });
-    el("btn-copy-compress").addEventListener("click", e =>
-      copyText(el("compress-text").textContent, e.currentTarget));
+    q("[data-variant]", el("variants-container")).forEach(button =>
+      button.addEventListener("click", () => {
+        el("engineer-input").value = variants[Number(button.dataset.variant)];
+        updateEngineer();
+        notify("Variant selected");
+      })
+    );
+  });
 
-    /* library */
-    el("history-search").addEventListener("input", renderLibrary);
-    el("btn-starred").addEventListener("click", e => {
-      state.starredOnly = !state.starredOnly;
-      e.currentTarget.setAttribute("aria-pressed", String(state.starredOnly));
-      e.currentTarget.classList.toggle("is-active", state.starredOnly);
-      renderLibrary();
-    });
-    el("history-list").addEventListener("click", e => {
-      const star = e.target.closest("[data-star]");
-      const copy = e.target.closest("[data-copy]");
-      const drop = e.target.closest("[data-drop]");
-      const load = e.target.closest("[data-load]");
-
-      if (star) {
-        const row = state.library.find(r => String(r.id) === star.dataset.star);
-        if (row) { row.star = !row.star; disk.set("vc.library", state.library); renderLibrary(); }
-        return;
-      }
-      if (copy) {
-        const row = state.library.find(r => String(r.id) === copy.dataset.copy);
-        if (row) copyText(row.result);
-        return;
-      }
-      if (drop) {
-        state.library = state.library.filter(r => String(r.id) !== drop.dataset.drop);
-        disk.set("vc.library", state.library);
-        renderLibrary();
-        return;
-      }
-      if (load) {
-        const row = state.library.find(r => String(r.id) === load.dataset.load);
-        if (!row) return;
-        setEditor(row.source);
-        switchTab("enhance");
-        $("#bench").scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-    el("btn-clear-history").addEventListener("click", () => {
-      if (!state.library.length) return;
-      if (!window.confirm("Delete every saved prompt? This cannot be undone.")) return;
-      state.library = [];
-      disk.drop("vc.library");
-      renderLibrary();
-      toast("Library emptied");
-    });
-
-    /* settings + theme */
-    el("btn-theme").addEventListener("click", toggleTheme);
-    el("btn-settings").addEventListener("click", openSettings);
-    ["set-stack", "set-live", "set-diff", "set-eff"]
-      .forEach(id => el(id).addEventListener("change", readSettings));
-
-    el("btn-export").addEventListener("click", exportData);
-    el("btn-import").addEventListener("click", () => el("file-import").click());
-    el("file-import").addEventListener("change", e => {
-      if (e.target.files && e.target.files[0]) importData(e.target.files[0]);
-      e.target.value = "";
-    });
-    el("btn-reset").addEventListener("click", () => {
-      state.settings = { stack: true, live: true, diff: true, eff: true };
-      disk.set("vc.settings", state.settings);
-      reflectSettings();
-      readSettings();
-      toast("Settings reset");
-    });
-    el("btn-wipe").addEventListener("click", () => {
-      if (!window.confirm("Erase drafts, library, snapshots and templates?")) return;
-      ["vc.settings", "vc.library", "vc.versions", "vc.mine", "vc.last", "vc.draft", "vc.theme"]
-        .forEach(disk.drop);
-      location.reload();
-    });
-
-    /* overlays */
-    $$("[data-close]").forEach(node => node.addEventListener("click", () => {
-      node.closest(".overlay").classList.add("is-hidden");
-    }));
-
-    /* palette */
-    el("btn-palette").addEventListener("click", openPalette);
-    el("palette-input").addEventListener("input", e => renderPalette(e.target.value));
-    el("palette-input").addEventListener("keydown", e => {
-      if (e.key === "ArrowDown") { e.preventDefault(); paletteAt = Math.min(paletteAt + 1, paletteRows.length - 1); paintPalette(); }
-      if (e.key === "ArrowUp")   { e.preventDefault(); paletteAt = Math.max(paletteAt - 1, 0); paintPalette(); }
-      if (e.key === "Enter")     { e.preventDefault(); runPalette(paletteAt); }
-    });
-    el("palette-list").addEventListener("click", e => {
-      const item = e.target.closest("[data-i]");
-      if (item) runPalette(Number(item.dataset.i));
-    });
-
-    /* tips */
-    el("tip-prev").addEventListener("click", () => {
-      state.tip = (state.tip - 1 + tips.length) % tips.length; showTip();
-    });
-    el("tip-next").addEventListener("click", () => {
-      state.tip = (state.tip + 1) % tips.length; showTip();
-    });
-
-    /* global keys */
-    document.addEventListener("keydown", e => {
-      const mod = e.ctrlKey || e.metaKey;
-
-      if (mod && e.key.toLowerCase() === "k") { e.preventDefault(); openPalette(); return; }
-      if (mod && e.key === "Enter") {
-        e.preventDefault();
-        if (!el("btn-enhance").disabled) { switchTab("enhance"); runEnhance(); }
-        return;
-      }
-      if (e.key === "Escape") {
-        $$(".overlay").forEach(o => o.classList.add("is-hidden"));
-      }
-    });
-  }
-
-  /* ---- 11 · boot -------------------------------------------------------- */
-
-  function boot() {
-    document.documentElement.dataset.theme = disk.get("vc.theme", "ink");
-    el("btn-theme").textContent = document.documentElement.dataset.theme === "ink" ? "◐" : "◑";
-
-    if (/Mac|iPhone|iPad/.test(navigator.platform || "")) {
-      el("mod-key").textContent = "⌘";
-      el("mod-key-2").textContent = "⌘";
-    }
-
-    reflectSettings();
-    renderTechniques();
-    renderTemplates();
+  el("btn-save-version").addEventListener("click", saveVersion);
+  el("btn-clear-versions").addEventListener("click", () => {
+    app.versions = [];
+    localStorage.removeItem("vibe_versions");
     renderVersions();
-    renderLibrary();
+  });
+
+  el("versions-list").addEventListener("click", event => {
+    const button = event.target.closest("[data-version]");
+    if (!button) return;
+    const version = app.versions.find(item => item.id == button.dataset.version);
+    if (version) {
+      el("engineer-input").value = version.text;
+      updateEngineer();
+    }
+  });
+
+  el("credit-input").addEventListener("input", event => {
+    updateCount(event.target, el("credit-word-count"));
+    el("btn-credit-transform").disabled = !event.target.value.trim();
+  });
+  el("btn-credit-transform").addEventListener("click", transformCredit);
+
+  el("history-search").addEventListener("input", event => renderHistory(event.target.value));
+  el("history-list").addEventListener("click", event => {
+    const star = event.target.closest("[data-star]");
+    const copier = event.target.closest("[data-copy]");
+    const row = event.target.closest("[data-id]");
+
+    if (star) {
+      const item = app.history.find(entry => entry.id == star.dataset.star);
+      if (item) {
+        item.starred = !item.starred;
+        store.write("vibe_history", app.history);
+        renderHistory(el("history-search").value);
+      }
+      return;
+    }
+
+    if (copier) {
+      const item = app.history.find(entry => entry.id == copier.dataset.copy);
+      if (item) copy(item.enhanced);
+      return;
+    }
+
+    if (row) {
+      const item = app.history.find(entry => entry.id == row.dataset.id);
+      if (!item) return;
+      el("prompt-input").value = item.prompt;
+      el("btn-enhance").disabled = false;
+      updateCount(el("prompt-input"), el("word-count"));
+      showStack(item.prompt);
+      switchTab("enhance");
+    }
+  });
+
+  el("btn-clear-history").addEventListener("click", () => {
+    app.history = [];
+    localStorage.removeItem("vibe_history");
+    renderHistory();
+    notify("History cleared");
+  });
+
+  el("efficiency-toggle").addEventListener("click", () =>
+    el("efficiency-body").classList.toggle("hidden")
+  );
+
+  el("btn-strip-filler").addEventListener("click", () => {
+    const cleaned = el("enhanced-text").textContent
+      .replace(/\b(very|really|basically|just|simply|please|kindly|obviously|actually)\b/gi, "")
+      .replace(/[ ]{2,}/g, " ")
+      .replace(/\n[ \t]+/g, "\n")
+      .trim();
+
+    el("enhanced-text").textContent = cleaned;
+    app.lastEnhanced = cleaned;
+    localStorage.setItem("vibe_last_enhanced", cleaned);
+    updateEfficiency(cleaned);
+    notify("Filler removed");
+  });
+
+  el("settings-btn").addEventListener("click", openSettings);
+  el("settings-close").addEventListener("click", () => el("settings-modal").classList.add("hidden"));
+  el("settings-backdrop").addEventListener("click", () => el("settings-modal").classList.add("hidden"));
+  ["setting-auto-stack","setting-token-eff","setting-before-after"].forEach(id =>
+    el(id).addEventListener("change", updateSettings)
+  );
+
+  el("btn-reset-settings").addEventListener("click", () => {
+    app.settings = {autoStack:true, tokenEff:true, beforeAfter:true};
+    store.write("vibe_settings", app.settings);
+    openSettings();
+    updateSettings();
+  });
+
+  el("btn-clear-data").addEventListener("click", () => {
+    localStorage.clear();
+    location.reload();
+  });
+
+  el("btn-export").addEventListener("click", () => {
+    const payload = JSON.stringify({
+      history:app.history, versions:app.versions, settings:app.settings
+    }, null, 2);
+    const blob = new Blob([payload], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "vibe-check-data.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  function showTip() { el("tip-text").textContent = tips[app.tip]; }
+  el("tip-prev").addEventListener("click", () => {
+    app.tip = (app.tip + tips.length - 1) % tips.length;
     showTip();
-    wire();
+  });
+  el("tip-next").addEventListener("click", () => {
+    app.tip = (app.tip + 1) % tips.length;
+    showTip();
+  });
 
-    const draft = disk.get("vc.draft", "");
-    if (draft) {
-      el("prompt-input").value = draft;
-      edits.list = [draft];
-      edits.at = 0;
-      setState("Draft restored");
-    }
-    syncEditor({ silent: true });
-    refreshUndo();
-    syncEngineer();
 
-    if (state.lastResult) {
-      el("result-text").textContent = state.lastResult;
-      el("changes").innerHTML = "<div>Restored from your last session</div>";
-      el("result-card").classList.remove("is-hidden");
-      renderEfficiency(state.lastResult);
-    }
+  const savedDraft = localStorage.getItem("vibe_draft") || "";
+  if (savedDraft) {
+    el("prompt-input").value = savedDraft;
+    syncPrompt(savedDraft, true);
   }
 
-  document.addEventListener("DOMContentLoaded", boot);
-})();
+  el("btn-random-prompt").addEventListener("click", () => {
+    const prompt = surprisePrompts[Math.floor(Math.random() * surprisePrompts.length)];
+    el("prompt-input").value = prompt;
+    syncPrompt(prompt);
+    el("prompt-input").focus();
+    notify("A rough idea, ready to shape");
+  });
+
+  el("btn-clear-prompt").addEventListener("click", () => {
+    el("prompt-input").value = "";
+    syncPrompt("");
+    el("prompt-input").focus();
+    notify("Prompt cleared");
+  });
+
+  document.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      if (!el("btn-enhance").disabled) runEnhance();
+    }
+    if (event.key === "Escape" && !el("settings-modal").classList.contains("hidden")) {
+      el("settings-modal").classList.add("hidden");
+    }
+  });
+
+  renderTechniques();
+  renderTemplates();
+  renderHistory();
+  renderVersions();
+  showTip();
+}
+
+document.addEventListener("DOMContentLoaded", initApp);
 </script>
 </body>
 </html>
