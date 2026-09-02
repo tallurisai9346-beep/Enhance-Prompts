@@ -1,121 +1,118 @@
-# Vibe Check
+# ✨ Vibe Check
 
-**Vibe Check** is a simple tool that helps you turn basic coding ideas into better, clearer prompts.
+> A tool for turning ideas into prompts for AI coding assistants
 
-Sometimes you know what you want to build, but your prompt is too short or vague. Vibe Check takes your query, improves it, and gives you a more useful prompt that you can paste directly into tools like Cursor, ChatGPT, Claude, v0, Bolt, or other AI coding assistants.
+Vibe Check is a web application that helps users refine prompts
 
-## ✨ What can it do?
+before submitting them to an AI coding assistant
+You can input a simple prompt such as:
+```text
+make a login page
+```
+and receive a much more descriptive prompt that provides the AI coding assistant with a better understanding of the task at hand
+## 🚀 Features
+Improve vague prompts
+Analyze prompts
+Compare old vs new prompts
+Copy prompts
+Use prompts templates
+Generate multiple prompt variations
+Identify common technologies
+Remove unneeded words
 
-* Improve simple coding prompts
-* Check the quality of your prompt
-* Compare your original prompt with the improved version
-* Use ready-made prompt templates
-* Generate different prompt variations
-* Keep track of your prompt history
-* Detect common technology stacks
-* Remove unnecessary words
-* Save prompts using browser Local Storage
-* Export your prompts
-* Use an optional API for prompt enhancement
-* Fall back to a local enhancement method if the API is unavailable
-
-## 🛠️ Built With
-
-Vibe Check is intentionally kept simple.
-
-* HTML
-* CSS
-* JavaScript
-* Local Storage
-* Optional API
-
-There is no frontend framework or complicated setup. Everything is kept in a single HTML file to make the project easy to understand and run.
-
-## 🚀 Run It Locally
-
-Clone the repository:
-
+Saves prompt history in the browser
+Exports prompt history
+Optional API integration
+Local fallback for the API
+## 💡 Why Vibe Check?
+Working with AI coding assistants often requires well-crafted prompts in order to perform well
+Sometimes you may have an idea in your head but struggle to translate that into a prompt that the AI assistant can understand.
+Instead of stressing over the "perfect" prompt, Vibe Check allows you to generate a prompt with the assistance of a prompt enhancement API and focus on the task at hand
+Fast, simple, and straight to the point
+### 🧠 The Vibe Check workflow
+```text
+Your idea
+↓
+Vibe Check
+↓
+Prompt analysis
+↓
+Improved prompt
+↓
+Copy and use it with your AI tool
+```
+Here's an example of a prompt before and after being processed by Vibe Check:
+Before:
+```text
+make a modern todo app
+```
+After:
+```text
+Build a modern, responsive todo application.
+Requirements:
+- Add, edit, complete, and delete tasks
+- Filter tasks by all, active, and completed
+- Save tasks in local storage
+- Use a clean and simple interface
+- Make it responsive on mobile and desktop
+```
+The ultimate goal of Vibe Check is not to bloat prompts with unneeded words, but to help clarify and organize thoughts in order to get the best results from AI coding assistants
+## 🛠️ Technologies used
+HTML
+CSS
+JavaScript
+Local Storage
+Optional API integration
+Vibe Check is a lightweight application made with common technologies so it can be easily understood and modified
+## 📂 Project structure
+```text
+Enhance-Prompts/
+│
+├── vibe-check-rewitten.html
+└── README.md
+```
+Vibe Check is a lightweight application hosted in a single HTML file for easy deployment
+## 🖥️ Run locally
+Clone this repository:
 ```bash
 git clone https://github.com/tallurisai9346-beep/Enhance-Prompts.git
 ```
-
-Go into the project folder:
-
+Change directory:
 ```bash
 cd Enhance-Prompts
 ```
-
-Start a local server:
-
+You can either open the file in a browser or alternatively install Node.js and run:
 ```bash
 npx serve .
 ```
-
-Then open the local URL shown in your terminal.
-
-### Another option
-
-Since the project is just HTML, CSS, and JavaScript, you can also open the HTML file directly in your browser.
-
-## 📡 API
-
-The app can optionally use an API to enhance prompts.
-
-The main API endpoint is:
-
+## 🌐 Vibe Check demo
+Vibe Check:
+https://enhance-prompts.vercel.app/
+## 💾 Data
+Vibe Check stores prompt history and saved prompts using your browser's Local Storage
+No account is needed to save data
+## 🔌 API
+Vibe Check can optionally use an enhancement API.
+The following endpoint is used:
 ```http
 POST /api/enhance
 ```
-
-If the app cannot connect to the API, it automatically uses a local prompt-enhancement method instead.
-
-This means the basic functionality can still work without the API.
-
-## 📁 Project Structure
-
-The project is intentionally small:
-
-```text
-Enhance-Prompts/
-└── vibe-check-rewitten.html
-```
-
-Most of the application is contained inside this one file.
-
-The goal was to keep things simple rather than split a small project into lots of files.
-
-## 🌐 Links
-
-**Live Demo:**
-https://enhance-prompts.vercel.app/
-
-**GitHub:**
-https://github.com/tallurisai9346-beep/Enhance-Prompts
-
-## ⚠️ Note About Token Savings
-
-The number of tokens shown as "saved" is only an estimate.
-
-Actual token usage can be different depending on the AI model, tokenizer, and the tool you use to run the prompt.
-
-## 🔮 Future Plans
-
-There are a few things I'd like to add in the future:
-
-* More prompt templates
-* Better prompt scoring
-* User accounts
-* Cloud storage
-* More AI providers
-* More prompt customization options
-* Improved prompt history and management
-
-## 💡 Why I Built This
-
-AI coding tools are really useful, but the quality of the result often depends on how clearly you explain what you want.
-
-Vibe Check is meant to make that first step easier.
-
-Instead of spending time trying to figure out the "perfect" prompt, write what you're thinking, improve it with Vibe Check, and then use the result in your favorite coding tool.
-
-**Write your query. Make it better. Get coding.**
+If the above API cannot be reached, the local enhancement algorithm will be used instead
+## 🛣️ Future work
+Here are some possible future features for Vibe Check:
+More prompt templates
+Better prompt scoring
+More prompt customization
+More AI tool support
+Better prompt analytics
+Prompt history cloud storage
+Better API support
+This is not an exhaustive list, and future work may be decided upon depending on circumstances
+## 🤝 Contributing
+Did you find a bug or have an idea for Vibe Check?
+I'm always open to contributions, suggestions, and proposals
+You can open a bug report or feature request
+Or, if you're feeling extra nice, you can submit a pull request.
+## 📄 License
+See the repository for license information.
+---
