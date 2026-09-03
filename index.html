@@ -1,2616 +1,1324 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Check — Prompt Workshop</title>
-<style>
-:root {
-  --black:#090909;
-  --surface:#10100f;
-  --surface-2:#151514;
-  --surface-3:#1b1b19;
-  --text:#f3f1eb;
-  --muted:#a3a19a;
-  --dim:#6f6d67;
-  --line:#2a2a27;
-  --line-light:#3c3c37;
-  --white:#fff;
-  --green:#7eb18a;
-  --red:#d77b73;
-  --yellow:#c7a762;
-  --focus:#d7d4cb;
-  --radius:3px;
-  --ease:180ms cubic-bezier(.22,.61,.36,1);
-}
-
-*,
-*::before,
-*::after {
-  box-sizing:border-box;
-}
-
-html {
-  scroll-behavior:smooth;
-}
-
-body {
-  margin:0;
-  min-height:100vh;
-  color:var(--text);
-  background:var(--black);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  font-size:14px;
-  line-height:1.5;
-  overflow-x:hidden;
-}
-
-body::before {
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.055;
-  background-image:
-    repeating-linear-gradient(0deg,rgba(255,255,255,.45) 0 1px,transparent 1px 4px);
-  mix-blend-mode:screen;
-}
-
-::selection {
-  background:#e7e4dc;
-  color:#111;
-}
-
-button,
-input,
-textarea {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-}
-
-a {
-  color:inherit;
-}
-
-.hidden {
-  display:none!important;
-}
-
-/* Header */
-
-.topbar {
-  position:sticky;
-  top:0;
-  z-index:20;
-  min-height:62px;
-  padding:10px clamp(16px,4vw,52px);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  background:rgba(9,9,9,.94);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(12px);
-}
-
-.brand {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  text-decoration:none;
-  font-weight:800;
-  letter-spacing:-.025em;
-}
-
-.brand-mark {
-  width:28px;
-  height:28px;
-  display:grid;
-  place-items:center;
-  border:1px solid #55544e;
-  color:#0a0a09;
-  background:#ddd9cf;
-  border-radius:2px;
-  font-size:10px;
-  transform:rotate(-3deg);
-  box-shadow:2px 2px 0 rgba(255,255,255,.06);
-}
-
-.main-nav {
-  display:flex;
-  gap:2px;
-}
-
-.main-nav button,
-.small-icon {
-  border:1px solid transparent;
-  background:transparent;
-  color:var(--muted);
-  border-radius:2px;
-  transition:background var(--ease),color var(--ease),border-color var(--ease),transform var(--ease);
-}
-
-.main-nav button {
-  padding:7px 11px;
-  font-size:12px;
-}
-
-.main-nav button:hover {
-  color:var(--text);
-  background:var(--surface-2);
-}
-
-.main-nav button.active {
-  color:var(--text);
-  box-shadow:inset 0 -2px 0 var(--focus);
-}
-
-.top-actions {
-  display:flex;
-  gap:5px;
-}
-
-.small-icon {
-  width:33px;
-  height:33px;
-  display:inline-grid;
-  place-items:center;
-  border-color:var(--line);
-}
-
-.small-icon:hover {
-  color:var(--text);
-  background:var(--surface-2);
-  border-color:var(--line-light);
-  transform:translateY(-1px);
-}
-
-/* Intro */
-
-.hero {
-  position:relative;
-  max-width:850px;
-  margin:0 auto;
-  padding:92px 20px 78px;
-  text-align:center;
-}
-
-.badge {
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:4px 9px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  color:var(--muted);
-  background:var(--surface);
-  font-size:10px;
-  letter-spacing:.025em;
-}
-
-.dot {
-  width:6px;
-  height:6px;
-  flex:0 0 6px;
-  border-radius:50%;
-  background:var(--green);
-}
-
-.hero h1 {
-  margin:22px 0 17px;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(48px,8vw,84px);
-  line-height:.9;
-  font-weight:500;
-  letter-spacing:-.07em;
-}
-
-.hero h1 span {
-  font-style:italic;
-  color:#aaa79e;
-}
-
-.hero p {
-  max-width:550px;
-  margin:0 auto 28px;
-  color:var(--muted);
-  font-size:15px;
-}
-
-.primary {
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 17px;
-  border:1px solid #dedbd2;
-  border-radius:2px;
-  background:#dedbd2;
-  color:#10100f;
-  font-weight:800;
-  box-shadow:2px 2px 0 rgba(255,255,255,.07);
-  transition:transform var(--ease),box-shadow var(--ease);
-}
-
-.primary:hover {
-  transform:translate(-1px,-1px);
-  box-shadow:4px 4px 0 rgba(255,255,255,.06);
-}
-
-.primary:active {
-  transform:none;
-  box-shadow:1px 1px 0 rgba(255,255,255,.05);
-}
-
-/* Main workspace */
-
-.shell {
-  width:min(950px,calc(100% - 24px));
-  margin:0 auto 82px;
-}
-
-.workspace {
-  position:relative;
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:4px;
-  background:var(--surface);
-  box-shadow:0 22px 50px rgba(0,0,0,.35);
-}
-
-.workspace-head {
-  display:flex;
-  align-items:center;
-  gap:16px;
-  min-height:51px;
-  padding:8px 12px;
-  border-bottom:1px solid var(--line);
-  background:#0e0e0d;
-}
-
-.app-id {
-  display:flex;
-  align-items:center;
-  gap:7px;
-  white-space:nowrap;
-  color:#d4d1c9;
-  font-size:9px;
-  font-weight:850;
-  letter-spacing:.11em;
-}
-
-.app-mark {
-  width:23px;
-  height:23px;
-  display:grid;
-  place-items:center;
-  border:1px solid #484741;
-  border-radius:2px;
-  background:#d8d5cc;
-  color:#111;
-  font-size:8px;
-}
-
-.workspace-tabs {
-  display:flex;
-  flex:1;
-  gap:2px;
-  overflow:auto;
-  scrollbar-width:none;
-}
-
-.workspace-tabs::-webkit-scrollbar {
-  display:none;
-}
-
-.workspace-tabs button {
-  flex:0 0 auto;
-  padding:7px 11px;
-  border:0;
-  border-radius:2px;
-  color:var(--dim);
-  background:transparent;
-  font-size:11px;
-  transition:background var(--ease),color var(--ease);
-}
-
-.workspace-tabs button:hover {
-  color:var(--text);
-  background:var(--surface-2);
-}
-
-.workspace-tabs button.active {
-  color:var(--text);
-  box-shadow:inset 0 -2px 0 var(--focus);
-}
-
-.panel {
-  padding:16px;
-}
-
-.panel:not(.active) {
-  display:none;
-}
-
-/* Form controls */
-
-.box {
-  margin-bottom:10px;
-  padding:13px;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  background:var(--surface-2);
-}
-
-textarea,
-input[type=text] {
-  width:100%;
-  border:1px solid #3a3a35;
-  outline:none;
-  border-radius:2px;
-  color:var(--text);
-  background:#0b0b0a;
-  transition:border-color var(--ease),box-shadow var(--ease);
-}
-
-textarea:focus,
-input[type=text]:focus {
-  border-color:#77756d;
-  box-shadow:0 0 0 2px rgba(255,255,255,.055);
-}
-
-textarea {
-  resize:vertical;
-}
-
-#prompt-input {
-  min-height:145px;
-  padding:12px;
-  font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-
-.meta {
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  margin-top:7px;
-  color:var(--dim);
-  font-size:10px;
-}
-
-.level {
-  padding:2px 7px;
-  border-radius:999px;
-  font-size:9px;
-  font-weight:750;
-}
-
-.level.simple {
-  color:#bbb8b0;
-  background:#252522;
-}
-
-.level.moderate {
-  color:#c0a9c6;
-  background:#28232a;
-}
-
-.level.detailed {
-  color:#8ec09a;
-  background:#172119;
-}
-
-.row {
-  display:flex;
-  gap:7px;
-  align-items:center;
-  margin-bottom:10px;
-}
-
-.grow {
-  flex:1;
-}
-
-.secondary,
-.copy-btn,
-.micro-btn {
-  border:1px solid var(--line);
-  border-radius:2px;
-  color:var(--muted);
-  background:transparent;
-  transition:background var(--ease),border-color var(--ease),color var(--ease),transform var(--ease);
-}
-
-.secondary {
-  padding:6px 10px;
-  font-size:10px;
-}
-
-.secondary:hover,
-.copy-btn:hover,
-.micro-btn:hover {
-  color:var(--text);
-  border-color:var(--line-light);
-  background:var(--surface-3);
-}
-
-.enhance {
-  width:100%;
-  height:43px;
-  border:1px solid #d8d5cc;
-  border-radius:2px;
-  color:#11110f;
-  background:#d8d5cc;
-  font-weight:800;
-  box-shadow:2px 2px 0 rgba(255,255,255,.05);
-  transition:transform var(--ease),box-shadow var(--ease),opacity var(--ease);
-}
-
-.enhance:hover:not(:disabled) {
-  transform:translate(-1px,-1px);
-  box-shadow:4px 4px 0 rgba(255,255,255,.05);
-}
-
-.enhance:disabled {
-  cursor:not-allowed;
-  opacity:.38;
-  box-shadow:none;
-}
-
-.busy .label {
-  display:none;
-}
-
-.busy .spinner {
-  display:block;
-}
-
-.spinner {
-  display:none;
-  width:15px;
-  height:15px;
-  margin:auto;
-  border:2px solid rgba(0,0,0,.25);
-  border-top-color:#111;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-}
-
-@keyframes spin {
-  to { transform:rotate(360deg); }
-}
-
-/* Small feedback blocks */
-
-.stack {
-  display:flex;
-  align-items:center;
-  gap:7px;
-  margin-bottom:9px;
-  padding:7px 9px;
-  border:1px solid #2f4034;
-  border-radius:2px;
-  background:#111811;
-  font-size:10px;
-}
-
-.stack strong {
-  color:var(--text);
-}
-
-.stack small {
-  color:var(--dim);
-}
-
-.tipbox {
-  margin-bottom:9px;
-  padding:10px;
-  border:1px solid #40342f;
-  border-left:2px solid #aaa59b;
-  border-radius:2px;
-  background:#171311;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.tipbox strong {
-  display:block;
-  margin-bottom:4px;
-  color:var(--text);
-}
-
-.tipbox ul {
-  margin:5px 0 0 17px;
-  padding:0;
-}
-
-.tipbox li {
-  margin:2px 0;
-}
-
-/* Results */
-
-.score {
-  display:grid;
-  grid-template-columns:auto 1fr;
-  gap:14px;
-  margin-bottom:10px;
-  padding:14px;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  background:var(--surface-2);
-}
-
-.score-value {
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:42px;
-  line-height:1;
-  font-weight:500;
-  letter-spacing:-.04em;
-}
-
-.score-caption {
-  margin-bottom:7px;
-  font-weight:750;
-}
-
-.meter {
-  display:grid;
-  grid-template-columns:70px 1fr 28px;
-  align-items:center;
-  gap:7px;
-  margin:4px 0;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.track {
-  height:4px;
-  overflow:hidden;
-  border-radius:999px;
-  background:#292925;
-}
-
-.fill {
-  height:100%;
-  border-radius:inherit;
-  background:#d2cfc6;
-  transition:width .4s var(--ease);
-}
-
-.score-note {
-  grid-column:1/-1;
-  padding-top:8px;
-  border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:10px;
-}
-
-.result-head,
-.section-head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.result-head {
-  padding:10px 12px 0;
-}
-
-.result-title,
-.section-label {
-  color:#d2cfc7;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.07em;
-  text-transform:uppercase;
-}
-
-.copy-btn {
-  padding:4px 8px;
-  font-size:9px;
-}
-
-.copy-btn.done {
-  color:var(--green);
-  border-color:var(--green);
-}
-
-.result-text,
-.compare pre {
-  margin:0;
-  padding:10px 12px;
-  overflow:auto;
-  color:var(--text);
-  white-space:pre-wrap;
-  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-
-.result-text {
-  max-height:250px;
-}
-
-.improvements,
-.changes {
-  padding:0 12px 10px;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.improvements div,
-.changes div {
-  padding:2px 0;
-}
-
-.compare {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:10px;
-}
-
-.compare>div {
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  background:var(--surface-2);
-}
-
-.compare h4 {
-  margin:0;
-  padding:7px 9px;
-  border-bottom:1px solid var(--line);
-  font-size:9px;
-  text-transform:uppercase;
-}
-
-.before h4 {
-  color:var(--red);
-}
-
-.after h4 {
-  color:var(--green);
-}
-
-.compare pre {
-  max-height:165px;
-  padding:9px;
-}
-
-.efficiency {
-  overflow:hidden;
-  padding:0;
-}
-
-.eff-head {
-  display:flex;
-  align-items:center;
-  gap:7px;
-  padding:10px 11px;
-  cursor:pointer;
-  font-size:11px;
-  font-weight:750;
-}
-
-.eff-head span:last-child {
-  margin-left:auto;
-  color:var(--dim);
-  font-size:9px;
-}
-
-.eff-body {
-  display:flex;
-  gap:12px;
-  padding:0 11px 11px;
-}
-
-.ring {
-  position:relative;
-  width:52px;
-  height:52px;
-  flex:0 0 52px;
-}
-
-.ring svg {
-  transform:rotate(-90deg);
-}
-
-.ring-label {
-  position:absolute;
-  inset:0;
-  display:grid;
-  place-items:center;
-  font-size:10px;
-  font-weight:800;
-}
-
-.mini-list {
-  margin:4px 0 7px;
-  padding:0;
-  list-style:none;
-  color:var(--dim);
-  font:9px/1.5 ui-monospace,monospace;
-}
-
-.bottom-tip {
-  display:flex;
-  align-items:center;
-  gap:7px;
-  padding:9px 11px;
-  border-top:1px solid var(--line);
-  color:var(--dim);
-  background:#0e0e0d;
-  font-size:9px;
-}
-
-.bottom-tip span {
-  flex:1;
-  text-align:center;
-}
-
-.bottom-tip button {
-  border:0;
-  background:none;
-  color:var(--dim);
-  font-size:17px;
-}
-
-.bottom-tip button:hover {
-  color:var(--text);
-}
-
-/* Templates / engineering */
-
-.template-tools {
-  display:flex;
-  gap:5px;
-  overflow:auto;
-  margin-bottom:8px;
-}
-
-.chip {
-  padding:5px 10px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  color:var(--dim);
-  background:transparent;
-  white-space:nowrap;
-  font-size:9px;
-}
-
-.chip.active {
-  color:#111;
-  background:#d7d4cb;
-  border-color:#d7d4cb;
-}
-
-.search {
-  margin-bottom:8px;
-  padding:8px 10px;
-  font-size:11px;
-}
-
-.template-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.card {
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  background:var(--surface-2);
-  cursor:pointer;
-  transition:border-color var(--ease),background var(--ease),transform var(--ease);
-}
-
-.card:hover {
-  border-color:var(--line-light);
-  background:var(--surface-3);
-  transform:translateY(-2px);
-}
-
-.card b {
-  display:block;
-  margin-bottom:3px;
-  font-size:11px;
-}
-
-.card p {
-  margin:0;
-  color:var(--dim);
-  font-size:9px;
-  line-height:1.5;
-}
-
-.tag {
-  display:inline-block;
-  margin-top:7px;
-  padding:2px 6px;
-  border-radius:999px;
-  color:var(--muted);
-  background:#252522;
-  font-size:8px;
-}
-
-.section-head {
-  margin-bottom:7px;
-}
-
-.section-sub {
-  color:var(--dim);
-  font-size:9px;
-}
-
-#engineer-input,
-#credit-input {
-  padding:10px;
-  font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-
-#engineer-input {
-  min-height:100px;
-}
-
-#credit-input {
-  min-height:76px;
-}
-
-.checks {
-  display:grid;
-  gap:2px;
-}
-
-.check {
-  display:grid;
-  grid-template-columns:19px 1fr auto;
-  gap:6px;
-  align-items:center;
-  padding:6px 7px;
-  border-radius:2px;
-  font-size:10px;
-}
-
-.check.pass {
-  background:rgba(126,177,138,.055);
-}
-
-.check.fail {
-  background:rgba(215,123,115,.055);
-}
-
-.check-icon {
-  width:17px;
-  height:17px;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  font-size:9px;
-  font-weight:800;
-}
-
-.pass .check-icon {
-  color:var(--green);
-  background:rgba(126,177,138,.13);
-}
-
-.fail .check-icon {
-  color:var(--red);
-  background:rgba(215,123,115,.13);
-}
-
-.check-fix {
-  max-width:170px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  color:var(--dim);
-  font-size:8px;
-}
-
-.tech-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-}
-
-.tech {
-  display:flex;
-  gap:7px;
-  padding:9px;
-  border:1px solid var(--line);
-  border-radius:2px;
-  background:var(--surface-2);
-  cursor:pointer;
-  transition:border-color var(--ease),background var(--ease);
-}
-
-.tech:hover {
-  border-color:var(--line-light);
-}
-
-.tech.selected {
-  border-color:#77756d;
-  background:#1c1c19;
-}
-
-.tech-mark {
-  width:13px;
-  height:13px;
-  flex:0 0 13px;
-  margin-top:1px;
-  border:1px solid #55544e;
-  border-radius:2px;
-}
-
-.selected .tech-mark {
-  background:#d8d5cc;
-  border-color:#d8d5cc;
-}
-
-.tech b {
-  display:block;
-  font-size:10px;
-}
-
-.tech small {
-  display:block;
-  color:var(--dim);
-  font-size:8px;
-}
-
-.history-row {
-  display:flex;
-  align-items:center;
-  gap:7px;
-  padding:9px 10px;
-  margin-bottom:5px;
-  border:1px solid var(--line);
-  border-radius:2px;
-  background:var(--surface-2);
-  transition:border-color var(--ease),background var(--ease);
-}
-
-.history-row:hover {
-  border-color:var(--line-light);
-  background:var(--surface-3);
-}
-
-.history-text {
-  flex:1;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  color:var(--muted);
-  font-size:10px;
-}
-
-.history-score {
-  color:#ddd9d0;
-  font-size:9px;
-}
-
-.plain {
-  padding:3px;
-  border:0;
-  background:none;
-  color:var(--dim);
-}
-
-.plain.starred {
-  color:var(--yellow);
-}
-
-.empty {
-  padding:22px;
-  text-align:center;
-  color:var(--dim);
-  font-size:10px;
-}
-
-/* Lower page */
-
-.info-section {
-  width:min(880px,calc(100% - 32px));
-  margin:0 auto;
-  padding:66px 0;
-}
-
-.info-title {
-  margin:0 0 31px;
-  text-align:center;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(29px,4vw,40px);
-  line-height:1;
-  font-weight:500;
-  letter-spacing:-.045em;
-}
-
-.info-title span {
-  color:#aaa79f;
-  font-style:italic;
-}
-
-.steps {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
-
-.step {
-  padding:19px;
-  border-top:1px solid var(--line-light);
-  background:transparent;
-  transition:transform var(--ease),border-color var(--ease);
-}
-
-.step:hover {
-  transform:translateY(-2px);
-  border-color:#66645d;
-}
-
-.step-num {
-  color:#d2cfc7;
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:22px;
-}
-
-.step h3 {
-  margin:8px 0 4px;
-  font-size:13px;
-}
-
-.step p {
-  margin:0;
-  color:var(--muted);
-  font-size:11px;
-}
-
-.platforms {
-  padding-top:10px;
-  text-align:center;
-}
-
-.platform-list {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:6px;
-  margin-top:14px;
-}
-
-.platform-list span {
-  padding:5px 10px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  color:var(--muted);
-  background:transparent;
-  font-size:10px;
-}
-
-footer {
-  padding:27px;
-  border-top:1px solid var(--line);
-  color:var(--dim);
-  text-align:center;
-  font-size:10px;
-}
-
-/* Modal */
-
-.modal {
-  position:fixed;
-  inset:0;
-  z-index:50;
-  display:grid;
-  place-items:center;
-  padding:18px;
-}
-
-.modal-bg {
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.72);
-  backdrop-filter:blur(5px);
-}
-
-.modal-card {
-  position:relative;
-  width:min(420px,100%);
-  max-height:80vh;
-  overflow:auto;
-  padding:18px;
-  border:1px solid var(--line-light);
-  border-radius:3px;
-  background:#121210;
-  box-shadow:0 24px 60px rgba(0,0,0,.5);
-}
-
-.modal-head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:15px;
-  font-weight:800;
-}
-
-.modal-close {
-  border:0;
-  background:none;
-  color:var(--dim);
-}
-
-.modal-close:hover {
-  color:var(--text);
-}
-
-.setting {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:9px 0;
-  font-size:11px;
-}
-
-.switch {
-  position:relative;
-  width:36px;
-  height:20px;
-}
-
-.switch input {
-  width:0;
-  height:0;
-  opacity:0;
-}
-
-.slider {
-  position:absolute;
-  inset:0;
-  background:#34342f;
-  border-radius:999px;
-  transition:background var(--ease);
-}
-
-.slider:before {
-  content:"";
-  position:absolute;
-  left:3px;
-  top:3px;
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  background:#e8e5dc;
-  transition:transform var(--ease);
-}
-
-.switch input:checked+.slider {
-  background:#77756d;
-}
-
-.switch input:checked+.slider:before {
-  transform:translateX(16px);
-}
-
-.modal-actions {
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:10px;
-  padding-top:12px;
-  border-top:1px solid var(--line);
-}
-
-.toast-area {
-  position:fixed;
-  top:72px;
-  right:14px;
-  z-index:80;
-  display:grid;
-  gap:6px;
-}
-
-.toast {
-  padding:9px 11px;
-  border:1px solid var(--line-light);
-  border-radius:2px;
-  color:var(--text);
-  background:#171715;
-  box-shadow:0 8px 20px rgba(0,0,0,.3);
-  font-size:10px;
-  animation:toast-in .2s var(--ease);
-}
-
-@keyframes toast-in {
-  from { opacity:0; transform:translateY(-4px); }
-  to { opacity:1; transform:none; }
-}
-
-#draft-status {
-  min-width:74px;
-  color:var(--dim);
-  text-align:right;
-  font-size:9px;
-}
-
-#draft-status.saved {
-  color:var(--green);
-}
-
-#draft-status.hot {
-  color:#d8d5cc;
-}
-
-.prompt-toolbar {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:7px;
-  margin-bottom:7px;
-}
-
-.prompt-toolbar .micro-actions {
-  display:flex;
-  gap:4px;
-}
-
-.micro-btn {
-  padding:4px 7px;
-  font-size:8px;
-}
-
-.char-meter {
-  height:2px;
-  overflow:hidden;
-  margin-top:7px;
-  border-radius:2px;
-  background:#292925;
-}
-
-.char-meter i {
-  display:block;
-  width:0;
-  height:100%;
-  background:#d3d0c7;
-  transition:width .2s;
-}
-
-.shortcut-hint {
-  margin-top:6px;
-  color:var(--dim);
-  font-size:8px;
-}
-
-.shortcut-hint kbd {
-  padding:2px 4px;
-  border:1px solid var(--line-light);
-  border-bottom-color:#171715;
-  border-radius:2px;
-  color:#c8c5bd;
-  background:#171715;
-}
-
-@media(max-width:760px) {
-  .main-nav {
-    display:none;
-  }
-
-  .topbar {
-    padding:9px 12px;
-  }
-
-  .hero {
-    padding:70px 16px 58px;
-  }
-
-  .shell {
-    width:calc(100% - 16px);
-  }
-
-  .workspace-head {
-    padding:8px;
-  }
-
-  .panel {
-    padding:10px;
-  }
-
-  .template-grid,
-  .tech-grid,
-  .compare,
-  .steps {
-    grid-template-columns:1fr;
-  }
-
-  .score {
-    grid-template-columns:1fr;
-  }
-
-  .score-note {
-    grid-column:auto;
-  }
-
-  .info-section {
-    width:calc(100% - 24px);
-  }
-
-  .prompt-toolbar {
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .prompt-toolbar .micro-actions {
-    width:100%;
-  }
-
-  .micro-btn {
-    flex:1;
-  }
-
-  .toast-area {
-    left:10px;
-    right:10px;
-    top:68px;
-  }
-}
-
-@media(prefers-reduced-motion:reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior:auto!important;
-    animation-duration:.001ms!important;
-    animation-iteration-count:1!important;
-    transition-duration:.001ms!important;
-  }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vibe Check</title>
+
+  <style>
+    :root {
+      --bg: #0e1014;
+      --card: #171a20;
+      --card2: #1d2128;
+      --text: #f4f5f7;
+      --muted: #9aa1aa;
+      --dim: #69707a;
+      --line: #2b3038;
+      --white: #fff;
+      --good: #43d17f;
+      --bad: #ff6a6a;
+      --warn: #e6bd55;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    textarea,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      height: 60px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(14, 16, 20, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      color: #101010;
+      background: var(--white);
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav button,
+    .small-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 9px;
+      padding: 8px 11px;
+      font-size: 13px;
+    }
+
+    .nav button:hover,
+    .nav button.active,
+    .small-btn:hover {
+      color: var(--white);
+      background: var(--card2);
+      border-color: var(--line);
+    }
+
+    .hero {
+      text-align: center;
+      padding: 92px 18px 80px;
+      background:
+        radial-gradient(circle at top, #252b35 0, transparent 38%),
+        linear-gradient(#11141a, #0e1014);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero h1 {
+      margin: 18px 0 14px;
+      font-size: clamp(45px, 8vw, 78px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+    }
+
+    .hero h1 span {
+      color: #8f98a5;
+    }
+
+    .hero p {
+      max-width: 560px;
+      margin: 0 auto 26px;
+      color: var(--muted);
+    }
+
+    .main-btn {
+      border: 0;
+      background: var(--white);
+      color: #111;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 800;
+    }
+
+    .main-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .main-btn:not(:disabled):hover {
+      background: #e2e5e9;
+    }
+
+    .wrap {
+      width: min(920px, calc(100% - 24px));
+      margin: -34px auto 72px;
+    }
+
+    .tool {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.24);
+    }
+
+    .tool-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #13161c;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tool-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .tabs button {
+      border: 0;
+      background: transparent;
+      color: var(--dim);
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tabs button:hover,
+    .tabs button.active {
+      color: var(--white);
+      background: #262b34;
+    }
+
+    .screen {
+      display: none;
+      padding: 18px;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    textarea,
+    input[type="search"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #101319;
+      color: var(--text);
+      border-radius: 11px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+      padding: 13px;
+      line-height: 1.6;
+    }
+
+    input[type="search"] {
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    textarea:focus,
+    input[type="search"]:focus {
+      border-color: #58606c;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 7px;
+      color: var(--dim);
+      font-size: 12px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+      margin: 13px 0;
+      flex-wrap: wrap;
+    }
+
+    .buttons .main-btn {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .ghost {
+      border: 1px solid var(--line);
+      background: #181c22;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    .ghost:hover {
+      color: var(--white);
+      background: #20252d;
+    }
+
+    .note {
+      margin-bottom: 10px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #11141a;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .note strong {
+      color: var(--white);
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      background: #12151b;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .box h3 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    pre {
+      margin: 0;
+      color: #edf0f4;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .box-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .box-head h3 {
+      margin: 0;
+    }
+
+    .copy-btn {
+      border: 1px solid var(--line);
+      background: #1a1e25;
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    .copy-btn:hover {
+      color: var(--white);
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 95px 1fr 40px;
+      align-items: center;
+      gap: 9px;
+      margin: 8px 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .bar {
+      height: 6px;
+      background: #2a3039;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0;
+      background: #f2f4f6;
+      border-radius: inherit;
+    }
+
+    .big-score {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .template {
+      border: 1px solid var(--line);
+      background: #12151b;
+      border-radius: 11px;
+      padding: 13px;
+      cursor: pointer;
+    }
+
+    .template:hover {
+      border-color: #505966;
+      transform: translateY(-1px);
+    }
+
+    .template strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .template p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tagline {
+      display: inline-block;
+      margin-top: 9px;
+      color: var(--dim);
+      font-size: 11px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: transparent;
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .chip.active,
+    .chip:hover {
+      background: #252a32;
+      color: var(--white);
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px;
+      border-radius: 9px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      background: #15191f;
+    }
+
+    .check.good {
+      background: rgba(67, 209, 127, 0.07);
+    }
+
+    .check.bad {
+      background: rgba(255, 106, 106, 0.055);
+    }
+
+    .dot {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #272d36;
+      font-size: 11px;
+    }
+
+    .good .dot {
+      color: var(--good);
+    }
+
+    .bad .dot {
+      color: var(--bad);
+    }
+
+    .hint {
+      margin-left: auto;
+      color: var(--dim);
+      font-size: 11px;
+    }
+
+    .saved-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid var(--line);
+      background: #12151b;
+      border-radius: 11px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+
+    .saved-text {
+      flex: 1;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #242a33;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--dim);
+      padding: 26px 10px;
+      font-size: 13px;
+    }
+
+    .info-section {
+      border-top: 1px solid var(--line);
+      padding: 64px 20px;
+      text-align: center;
+    }
+
+    .info-section h2 {
+      margin: 13px 0 30px;
+      font-size: 31px;
+      letter-spacing: -0.04em;
+    }
+
+    .info-section h2 span {
+      color: var(--dim);
+    }
+
+    .steps {
+      width: min(850px, 100%);
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: left;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      background: #11141a;
+      border-radius: 12px;
+      padding: 17px;
+    }
+
+    .step b {
+      color: var(--dim);
+      font-size: 20px;
+    }
+
+    .step h3 {
+      margin: 10px 0 4px;
+      font-size: 14px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 99;
+      background: #252a32;
+      color: var(--text);
+      border: 1px solid #39414c;
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: 0.2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        padding: 0 14px;
+      }
+
+      .nav {
+        display: none;
+      }
+
+      .wrap {
+        width: calc(100% - 18px);
+      }
+
+      .tool-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .screen {
+        padding: 13px;
+      }
+
+      .grid,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 72px;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <header class="topbar">
+    <div class="logo">
+      <span class="logo-box">V</span>
+      <span>Vibe Check</span>
+    </div>
 
-<header class="topbar">
-  <a class="brand" href="#"><span class="brand-mark">◆</span><span>Vibe Check</span></a>
-  <nav class="main-nav" aria-label="Main">
-    <button class="active" data-tab="enhance">Enhance</button>
-    <button data-tab="templates">Templates</button>
-    <button data-tab="engineer">Engineer</button>
-    <button data-tab="history">History</button>
-  </nav>
-  <div class="top-actions">
-    <a class="small-icon" href="#workspace" aria-label="Open workspace">◆</a>
-    <button class="small-icon" id="settings-btn" aria-label="Settings">⚙</button>
-  </div>
-</header>
-
-<main>
-<section class="hero">
-  <div class="badge"><span class="dot"></span>Prompt workshop for AI coding tools</div>
-  <h1>Write <span>better</span><br>prompts.</h1>
-  <p>Improve, score, test, and organize prompts before you hand them to your coding assistant.</p>
-  <a class="primary" href="#workspace">Start writing →</a>
-</section>
-
-<section class="shell" id="workspace">
-<div class="workspace">
-  <div class="workspace-head">
-    <div class="app-id"><span class="app-mark">◆</span>VIBE CHECK</div>
-    <nav class="workspace-tabs">
-      <button class="active" data-tab="enhance">Enhance</button>
-      <button data-tab="templates">Templates</button>
-      <button data-tab="engineer">Engineer</button>
-      <button data-tab="history">History</button>
+    <nav class="nav">
+      <button class="active" data-go="writer">Writer</button>
+      <button data-go="bank">Prompt Bank</button>
+      <button data-go="audit">Audit</button>
+      <button data-go="saved">Saved</button>
     </nav>
-  </div>
 
-  <section class="panel active" id="panel-enhance">
-    <div class="stack hidden" id="stack-badge"><span class="dot"></span><small>Detected stack:</small><strong id="stack-name"></strong></div>
-    <div class="tipbox hidden" id="stack-tips"><strong>Useful reminders</strong><span id="tips-stack-name"></span><ul id="tips-list"></ul></div>
+    <button class="small-btn" id="jumpToTool">Open tool</button>
+  </header>
 
-    <div class="box">
-      <div class="prompt-toolbar">
-        <span id="draft-status">Ready</span>
-        <div class="micro-actions">
-          <button class="micro-btn" id="btn-random-prompt" type="button">Surprise me</button>
-          <button class="micro-btn" id="btn-clear-prompt" type="button">Clear</button>
+  <section class="hero">
+    <span class="pill">Local prompt helper</span>
+    <h1>Write beter<br><span>prompts.</span></h1>
+    <p>
+      A small browser tool for cleaning up coding prompts, checking missing details,
+      and saving useful versions locally.
+    </p>
+    <button class="main-btn" id="startWriting">Start writing</button>
+  </section>
+
+  <main class="wrap" id="tool">
+    <section class="tool">
+      <div class="tool-head">
+        <div class="tool-title">VIBE CHECK</div>
+
+        <div class="tabs">
+          <button class="active" data-go="writer">Writer</button>
+          <button data-go="bank">Prompt Bank</button>
+          <button data-go="audit">Audit</button>
+          <button data-go="saved">Saved</button>
         </div>
       </div>
-      <textarea id="prompt-input" maxlength="5000" placeholder="Type or paste your prompt here..."></textarea>
-      <div class="char-meter" aria-hidden="true"><i id="char-meter-fill"></i></div>
-      <div class="meta">
-        <span id="word-count">0 words · 0 characters</span>
-        <span id="complexity-badge" class="level hidden"></span>
-      </div>
-      <div class="shortcut-hint">Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> to enhance</div>
-    </div>
 
-    <div class="row">
-      <button class="enhance grow" id="btn-enhance" disabled>
-        <span class="label">Enhance prompt</span><span class="spinner"></span>
-      </button>
-      <button class="small-icon hidden" id="btn-undo" title="Undo">↶</button>
-      <button class="small-icon hidden" id="btn-redo" title="Redo">↷</button>
-    </div>
-
-    <div class="score hidden" id="score-display">
-      <div><span class="score-value" id="score-number">0</span><span style="color:var(--dim)"> / 100</span></div>
-      <div><div class="score-caption" id="score-label"></div><div id="score-bars"></div></div>
-      <div class="score-note" id="score-feedback"></div>
-    </div>
-
-    <div class="box hidden" id="enhanced-area" style="padding:0;border-left:2px solid #d8d5cc">
-      <div class="result-head"><span class="result-title">✓ Enhanced</span><button class="copy-btn" id="btn-copy-enhanced">Copy</button></div>
-      <pre class="result-text" id="enhanced-text"></pre>
-      <div class="improvements" id="improvements-list"></div>
-    </div>
-
-    <div class="compare hidden" id="before-after">
-      <div class="before">
-        <h4>Before <button class="copy-btn" id="btn-copy-before" type="button">Copy</button></h4>
-        <pre id="before-text"></pre>
-      </div>
-      <div class="after">
-        <h4>After <button class="copy-btn" id="btn-copy-after" type="button">Copy</button></h4>
-        <pre id="after-text"></pre>
-      </div>
-      <div class="changes" id="changes-list" style="grid-column:1/-1"></div>
-    </div>
-
-    <div class="box efficiency hidden" id="token-efficiency">
-      <div class="eff-head" id="efficiency-toggle">▥ <span>Token efficiency</span><span id="efficiency-pct"></span>⌄</div>
-      <div class="eff-body hidden" id="efficiency-body">
-        <div class="ring">
-          <svg width="58" height="58" viewBox="0 0 58 58">
-            <circle cx="29" cy="29" r="24" fill="none" stroke="#292925" stroke-width="4"/>
-            <circle id="efficiency-ring" cx="29" cy="29" r="24" fill="none" stroke="#d8d5cc" stroke-width="4" stroke-dasharray="150.8" stroke-linecap="round"/>
-          </svg>
-          <span class="ring-label" id="ring-percent">100%</span>
+      <section class="screen active" id="writer">
+        <div class="note hide" id="stackNote">
+          Stack note: <strong id="stackName"></strong> —
+          <span id="stackTip"></span>
         </div>
-        <div>
-          <div id="filler-count" style="color:var(--muted);font-size:11px"></div>
-          <ul class="mini-list" id="filler-list"></ul>
-          <button class="secondary" id="btn-strip-filler">Strip filler</button>
+
+        <textarea id="promptText" maxlength="5000" placeholder="Paste your rough coding prompt here..."></textarea>
+
+        <div class="meta">
+          <span id="textCount">0 words · 0 characters</span>
+          <span id="difficulty"></span>
         </div>
-      </div>
+
+        <div class="buttons">
+          <button class="main-btn" id="cleanBtn" disabled>Improve prompt</button>
+          <button class="ghost" id="saveRawBtn">Save draft</button>
+          <button class="ghost" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="box hide" id="scoreBox">
+          <div class="box-head">
+            <h3>Prompt score</h3>
+            <span><strong class="big-score" id="scoreNum">0</strong>/100</span>
+          </div>
+          <div id="scoreLines"></div>
+          <p id="scoreComment" style="color: var(--muted); font-size: 12px; margin-bottom: 0;"></p>
+        </div>
+
+        <div class="box hide" id="outputBox">
+          <div class="box-head">
+            <h3>Improved version</h3>
+            <button class="copy-btn" id="copyOutput">Copy</button>
+          </div>
+          <pre id="outputText"></pre>
+        </div>
+      </section>
+
+      <section class="screen" id="bank">
+        <div class="chips" id="bankFilters"></div>
+        <input type="search" id="bankSearch" placeholder="Search starter prompts..." />
+        <div class="grid" id="bankGrid"></div>
+      </section>
+
+      <section class="screen" id="audit">
+        <textarea id="auditText" placeholder="Paste a prompt here to check what is missing..."></textarea>
+
+        <div class="meta">
+          <span id="auditCount">0 words · 0 characters</span>
+          <span id="auditScore">0/6 checks</span>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <h3>Checklist</h3>
+            <button class="copy-btn" id="sendToWriter">Send to writer</button>
+          </div>
+          <div id="checks"></div>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <h3>Quick rewrite</h3>
+            <button class="copy-btn" id="makeTighter">Generate</button>
+          </div>
+          <pre id="tightText">Nothing generated yet.</pre>
+        </div>
+      </section>
+
+      <section class="screen" id="saved">
+        <input type="search" id="savedSearch" placeholder="Search saved prompts..." />
+        <div id="savedList"></div>
+
+        <div class="buttons">
+          <button class="ghost" id="exportBtn">Export JSON</button>
+          <button class="ghost" id="wipeBtn">Clear saved</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <section class="info-section">
+    <span class="pill">How I use it</span>
+    <h2>Small workflow, <span>better result</span></h2>
+
+    <div class="steps">
+      <article class="step">
+        <b>01</b>
+        <h3>Write messy first</h3>
+        <p>Drop in the rough version instead of overthinking the first sentence.</p>
+      </article>
+
+      <article class="step">
+        <b>02</b>
+        <h3>Check the gaps</h3>
+        <p>Look for missing context, constraints, format, and edge cases.</p>
+      </article>
+
+      <article class="step">
+        <b>03</b>
+        <h3>Save the good one</h3>
+        <p>Keep useful prompts in local storage so they are easy to reuse.</p>
+      </article>
     </div>
   </section>
 
-  <section class="panel" id="panel-templates">
-    <div class="template-tools" id="templates-category-tabs">
-      <button class="chip active" data-category="ui-components">UI</button>
-      <button class="chip" data-category="full-apps">Apps</button>
-      <button class="chip" data-category="fixes">Fixes</button>
-      <button class="chip" data-category="api-backend">API</button>
-      <button class="chip" data-category="ai-prompts">AI</button>
-    </div>
-    <input class="search" id="template-search" type="text" placeholder="Search templates...">
-    <div class="template-grid" id="templates-grid"></div>
-  </section>
+  <footer style="padding: 30px; text-align: center; color: var(--dim); font-size: 12px; border-top: 1px solid var(--line);">
+    Vibe Check — browser-only prompt toolkit
+  </footer>
 
-  <section class="panel" id="panel-engineer">
-    <div class="box">
-      <div class="section-head"><span class="section-label">Source prompt</span><button class="secondary" id="btn-engineer-from-enhance">Use last enhanced</button></div>
-      <textarea id="engineer-input" maxlength="5000" placeholder="Paste or type your prompt to engineer..."></textarea>
-      <div class="meta"><span id="engineer-word-count">0 words · 0 characters</span></div>
-    </div>
+  <div class="toast" id="toast"></div>
 
-    <div class="box">
-      <div class="section-head"><span class="section-label">Quality checklist</span><span id="checklist-score" class="section-sub"></span></div>
-      <div class="checks" id="checklist-grid"></div>
-    </div>
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-    <div class="box">
-      <div class="section-head"><span class="section-label">Apply techniques</span><button class="secondary" id="btn-apply-techniques">Apply selected</button></div>
-      <div class="tech-grid" id="techniques-grid"></div>
-    </div>
-
-    <div class="box">
-      <div class="section-head"><span class="section-label">Prompt variants</span><button class="secondary" id="btn-generate-variants">Generate</button></div>
-      <div id="variants-container"><div class="empty">Click Generate to create 3 variations</div></div>
-    </div>
-
-    <div class="box">
-      <div class="section-head"><span class="section-label">Version history</span><span><button class="secondary" id="btn-save-version">Save</button> <button class="secondary" id="btn-clear-versions">Clear</button></span></div>
-      <div id="versions-list"><div class="empty">No versions saved</div></div>
-    </div>
-
-    <div class="box">
-      <div class="section-head"><span class="section-label">Credit saver</span><span class="section-sub">English → Chinese</span></div>
-      <p style="margin:7px 0 10px;color:var(--muted);font-size:10px">Chinese can use fewer tokens for some prompts. Compare provider-specific usage before relying on the estimate.</p>
-      <textarea id="credit-input" maxlength="5000" placeholder="Paste your English prompt..."></textarea>
-      <div class="meta"><span id="credit-word-count">0 words · 0 characters</span><span>estimate only</span></div>
-      <div class="row" style="margin-top:10px"><button class="enhance grow" id="btn-credit-transform" disabled><span class="label">Transform</span><span class="spinner"></span></button></div>
-      <div class="box hidden" id="credit-result" style="margin:10px 0 0"><div class="result-head"><span class="result-title">Chinese prompt</span><button class="copy-btn" id="btn-copy-credit">Copy</button></div><pre class="result-text" id="credit-text"></pre></div>
-    </div>
-  </section>
-
-  <section class="panel" id="panel-history">
-    <input class="search" id="history-search" type="text" placeholder="Search prompts...">
-    <div id="history-list"></div>
-    <button class="secondary" id="btn-clear-history" style="margin-top:7px;color:var(--bad)">Clear all history</button>
-  </section>
-
-  <div class="bottom-tip"><button id="tip-prev">‹</button><span id="tip-text"></span><button id="tip-next">›</button></div>
-</div>
-</section>
-
-<section class="info-section">
-  <div class="badge" style="display:flex;width:max-content;margin:auto">How it works</div>
-  <h2 class="info-title">Three steps to <span>better prompts</span></h2>
-  <div class="steps">
-    <article class="step"><div class="step-num">01</div><h3>Write the rough idea</h3><p>Start with the outcome you want. The first draft does not need to be polished.</p></article>
-    <article class="step"><div class="step-num">02</div><h3>Improve the request</h3><p>Use scoring, structure, constraints, techniques, and stack detection to tighten it.</p></article>
-    <article class="step"><div class="step-num">03</div><h3>Copy and build</h3><p>Take the resulting prompt into the coding assistant you actually use.</p></article>
-  </div>
-</section>
-
-<section class="info-section platforms">
-  <div class="badge" style="display:flex;width:max-content;margin:auto">Works with</div>
-  <h2 class="info-title" style="font-size:30px">Any AI coding <span>platform</span></h2>
-  <div class="platform-list">
-    <span>v0</span><span>Bolt</span><span>Lovable</span><span>Cursor</span><span>ChatGPT</span>
-    <span>Claude</span><span>Gemini</span><span>Perplexity</span><span>DeepSeek</span><span>Replit</span>
-    <span>StackBlitz</span><span>GitHub Copilot</span><span>Phind</span><span>Windsurf</span><span>Cody</span>
-  </div>
-</section>
-</main>
-
-<footer>Vibe Check — Prompt Workshop · made with intent, not a template</footer>
-
-<div class="modal hidden" id="settings-modal">
-  <div class="modal-bg" id="settings-backdrop"></div>
-  <div class="modal-card">
-    <div class="modal-head"><span>Settings</span><button class="modal-close" id="settings-close">✕</button></div>
-    <div class="setting"><span>Auto-detect stack</span><label class="switch"><input type="checkbox" id="setting-auto-stack" checked><span class="slider"></span></label></div>
-    <div class="setting"><span>Token efficiency</span><label class="switch"><input type="checkbox" id="setting-token-eff" checked><span class="slider"></span></label></div>
-    <div class="setting"><span>Before / after</span><label class="switch"><input type="checkbox" id="setting-before-after" checked><span class="slider"></span></label></div>
-    <div class="modal-actions">
-      <button class="secondary" id="btn-export">Export data</button>
-      <button class="secondary" id="btn-clear-data" style="color:var(--bad)">Clear all data</button>
-      <button class="secondary" id="btn-reset-settings">Reset settings</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast-area" id="toast-container"></div>
-
-<script>
-function initApp() {
-  "use strict";
-
-  const el = id => document.getElementById(id);
-  const q = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const store = {
-    read(key, fallback) {
-      try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
-      catch { return fallback; }
-    },
-    write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
-  };
-
-  const app = {
-    history: store.read("vibe_history", []),
-    versions: store.read("vibe_versions", []),
-    settings: store.read("vibe_settings", {
-      autoStack: true, tokenEff: true, beforeAfter: true
-    }),
-    lastEnhanced: localStorage.getItem("vibe_last_enhanced") || "",
-    original: "",
-    tip: 0
-  };
-
-  const tips = [
-    "Name the outcome instead of describing a vague intention.",
-    "Include constraints, edge cases, and completion criteria.",
-    "Mention the framework or environment when it changes the solution.",
-    "Ask for accessible and responsive behavior when building UI.",
-    "For larger jobs, split the request into clear deliverables."
-  ];
-
-  const library = {
-    "ui-components": [
-      ["Responsive dashboard","Build a responsive dashboard with navigation, cards, tables, filters, and loading states.","UI"],
-      ["Landing page","Create a modern responsive landing page with a hero, features, testimonials, CTA, and footer.","UI"],
-      ["Accessible modal","Create a reusable modal with keyboard support, focus management, and sensible animation.","UI"],
-      ["Data table","Build a responsive table with sorting, filtering, pagination, and empty states.","UI"]
-    ],
-    "full-apps": [
-      ["SaaS starter","Build a production-ready SaaS app with authentication, dashboard, settings, billing, and responsive UI.","APP"],
-      ["Task manager","Create a task management app with projects, tasks, priorities, filters, and persistence.","APP"],
-      ["Admin panel","Build an admin panel with authentication, analytics, users, roles, and settings.","APP"]
-    ],
-    fixes: [
-      ["Responsive layout","Fix the responsive layout without changing the existing design or functionality.","FIX"],
-      ["JavaScript bug","Find and fix JavaScript errors and broken event handlers without changing the UI.","FIX"],
-      ["Form validation","Fix validation, error states, and submission handling while preserving the existing design.","FIX"]
-    ],
-    "api-backend": [
-      ["REST API","Create a REST API with validation, authentication, error handling, pagination, and clear endpoints.","API"],
-      ["Database schema","Design a normalized database schema with relationships, indexes, and migration-ready SQL.","API"],
-      ["Authentication","Implement secure authentication with sessions, password hashing, validation, and protected routes.","API"]
-    ],
-    "ai-prompts": [
-      ["Code review","Review this code for correctness, security, performance, accessibility, and maintainability. Return actionable fixes.","AI"],
-      ["Debugging","Debug the issue systematically. Explain the root cause, then provide the smallest safe fix.","AI"],
-      ["Refactor","Refactor this code for readability and maintainability without changing its behavior.","AI"]
-    ]
-  };
-
-  const techniques = [
-    ["Role","Define an expert perspective."],
-    ["Constraints","Add explicit rules and boundaries."],
-    ["Steps","Turn the work into ordered actions."],
-    ["Criteria","Define measurable completion checks."],
-    ["Edge cases","Cover failure and unusual states."],
-    ["Output format","Specify exactly how the answer should be returned."]
-  ];
-
-  function notify(message) {
-    const node = document.createElement("div");
-    node.className = "toast";
-    node.textContent = message;
-    el("toast-container").append(node);
-    setTimeout(() => node.remove(), 2200);
-  }
-
-  async function copy(value, button) {
-    try {
-      await navigator.clipboard.writeText(value);
-      if (button) {
-        button.textContent = "Copied";
-        button.classList.add("done");
-        setTimeout(() => {
-          button.textContent = "Copy";
-          button.classList.remove("done");
-        }, 1100);
+    const starterPrompts = [
+      {
+        title: "Mobile nav",
+        type: "UI",
+        text: "Build a responsive navigation bar with a desktop layout, a mobile menu, keyboard support, and clear active states."
+      },
+      {
+        title: "Landing page",
+        type: "UI",
+        text: "Create a landing page with a hero, feature cards, a pricing or CTA section, and a responsive layout."
+      },
+      {
+        title: "Bug fix",
+        type: "Debug",
+        text: "Find the cause of this bug, explain the issue briefly, then return the corrected code with the smallest safe change."
+      },
+      {
+        title: "Code review",
+        type: "Debug",
+        text: "Review this code for bugs, accessibility issues, repeated logic, and confusing names. Suggest practical improvements."
+      },
+      {
+        title: "CRUD API",
+        type: "Backend",
+        text: "Create CRUD API routes with validation, useful error responses, pagination, and correct HTTP status codes."
+      },
+      {
+        title: "Auth flow",
+        type: "Backend",
+        text: "Add authentication with sign up, login, logout, protected routes, loading states, and clear error messages."
+      },
+      {
+        title: "Dashboard",
+        type: "App",
+        text: "Build a dashboard with summary cards, filters, a table, empty states, and a layout that works on mobile."
+      },
+      {
+        title: "Local storage app",
+        type: "App",
+        text: "Build a small app that saves data to local storage, supports editing and deleting, and handles empty states."
       }
-      notify("Copied to clipboard");
-    } catch {
-      notify("Clipboard access failed");
-    }
-  }
-
-  function words(value) {
-    const clean = value.trim();
-    return clean ? clean.split(/\s+/).length : 0;
-  }
-
-  // Small, intentionally opinionated touches: local drafts, a surprise prompt,
-  // keyboard-first enhancement, and a character runway. No dependencies.
-  const surprisePrompts = [
-    "Redesign this dashboard so the important actions are obvious, fast, and accessible.",
-    "Refactor this component without changing its public API or existing behavior.",
-    "Build a polished empty state that explains what happened and gives the user a useful next step.",
-    "Fix the responsive layout while preserving the current visual language and content.",
-    "Review this UI for accessibility, loading states, edge cases, and unnecessary complexity."
-  ];
-
-  function saveDraft(value) {
-    try {
-      localStorage.setItem("vibe_draft", value);
-      const status = el("draft-status");
-      if (status) {
-        status.textContent = value ? "Draft saved" : "Ready";
-        status.classList.add("saved");
-        setTimeout(() => status.classList.remove("saved"), 900);
-      }
-    } catch (_) {}
-  }
-
-  function updatePromptMeter(value) {
-    const fill = el("char-meter-fill");
-    if (fill) fill.style.width = `${Math.min(100, (value.length / 5000) * 100)}%`;
-  }
-
-  function syncPrompt(value, announce = false) {
-    el("btn-enhance").disabled = !value.trim();
-    updateCount(el("prompt-input"), el("word-count"));
-    const [className, label] = complexity(value);
-    el("complexity-badge").textContent = label;
-    el("complexity-badge").className = `level ${className}${value ? "" : " hidden"}`;
-    updatePromptMeter(value);
-    showStack(value);
-    saveDraft(value);
-    if (announce) notify("Draft restored");
-  }
-
-  function updateCount(input, output) {
-    const value = input.value.trim();
-    output.textContent = `${words(value)} words · ${value.length} characters`;
-  }
-
-  function complexity(value) {
-    const count = words(value);
-    if (count < 20) return ["simple", "Simple"];
-    if (count < 80) return ["moderate", "Moderate"];
-    return ["detailed", "Detailed"];
-  }
-
-  function score(value) {
-    const text = value.toLowerCase();
-    const measures = [
-      ["Clarity", 35 + (value.length > 80 ? 20 : 0) +
-        (/[.!?]/.test(value) ? 15 : 0) +
-        (/\b(build|create|make|fix|design|implement|write)\b/.test(text) ? 30 : 0)],
-      ["Specificity", 25 + (value.length > 150 ? 25 : 0) +
-        (/\b(react|next|vue|svelte|html|css|javascript|typescript|api|database)\b/.test(text) ? 25 : 0) +
-        (/\b(responsive|mobile|desktop|accessible)\b/.test(text) ? 25 : 0)],
-      ["Constraints", 20 +
-        (/\b(must|should|required|without|only|avoid|don't|do not)\b/.test(text) ? 35 : 0) +
-        (/\b(performance|security|accessibility|validation)\b/.test(text) ? 25 : 0) +
-        (text.includes("acceptance") ? 20 : 0)],
-      ["Context", 25 + (value.length > 100 ? 20 : 0) +
-        (/\b(user|users|customer|admin|developer)\b/.test(text) ? 20 : 0) +
-        (/\b(existing|current|project|app|website)\b/.test(text) ? 35 : 0)]
     ];
-    measures.forEach(item => item[1] = Math.min(100, item[1]));
-    return {
-      total: Math.round(measures.reduce((sum, item) => sum + item[1], 0) / measures.length),
-      measures
-    };
-  }
 
-  function localRewrite(input) {
-    const original = input.trim();
+    const stackHints = [
+      {
+        name: "React",
+        words: ["react", "jsx", "component", "hooks"],
+        tip: "Use small functional components and keep state close to where it is used."
+      },
+      {
+        name: "Next.js",
+        words: ["next.js", "nextjs", "app router"],
+        tip: "Mention routes, server/client components, and where each file should live."
+      },
+      {
+        name: "Tailwind CSS",
+        words: ["tailwind", "utility classes"],
+        tip: "Ask for readable class names and responsive breakpoints."
+      },
+      {
+        name: "Firebase",
+        words: ["firebase", "firestore"],
+        tip: "Include auth state, loading state, rules, and permission errors."
+      },
+      {
+        name: "Python",
+        words: ["python", "django", "flask"],
+        tip: "Ask for clear functions, simple error handling, and basic tests."
+      }
+    ];
 
-    if (!original) {
-      return { enhanced: "", improvements: [] };
-    }
+    const auditRules = [
+      {
+        label: "Clear action",
+        hint: "Start with build, fix, create, refactor, or review.",
+        pass: text => /\b(build|fix|create|make|refactor|review|debug|design)\b/i.test(text)
+      },
+      {
+        label: "Project context",
+        hint: "Say what the feature belongs to.",
+        pass: text => text.trim().length > 80
+      },
+      {
+        label: "Requirements",
+        hint: "List what must be included.",
+        pass: text => /\b(must|should|include|needs|require|with)\b/i.test(text)
+      },
+      {
+        label: "Boundaries",
+        hint: "Mention what to avoid or keep unchanged.",
+        pass: text => /\b(avoid|without|do not|only|keep|limit)\b/i.test(text)
+      },
+      {
+        label: "Output format",
+        hint: "Say what the answer should return.",
+        pass: text => /\b(return|output|provide|format|code|json|files?)\b/i.test(text)
+      },
+      {
+        label: "Edge cases",
+        hint: "Mention errors, empty states, validation, or responsive behavior.",
+        pass: text => /\b(error|empty|loading|validation|edge|responsive|mobile|test)\b/i.test(text)
+      }
+    ];
 
-    let result = original;
-    const changes = [];
-    const lower = original.toLowerCase();
+    let saved = load("vibe_check_saved", []);
+    let currentFilter = "All";
+    let lastCleanPrompt = "";
 
-    // Read the prompt first. Different jobs deserve different advice.
-    const requirements = [];
-    const acceptance = [];
-
-    const hasAction =
-      /\b(goal|objective|build|create|make|implement|fix|design|write|develop|add|update|remove|refactor|change)\b/i
-        .test(original);
-
-    const isUI =
-      /\b(ui|interface|frontend|front-end|website|webpage|page|component|layout|design)\b/i
-        .test(lower);
-
-    const isDashboard =
-      /\b(dashboard|admin panel|analytics|metrics|statistics|charts|table|reporting)\b/i
-        .test(lower);
-
-    const isAuth =
-      /\b(login|log in|signin|sign in|signup|sign up|register|authentication|auth|password|account)\b/i
-        .test(lower);
-
-    const isForm =
-      /\b(form|input|textarea|select|checkbox|radio|submit|validation)\b/i
-        .test(lower);
-
-    const isAPI =
-      /\b(api|rest api|endpoint|backend|server|request|response|http|fetch|axios|graphql)\b/i
-        .test(lower);
-
-    const isDatabase =
-      /\b(database|db|sql|postgres|postgresql|mysql|mongodb|schema|query|migration|supabase|firebase)\b/i
-        .test(lower);
-
-    const isBug =
-      /\b(bug|broken|error|fix|issue|doesn't work|not working|crash|debug|problem)\b/i
-        .test(lower);
-
-    const isReact =
-      /\b(react|next\.?js|nextjs|jsx|tsx|hooks|usestate|useeffect)\b/i
-        .test(lower);
-
-    const isCSS =
-      /\b(css|stylesheet|styling|styles|scss|sass|tailwind|animation|transition|grid|flexbox)\b/i
-        .test(lower);
-
-    const isLanding =
-      /\b(landing page|marketing page|homepage|home page|hero|pricing page|portfolio)\b/i
-        .test(lower);
-
-    const mentionsResponsive =
-      /\b(responsive|mobile|tablet|desktop|phone|small screen)\b/i.test(lower);
-
-    const mentionsAccessibility =
-      /\b(accessib|aria|screen reader|keyboard|focus)\b/i.test(lower);
-
-    if (!hasAction) {
-      result = `Goal: ${original}`;
-      changes.push("Added a clear goal");
-    }
-
-    if (isUI) {
-      requirements.push(
-        "Keep the interface visually consistent and easy to understand.",
-        "Make interactive controls clear in normal, hover, focus, and disabled states."
-      );
-      changes.push("Added interface-specific guidance");
-    }
-
-    if (isDashboard) {
-      requirements.push(
-        "Make the most important metrics and actions easy to scan.",
-        "Handle loading, empty, no-data, and failed-data states clearly.",
-        "Keep tables, filters, cards, and charts usable on smaller screens."
-      );
-      acceptance.push(
-        "The important information is easy to find at a glance.",
-        "Empty and loading states explain what the user can do next."
-      );
-      changes.push("Added dashboard-specific guidance");
-    }
-
-    if (isAuth) {
-      requirements.push(
-        "Handle signed-out, signing-in, signed-in, and failed-authentication states.",
-        "Validate credentials without exposing sensitive information.",
-        "Keep password and account data handled securely."
-      );
-      acceptance.push(
-        "Authentication states work correctly.",
-        "Invalid credentials produce clear, safe feedback."
-      );
-      changes.push("Added authentication-specific guidance");
-    }
-
-    if (isForm) {
-      requirements.push(
-        "Validate fields at the appropriate point in the user flow.",
-        "Show useful feedback for missing or invalid values.",
-        "Prevent accidental duplicate submissions while a request is in progress."
-      );
-      acceptance.push(
-        "Valid data can be submitted successfully.",
-        "Invalid data receives clear feedback near the relevant field."
-      );
-      changes.push("Added form-specific guidance");
-    }
-
-    if (isAPI) {
-      requirements.push(
-        "Keep request and response behavior predictable for each relevant endpoint.",
-        "Validate incoming data before processing it.",
-        "Return useful error responses when requests fail."
-      );
-      acceptance.push(
-        "Successful and failed requests are handled correctly.",
-        "Invalid input produces a clear error response."
-      );
-      changes.push("Added API-specific guidance");
-    }
-
-    if (isDatabase) {
-      requirements.push(
-        "Keep the data model consistent and avoid unnecessary duplication.",
-        "Define relationships, validation, and useful indexes where appropriate.",
-        "Handle missing records and database failures safely."
-      );
-      acceptance.push(
-        "The required data can be stored and retrieved correctly.",
-        "Missing or invalid data does not break the application."
-      );
-      changes.push("Added database-specific guidance");
-    }
-
-    if (isBug) {
-      requirements.push(
-        "Identify the root cause before changing the implementation.",
-        "Make the smallest safe change that fixes the reported behavior.",
-        "Avoid unrelated refactoring unless it is necessary for the fix."
-      );
-      acceptance.push(
-        "The reported issue is reproducibly fixed.",
-        "Existing working behavior remains intact."
-      );
-      changes.push("Added debugging guidance");
-    }
-
-    if (isReact) {
-      requirements.push(
-        "Follow the existing component and state-management patterns in the project.",
-        "Keep component responsibilities clear and avoid unnecessary state.",
-        "Preserve existing props and public behavior unless a change is required."
-      );
-      changes.push("Added React-specific guidance");
-    }
-
-    if (isCSS) {
-      requirements.push(
-        "Keep styles consistent with the existing visual language.",
-        "Prefer reusable rules over unnecessary one-off declarations.",
-        "Make spacing, typography, states, and transitions feel intentional."
-      );
-      changes.push("Added CSS-specific guidance");
-    }
-
-    if (isLanding) {
-      requirements.push(
-        "Make the main message and primary call to action obvious.",
-        "Keep the visual hierarchy clear from the hero through the final CTA.",
-        "Use responsive typography and spacing instead of simply shrinking the desktop layout."
-      );
-      acceptance.push(
-        "The main value proposition is understandable immediately.",
-        "The primary CTA stays clear across screen sizes."
-      );
-      changes.push("Added landing-page guidance");
-    }
-
-    if (isUI && !mentionsResponsive) {
-      requirements.push(
-        "Consider sensible responsive behavior where the layout becomes constrained."
-      );
-      changes.push("Added responsive consideration");
-    }
-
-    if (isUI && !mentionsAccessibility) {
-      requirements.push(
-        "Keep interactive controls usable with keyboard navigation and visible focus."
-      );
-      changes.push("Added practical accessibility guidance");
-    }
-
-    // Unknown requests still get useful help, but not a giant generic template.
-    if (!requirements.length) {
-      const subject = extractSubject(original);
-
-      if (subject) {
-        requirements.push(
-          `Keep the implementation focused on the requested ${subject}.`,
-          "Avoid adding complexity that is unrelated to the requested outcome."
-        );
-        changes.push("Added guidance based on the requested subject");
-      } else {
-        requirements.push(
-          "Keep the implementation focused on the requested outcome.",
-          "Avoid unrelated changes outside the scope of the request."
-        );
-        changes.push("Added focused implementation guidance");
+    function load(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value ?? fallback;
+      } catch {
+        return fallback;
       }
     }
 
-    // Don't repeat things the user has already said.
-    const usefulRequirements = requirements.filter(requirement => {
-      const importantWords = requirement
-        .toLowerCase()
-        .replace(/[^\w\s]/g, "")
-        .split(/\s+/)
-        .filter(word => word.length > 5)
-        .slice(0, 3);
+    function store() {
+      localStorage.setItem("vibe_check_saved", JSON.stringify(saved));
+    }
 
-      return !importantWords.every(word => lower.includes(word));
-    });
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
 
-    if (usefulRequirements.length) {
-      result += "\n\nRequirements:\n";
-      usefulRequirements.forEach(item => {
-        result += `- ${item}\n`;
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1600);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[char];
       });
     }
 
-    if (!acceptance.length) {
-      acceptance.push(
-        "The requested result works end-to-end.",
-        "Preserve existing behavior unless the request explicitly changes it."
-      );
-    }
-
-    result += "\nAcceptance criteria:\n";
-    acceptance.forEach(item => {
-      result += `- ${item}\n`;
-    });
-
-    changes.push("Added task-specific acceptance criteria");
-
-    return {
-      enhanced: result.trim(),
-      improvements: [...new Set(changes)]
-    };
-  }
-
-  function extractSubject(prompt) {
-    const clean = prompt.replace(/\s+/g, " ").trim();
-
-    const patterns = [
-      /\b(?:build|create|make|design|develop|implement)\s+(?:a|an|the)?\s*([^.!?]+)/i,
-      /\b(?:fix|update|improve|refactor|redesign)\s+(?:the|this|my)?\s*([^.!?]+)/i,
-      /\b(?:add|remove)\s+(?:a|an|the)?\s*([^.!?]+)/i
-    ];
-
-    for (const pattern of patterns) {
-      const match = clean.match(pattern);
-
-      if (match && match[1]) {
-        return match[1].trim().replace(/[,:;]+$/, "");
-      }
-    }
-
-    return "";
-  }
-
-  async function improve(prompt, mode = "enhance") {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
-
-    try {
-      const response = await fetch("/api/enhance", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({prompt, mode}),
-        signal: controller.signal
+    function setScreen(name) {
+      $$("[data-go]").forEach(button => {
+        button.classList.toggle("active", button.dataset.go === name);
       });
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.enhanced) {
-          return {enhanced:data.enhanced, improvements:data.improvements || []};
-        }
+
+      $$(".screen").forEach(screen => {
+        screen.classList.toggle("active", screen.id === name);
+      });
+    }
+
+    function countText(text) {
+      const clean = text.trim();
+      const words = clean ? clean.split(/\s+/).length : 0;
+      return `${words} words · ${text.length} characters`;
+    }
+
+    function findStack(text) {
+      const lower = text.toLowerCase();
+
+      return stackHints.find(stack => {
+        return stack.words.some(word => lower.includes(word));
+      });
+    }
+
+    function updateWriter() {
+      const text = $("#promptText").value;
+      $("#textCount").textContent = countText(text);
+      $("#cleanBtn").disabled = !text.trim();
+
+      const size = text.trim().length;
+      $("#difficulty").textContent = size < 1
+        ? ""
+        : size < 90
+          ? "Short"
+          : size < 280
+            ? "Medium"
+            : "Detailed";
+
+      const stack = findStack(text);
+      const note = $("#stackNote");
+
+      if (!stack || !text.trim()) {
+        note.classList.add("hide");
+        return;
       }
-    } catch (_) {
-      // Fall through to the offline rewrite.
-    } finally {
-      clearTimeout(timeout);
+
+      $("#stackName").textContent = stack.name;
+      $("#stackTip").textContent = stack.tip;
+      note.classList.remove("hide");
     }
-    return localRewrite(prompt);
-  }
 
-  function stackFor(prompt) {
-    const rules = [
-      ["Next.js", /next\.?js|nextjs/],
-      ["React", /\breact\b/],
-      ["Vue", /\bvue\b/],
-      ["Svelte", /\bsvelte\b/],
-      ["Tailwind CSS", /tailwind/],
-      ["Node.js", /\bnode\.?js\b|express/],
-      ["Python", /\bpython\b|django|flask/]
-    ];
-    const lower = prompt.toLowerCase();
-    return rules.find(rule => rule[1].test(lower))?.[0] || "";
-  }
+    function promptScore(text) {
+      const values = {
+        Clarity: /\b(build|fix|create|make|refactor|review|debug|design)\b/i.test(text) ? 20 : 8,
+        Context: Math.min(20, Math.max(6, Math.floor(text.length / 9))),
+        Requirements: /\b(must|should|include|needs|require|with)\b/i.test(text) ? 20 : 7,
+        Limits: /\b(avoid|without|do not|only|keep|limit)\b/i.test(text) ? 20 : 8,
+        Edges: /\b(error|empty|loading|validation|edge|responsive|mobile|test)\b/i.test(text) ? 20 : 6
+      };
 
-  function showStack(prompt) {
-    const found = app.settings.autoStack ? stackFor(prompt) : "";
-    const badge = el("stack-badge");
-    const tip = el("stack-tips");
-    if (!found) {
-      badge.classList.add("hidden");
-      tip.classList.add("hidden");
-      return;
+      const total = Object.values(values).reduce((sum, num) => sum + num, 0);
+
+      return {
+        total: Math.min(100, total),
+        values
+      };
     }
-    el("stack-name").textContent = found;
-    el("tips-stack-name").textContent = `${found} is detected.`;
-    el("tips-list").innerHTML =
-      `<li>Use conventions already established by the project.</li>` +
-      `<li>Avoid introducing incompatible tooling without a reason.</li>`;
-    badge.classList.remove("hidden");
-    tip.classList.remove("hidden");
-  }
 
-  function fillerStats(value) {
-    const list = ["very","really","basically","just","simply","please","kindly","obviously","actually"];
-    const hits = list.filter(word => new RegExp(`\\b${word}\\b`, "i").test(value));
-    const count = hits.reduce((sum, word) => {
-      const found = value.match(new RegExp(`\\b${word}\\b`, "gi"));
-      return sum + (found ? found.length : 0);
-    }, 0);
-    return {hits, count, total:words(value)};
-  }
+    function renderScore(text) {
+      const score = promptScore(text);
 
-  function updateEfficiency(value) {
-    if (!app.settings.tokenEff) {
-      el("token-efficiency").classList.add("hidden");
-      return;
+      $("#scoreNum").textContent = score.total;
+
+      $("#scoreLines").innerHTML = Object.entries(score.values).map(([name, value]) => {
+        return `
+          <div class="score-row">
+            <span>${name}</span>
+            <div class="bar">
+              <div class="fill" style="width: ${value * 5}%"></div>
+            </div>
+            <span>${value}/20</span>
+          </div>
+        `;
+      }).join("");
+
+      $("#scoreComment").textContent = score.total >= 80
+        ? "Strong prompt. It gives enough direction to produce a useful answer."
+        : score.total >= 60
+          ? "Good start. Add more boundaries or edge cases if the task is important."
+          : "This is still vague. Add context, exact requirements, and expected output.";
+
+      $("#scoreBox").classList.remove("hide");
+
+      return score.total;
     }
-    const stats = fillerStats(value);
-    const pct = stats.total ? Math.max(0, Math.round((1 - stats.count / stats.total) * 100)) : 100;
-    el("token-efficiency").classList.remove("hidden");
-    el("efficiency-pct").textContent = `${pct}% efficient`;
-    el("ring-percent").textContent = `${pct}%`;
-    el("efficiency-ring").style.strokeDashoffset = 150.8 - 150.8 * pct / 100;
-    el("filler-count").textContent = stats.count ? `${stats.count} possible filler word(s)` : "No obvious filler found";
-    el("filler-list").innerHTML = stats.hits.map(item => `<li>${item}</li>`).join("");
-  }
 
-  function renderScore(prompt) {
-    const result = score(prompt);
-    el("score-display").classList.remove("hidden");
-    el("score-number").textContent = result.total;
-    el("score-label").textContent =
-      result.total >= 80 ? "Strong prompt" :
-      result.total >= 60 ? "Good foundation" : "Needs more detail";
+    function improvePrompt() {
+      const raw = $("#promptText").value.trim();
 
-    el("score-bars").innerHTML = result.measures.map(([name, value]) =>
-      `<div class="meter"><span>${name}</span><span class="track"><span class="fill" style="width:${value}%"></span></span><span>${value}</span></div>`
-    ).join("");
+      if (!raw) return;
 
-    el("score-feedback").textContent = result.total < 80
-      ? "Add concrete requirements, context, and constraints."
-      : "Good structure. Acceptance criteria can make results more repeatable.";
+      const stack = findStack(raw);
 
-    return result.total;
-  }
+      const cleaned = [
+        "TASK",
+        raw,
+        "",
+        "CONTEXT",
+        "- Treat this as part of a real project, not just a visual mockup.",
+        "- Keep the solution simple enough to maintain.",
+        "",
+        "REQUIREMENTS",
+        "- Build the complete working feature.",
+        "- Make the layout responsive for desktop and mobile.",
+        "- Include useful loading, empty, and error states where they apply.",
+        "- Avoid unnecessary dependencies unless they clearly help.",
+        stack ? `- ${stack.name}: ${stack.tip}` : "",
+        "",
+        "OUTPUT",
+        "- Return the code needed to implement the feature.",
+        "- Mention any files that need to be created or changed.",
+        "- Do not leave important behavior as placeholder comments."
+      ].filter(Boolean).join("\n");
 
-  function saveHistory(original, enhanced) {
-    app.history.unshift({
-      id: Date.now(),
-      prompt: original,
-      enhanced,
-      score: score(original).total,
-      starred: false
+      lastCleanPrompt = cleaned;
+
+      $("#outputText").textContent = cleaned;
+      $("#outputBox").classList.remove("hide");
+
+      const score = renderScore(raw);
+      addSaved(raw, cleaned, score, false);
+
+      showToast("Prompt improved");
+    }
+
+    function addSaved(raw, cleaned, score, quiet) {
+      saved.unshift({
+        id: Date.now(),
+        raw,
+        cleaned,
+        score,
+        date: new Date().toLocaleDateString()
+      });
+
+      saved = saved.slice(0, 40);
+      store();
+      renderSaved();
+
+      if (!quiet) {
+        showToast("Saved to history");
+      }
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Copied");
+      } catch {
+        showToast("Copy failed");
+      }
+    }
+
+    function renderFilters() {
+      const types = ["All", ...new Set(starterPrompts.map(item => item.type))];
+
+      $("#bankFilters").innerHTML = types.map(type => {
+        return `<button class="chip ${type === currentFilter ? "active" : ""}" data-filter="${type}">${type}</button>`;
+      }).join("");
+
+      $$("[data-filter]").forEach(button => {
+        button.addEventListener("click", () => {
+          currentFilter = button.dataset.filter;
+          renderFilters();
+          renderBank();
+        });
+      });
+    }
+
+    function renderBank() {
+      const search = $("#bankSearch").value.toLowerCase();
+
+      const list = starterPrompts.filter(item => {
+        const matchesFilter = currentFilter === "All" || item.type === currentFilter;
+        const matchesSearch = `${item.title} ${item.text}`.toLowerCase().includes(search);
+        return matchesFilter && matchesSearch;
+      });
+
+      if (!list.length) {
+        $("#bankGrid").innerHTML = `<div class="empty">No matching prompts found.</div>`;
+        return;
+      }
+
+      $("#bankGrid").innerHTML = list.map((item, index) => {
+        return `
+          <article class="template" data-template="${index}">
+            <strong>${escapeHtml(item.title)}</strong>
+            <p>${escapeHtml(item.text)}</p>
+            <span class="tagline">${escapeHtml(item.type)}</span>
+          </article>
+        `;
+      }).join("");
+
+      $$("[data-template]", $("#bankGrid")).forEach(card => {
+        card.addEventListener("click", () => {
+          const item = list[Number(card.dataset.template)];
+          $("#promptText").value = item.text;
+          updateWriter();
+          setScreen("writer");
+          $("#promptText").focus();
+          showToast("Template loaded");
+        });
+      });
+    }
+
+    function renderAudit() {
+      const text = $("#auditText").value;
+      let passed = 0;
+
+      $("#auditCount").textContent = countText(text);
+
+      $("#checks").innerHTML = auditRules.map(rule => {
+        const ok = rule.pass(text);
+
+        if (ok) passed++;
+
+        return `
+          <div class="check ${ok ? "good" : "bad"}">
+            <span class="dot">${ok ? "✓" : "!"}</span>
+            <span>${rule.label}</span>
+            ${ok ? "" : `<span class="hint">${rule.hint}</span>`}
+          </div>
+        `;
+      }).join("");
+
+      $("#auditScore").textContent = `${passed}/${auditRules.length} checks`;
+    }
+
+    function makeTighterPrompt() {
+      const text = $("#auditText").value.trim();
+
+      if (!text) {
+        showToast("Paste a prompt first");
+        return;
+      }
+
+      const tighter = [
+        "Please work on this task:",
+        text,
+        "",
+        "Before coding, check for missing assumptions.",
+        "Return the final code, explain file changes briefly, and include edge cases for errors, empty states, and mobile layout."
+      ].join("\n");
+
+      $("#tightText").textContent = tighter;
+      showToast("Rewrite generated");
+    }
+
+    function renderSaved() {
+      const query = $("#savedSearch").value.toLowerCase();
+
+      const list = saved.filter(item => {
+        return `${item.raw} ${item.cleaned}`.toLowerCase().includes(query);
+      });
+
+      if (!list.length) {
+        $("#savedList").innerHTML = `<div class="empty">Nothing saved yet.</div>`;
+        return;
+      }
+
+      $("#savedList").innerHTML = list.map(item => {
+        return `
+          <div class="saved-item">
+            <div class="saved-text" title="${escapeHtml(item.raw)}">
+              ${escapeHtml(item.raw)}
+            </div>
+            <span class="badge">${item.score || "-"} / 100</span>
+            <button class="copy-btn" data-copy-saved="${item.id}">Copy</button>
+            <button class="copy-btn" data-load-saved="${item.id}">Load</button>
+          </div>
+        `;
+      }).join("");
+
+      $$("[data-copy-saved]").forEach(button => {
+        button.addEventListener("click", () => {
+          const item = saved.find(entry => entry.id == button.dataset.copySaved);
+          if (item) copyText(item.cleaned || item.raw);
+        });
+      });
+
+      $$("[data-load-saved]").forEach(button => {
+        button.addEventListener("click", () => {
+          const item = saved.find(entry => entry.id == button.dataset.loadSaved);
+
+          if (!item) return;
+
+          $("#promptText").value = item.raw;
+          updateWriter();
+          setScreen("writer");
+          showToast("Loaded");
+        });
+      });
+    }
+
+    function exportSaved() {
+      const blob = new Blob(
+        [JSON.stringify(saved, null, 2)],
+        { type: "application/json" }
+      );
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "vibe-check-prompts.json";
+      link.click();
+
+      URL.revokeObjectURL(link.href);
+      showToast("Exported");
+    }
+
+    $$("[data-go]").forEach(button => {
+      button.addEventListener("click", () => setScreen(button.dataset.go));
     });
-    app.history = app.history.slice(0, 30);
-    store.write("vibe_history", app.history);
-    renderHistory();
-  }
 
-  function presentResult(original, data) {
-    app.original = original;
-    app.lastEnhanced = data.enhanced;
-    localStorage.setItem("vibe_last_enhanced", data.enhanced);
+    $("#jumpToTool").addEventListener("click", () => {
+      $("#tool").scrollIntoView({ behavior: "smooth" });
+    });
 
-    el("enhanced-text").textContent = data.enhanced;
-    el("improvements-list").innerHTML = (data.improvements || [])
-      .map(item => `<div>• ${item}</div>`).join("");
-    el("enhanced-area").classList.remove("hidden");
+    $("#startWriting").addEventListener("click", () => {
+      $("#tool").scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => $("#promptText").focus(), 350);
+    });
 
-    if (app.settings.beforeAfter) {
-      el("before-text").textContent = original;
-      el("after-text").textContent = data.enhanced;
-      el("changes-list").innerHTML = (data.improvements?.length
-        ? data.improvements
-        : ["Improved structure and specificity"])
-        .map(item => `<div>• ${item}</div>`).join("");
-      el("before-after").classList.remove("hidden");
-    } else {
-      el("before-after").classList.add("hidden");
-    }
+    $("#promptText").addEventListener("input", updateWriter);
+    $("#cleanBtn").addEventListener("click", improvePrompt);
 
-    updateEfficiency(data.enhanced);
-    saveHistory(original, data.enhanced);
-    el("btn-undo").classList.remove("hidden");
-    el("btn-redo").classList.add("hidden");
-  }
+    $("#copyOutput").addEventListener("click", () => {
+      const text = $("#outputText").textContent.trim();
+      if (text) copyText(text);
+    });
 
-  function renderTemplates(category = "ui-components", search = "") {
-    const query = search.toLowerCase();
-    const data = (library[category] || []).filter(item =>
-      `${item[0]} ${item[1]}`.toLowerCase().includes(query)
-    );
-    el("templates-grid").innerHTML = data.map(item =>
-      `<article class="card" data-template="${escapeHtml(item[1])}">
-        <b>${escapeHtml(item[0])}</b><p>${escapeHtml(item[1])}</p><span class="tag">${item[2]}</span>
-      </article>`
-    ).join("");
-  }
+    $("#saveRawBtn").addEventListener("click", () => {
+      const raw = $("#promptText").value.trim();
 
-  function escapeHtml(value) {
-    return value.replace(/[&<>"']/g, char => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[char]));
-  }
-
-  function checklist(prompt) {
-    const lower = prompt.toLowerCase();
-    const checks = [
-      ["Clear objective", /\b(build|create|make|implement|fix|design|write)\b/, "State the desired outcome"],
-      ["Specific context", prompt.length > 80, "Add project or context details"],
-      ["Constraints", /\b(must|should|required|without|avoid|don't|do not)\b/, "Add explicit constraints"],
-      ["Edge states", /\b(error|loading|empty|validation)\b/, "Define failure and loading states"],
-      ["Acceptance criteria", /\b(acceptance|criteria|done when|must include)\b/, "Add measurable completion criteria"]
-    ];
-    const passed = checks.filter(item =>
-      typeof item[1] === "boolean" ? item[1] : item[1].test(lower)
-    ).length;
-
-    el("checklist-score").textContent = `${passed}/${checks.length}`;
-    el("checklist-grid").innerHTML = checks.map(item => {
-      const ok = typeof item[1] === "boolean" ? item[1] : item[1].test(lower);
-      return `<div class="check ${ok ? "pass" : "fail"}">
-        <span class="check-icon">${ok ? "✓" : "!"}</span>
-        <span>${item[0]}</span><span class="check-fix">${ok ? "Good" : item[2]}</span>
-      </div>`;
-    }).join("");
-  }
-
-  function renderTechniques() {
-    el("techniques-grid").innerHTML = techniques.map((item, index) =>
-      `<div class="tech" data-tech="${index}">
-        <span class="tech-mark"></span><div><b>${item[0]}</b><small>${item[1]}</small></div>
-      </div>`
-    ).join("");
-  }
-
-  function applyTechniques() {
-    let prompt = el("engineer-input").value.trim();
-    if (!prompt) return notify("Enter a prompt first");
-
-    const selected = q(".tech.selected").map(node => techniques[Number(node.dataset.tech)][0]);
-
-    if (selected.includes("Role"))
-      prompt = `Act as an experienced implementation engineer.\n\n${prompt}`;
-    if (selected.includes("Constraints"))
-      prompt += "\n\nConstraints:\n- Preserve existing behavior unless explicitly requested.\n- Keep the implementation maintainable.";
-    if (selected.includes("Steps"))
-      prompt += "\n\nImplementation plan:\n1. Inspect the existing implementation.\n2. Identify the required change or root cause.\n3. Make the smallest correct change.\n4. Verify the result.";
-    if (selected.includes("Criteria"))
-      prompt += "\n\nAcceptance criteria:\n- Works end-to-end.\n- No regressions.\n- Responsive and accessible.";
-    if (selected.includes("Edge cases"))
-      prompt += "\n\nCover loading, empty, validation, error, and mobile states.";
-    if (selected.includes("Output format"))
-      prompt += "\n\nResponse format:\n1. Brief diagnosis.\n2. Exact changes.\n3. Complete code where appropriate.";
-
-    el("engineer-input").value = prompt;
-    updateEngineer();
-    notify("Selected techniques applied");
-  }
-
-  function updateEngineer() {
-    updateCount(el("engineer-input"), el("engineer-word-count"));
-    checklist(el("engineer-input").value);
-  }
-
-  function renderVersions() {
-    const target = el("versions-list");
-    if (!app.versions.length) {
-      target.innerHTML = '<div class="empty">No versions saved</div>';
-      return;
-    }
-    target.innerHTML = app.versions.map(version =>
-      `<div class="history-row">
-        <span class="history-text">${escapeHtml(version.text)}</span>
-        <button class="secondary" data-version="${version.id}">Use</button>
-      </div>`
-    ).join("");
-  }
-
-  function saveVersion() {
-    const text = el("engineer-input").value.trim();
-    if (!text) return notify("Nothing to save");
-    app.versions.unshift({id:Date.now(), text, date:new Date().toLocaleString()});
-    app.versions = app.versions.slice(0, 20);
-    store.write("vibe_versions", app.versions);
-    renderVersions();
-    notify("Version saved");
-  }
-
-  function renderHistory(filter = "") {
-    const query = filter.toLowerCase();
-    const entries = app.history.filter(item => item.prompt.toLowerCase().includes(query));
-    if (!entries.length) {
-      el("history-list").innerHTML = '<div class="empty">No prompts yet.</div>';
-      return;
-    }
-
-    el("history-list").innerHTML = entries.map(item =>
-      `<div class="history-row" data-id="${item.id}">
-        <span class="history-text">${escapeHtml(item.prompt)}</span>
-        <span class="history-score">${item.score}</span>
-        <button class="plain ${item.starred ? "starred" : ""}" data-star="${item.id}">★</button>
-        <button class="plain" data-copy="${item.id}">Copy</button>
-      </div>`
-    ).join("");
-  }
-
-  function switchTab(name) {
-    q("[data-tab]").forEach(button => button.classList.toggle("active", button.dataset.tab === name));
-    q(".panel").forEach(panel => panel.classList.toggle("active", panel.id === `panel-${name}`));
-
-    if (name === "templates") renderTemplates();
-    if (name === "history") renderHistory();
-    if (name === "engineer") updateEngineer();
-  }
-
-  async function runEnhance() {
-    const input = el("prompt-input");
-    const prompt = input.value.trim();
-    if (!prompt) return;
-
-    const button = el("btn-enhance");
-    button.classList.add("busy");
-    button.disabled = true;
-    renderScore(prompt);
-
-    try {
-      presentResult(prompt, await improve(prompt));
-    } finally {
-      button.classList.remove("busy");
-      button.disabled = false;
-    }
-  }
-
-  async function transformCredit() {
-    const prompt = el("credit-input").value.trim();
-    if (!prompt) return;
-
-    const button = el("btn-credit-transform");
-    button.classList.add("busy");
-    button.disabled = true;
-
-    try {
-      const result = await improve(prompt, "chinese");
-      el("credit-text").textContent = result.enhanced;
-      el("credit-result").classList.remove("hidden");
-    } finally {
-      button.classList.remove("busy");
-      button.disabled = false;
-    }
-  }
-
-  function openSettings() {
-    el("settings-modal").classList.remove("hidden");
-    el("setting-auto-stack").checked = app.settings.autoStack;
-    el("setting-token-eff").checked = app.settings.tokenEff;
-    el("setting-before-after").checked = app.settings.beforeAfter;
-  }
-
-  function updateSettings() {
-    app.settings = {
-      autoStack: el("setting-auto-stack").checked,
-      tokenEff: el("setting-token-eff").checked,
-      beforeAfter: el("setting-before-after").checked
-    };
-    store.write("vibe_settings", app.settings);
-    showStack(el("prompt-input").value);
-    updateEfficiency(app.lastEnhanced);
-  }
-
-  q("[data-tab]").forEach(button =>
-    button.addEventListener("click", () => switchTab(button.dataset.tab))
-  );
-
-  el("prompt-input").addEventListener("input", event => {
-    syncPrompt(event.target.value);
-  });
-
-  el("btn-enhance").addEventListener("click", runEnhance);
-  el("btn-copy-enhanced").addEventListener("click", () => copy(el("enhanced-text").textContent, el("btn-copy-enhanced")));
-  el("btn-copy-before").addEventListener("click", () => copy(el("before-text").textContent));
-  el("btn-copy-after").addEventListener("click", () => copy(el("after-text").textContent));
-  el("btn-copy-credit").addEventListener("click", () => copy(el("credit-text").textContent, el("btn-copy-credit")));
-
-  el("btn-undo").addEventListener("click", () => {
-    if (!app.original) return;
-    el("prompt-input").value = app.original;
-    el("btn-undo").classList.add("hidden");
-    el("btn-redo").classList.remove("hidden");
-    el("btn-enhance").disabled = false;
-    syncPrompt(el("prompt-input").value);
-  });
-
-  el("btn-redo").addEventListener("click", () => {
-    if (!app.lastEnhanced) return;
-    el("prompt-input").value = app.lastEnhanced;
-    el("btn-redo").classList.add("hidden");
-    el("btn-undo").classList.remove("hidden");
-    syncPrompt(el("prompt-input").value);
-  });
-
-  q(".chip").forEach(button => button.addEventListener("click", () => {
-    q(".chip").forEach(item => item.classList.remove("active"));
-    button.classList.add("active");
-    renderTemplates(button.dataset.category, el("template-search").value);
-  }));
-
-  el("template-search").addEventListener("input", () =>
-    renderTemplates(document.querySelector(".chip.active").dataset.category, el("template-search").value)
-  );
-
-  el("templates-grid").addEventListener("click", event => {
-    const card = event.target.closest("[data-template]");
-    if (!card) return;
-    el("prompt-input").value = card.dataset.template;
-    el("btn-enhance").disabled = false;
-    updateCount(el("prompt-input"), el("word-count"));
-    showStack(card.dataset.template);
-    switchTab("enhance");
-    document.querySelector("#workspace").scrollIntoView({behavior:"smooth", block:"start"});
-  });
-
-  el("engineer-input").addEventListener("input", updateEngineer);
-  el("btn-engineer-from-enhance").addEventListener("click", () => {
-    if (!app.lastEnhanced) return notify("Enhance a prompt first");
-    el("engineer-input").value = app.lastEnhanced;
-    updateEngineer();
-    notify("Loaded last enhanced prompt");
-  });
-  el("btn-apply-techniques").addEventListener("click", applyTechniques);
-  el("techniques-grid").addEventListener("click", event => {
-    const card = event.target.closest(".tech");
-    if (card) card.classList.toggle("selected");
-  });
-
-  el("btn-generate-variants").addEventListener("click", () => {
-    const prompt = el("engineer-input").value.trim();
-    if (!prompt) return notify("Enter a prompt first");
-
-    const variants = [
-      `${prompt}\n\nKeep the change focused and prefer the smallest reliable implementation.`,
-      `${prompt}\n\nBefore coding, identify the important requirements and assumptions. Then return a production-ready solution.`,
-      `${prompt}\n\nThink through the normal path, likely failure cases, and important edge cases before implementing the final solution.`
-    ];
-
-    el("variants-container").innerHTML = variants.map((value, index) =>
-      `<div class="card" style="margin-bottom:8px">
-        <b>Variant ${index + 1}</b><p>${escapeHtml(value)}</p>
-        <button class="secondary" data-variant="${index}" style="margin-top:8px">Use</button>
-      </div>`
-    ).join("");
-
-    q("[data-variant]", el("variants-container")).forEach(button =>
-      button.addEventListener("click", () => {
-        el("engineer-input").value = variants[Number(button.dataset.variant)];
-        updateEngineer();
-        notify("Variant selected");
-      })
-    );
-  });
-
-  el("btn-save-version").addEventListener("click", saveVersion);
-  el("btn-clear-versions").addEventListener("click", () => {
-    app.versions = [];
-    localStorage.removeItem("vibe_versions");
-    renderVersions();
-  });
-
-  el("versions-list").addEventListener("click", event => {
-    const button = event.target.closest("[data-version]");
-    if (!button) return;
-    const version = app.versions.find(item => item.id == button.dataset.version);
-    if (version) {
-      el("engineer-input").value = version.text;
-      updateEngineer();
-    }
-  });
-
-  el("credit-input").addEventListener("input", event => {
-    updateCount(event.target, el("credit-word-count"));
-    el("btn-credit-transform").disabled = !event.target.value.trim();
-  });
-  el("btn-credit-transform").addEventListener("click", transformCredit);
-
-  el("history-search").addEventListener("input", event => renderHistory(event.target.value));
-  el("history-list").addEventListener("click", event => {
-    const star = event.target.closest("[data-star]");
-    const copier = event.target.closest("[data-copy]");
-    const row = event.target.closest("[data-id]");
-
-    if (star) {
-      const item = app.history.find(entry => entry.id == star.dataset.star);
-      if (item) {
-        item.starred = !item.starred;
-        store.write("vibe_history", app.history);
-        renderHistory(el("history-search").value);
+      if (!raw) {
+        showToast("Nothing to save");
+        return;
       }
-      return;
-    }
 
-    if (copier) {
-      const item = app.history.find(entry => entry.id == copier.dataset.copy);
-      if (item) copy(item.enhanced);
-      return;
-    }
+      const score = promptScore(raw).total;
+      addSaved(raw, lastCleanPrompt || raw, score, false);
+    });
 
-    if (row) {
-      const item = app.history.find(entry => entry.id == row.dataset.id);
-      if (!item) return;
-      el("prompt-input").value = item.prompt;
-      el("btn-enhance").disabled = false;
-      updateCount(el("prompt-input"), el("word-count"));
-      showStack(item.prompt);
-      switchTab("enhance");
-    }
-  });
+    $("#clearBtn").addEventListener("click", () => {
+      $("#promptText").value = "";
+      updateWriter();
+      $("#scoreBox").classList.add("hide");
+      $("#outputBox").classList.add("hide");
+    });
 
-  el("btn-clear-history").addEventListener("click", () => {
-    app.history = [];
-    localStorage.removeItem("vibe_history");
-    renderHistory();
-    notify("History cleared");
-  });
+    $("#bankSearch").addEventListener("input", renderBank);
 
-  el("efficiency-toggle").addEventListener("click", () =>
-    el("efficiency-body").classList.toggle("hidden")
-  );
+    $("#auditText").addEventListener("input", renderAudit);
 
-  el("btn-strip-filler").addEventListener("click", () => {
-    const cleaned = el("enhanced-text").textContent
-      .replace(/\b(very|really|basically|just|simply|please|kindly|obviously|actually)\b/gi, "")
-      .replace(/[ ]{2,}/g, " ")
-      .replace(/\n[ \t]+/g, "\n")
-      .trim();
+    $("#sendToWriter").addEventListener("click", () => {
+      const text = $("#auditText").value.trim();
 
-    el("enhanced-text").textContent = cleaned;
-    app.lastEnhanced = cleaned;
-    localStorage.setItem("vibe_last_enhanced", cleaned);
-    updateEfficiency(cleaned);
-    notify("Filler removed");
-  });
+      if (!text) {
+        showToast("Nothing to send");
+        return;
+      }
 
-  el("settings-btn").addEventListener("click", openSettings);
-  el("settings-close").addEventListener("click", () => el("settings-modal").classList.add("hidden"));
-  el("settings-backdrop").addEventListener("click", () => el("settings-modal").classList.add("hidden"));
-  ["setting-auto-stack","setting-token-eff","setting-before-after"].forEach(id =>
-    el(id).addEventListener("change", updateSettings)
-  );
+      $("#promptText").value = text;
+      updateWriter();
+      setScreen("writer");
+    });
 
-  el("btn-reset-settings").addEventListener("click", () => {
-    app.settings = {autoStack:true, tokenEff:true, beforeAfter:true};
-    store.write("vibe_settings", app.settings);
-    openSettings();
-    updateSettings();
-  });
+    $("#makeTighter").addEventListener("click", makeTighterPrompt);
 
-  el("btn-clear-data").addEventListener("click", () => {
-    localStorage.clear();
-    location.reload();
-  });
+    $("#savedSearch").addEventListener("input", renderSaved);
 
-  el("btn-export").addEventListener("click", () => {
-    const payload = JSON.stringify({
-      history:app.history, versions:app.versions, settings:app.settings
-    }, null, 2);
-    const blob = new Blob([payload], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "vibe-check-data.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  });
+    $("#exportBtn").addEventListener("click", exportSaved);
 
-  function showTip() { el("tip-text").textContent = tips[app.tip]; }
-  el("tip-prev").addEventListener("click", () => {
-    app.tip = (app.tip + tips.length - 1) % tips.length;
-    showTip();
-  });
-  el("tip-next").addEventListener("click", () => {
-    app.tip = (app.tip + 1) % tips.length;
-    showTip();
-  });
+    $("#wipeBtn").addEventListener("click", () => {
+      if (!confirm("Clear all saved prompts?")) return;
 
+      saved = [];
+      store();
+      renderSaved();
+      showToast("Saved prompts cleared");
+    });
 
-  const savedDraft = localStorage.getItem("vibe_draft") || "";
-  if (savedDraft) {
-    el("prompt-input").value = savedDraft;
-    syncPrompt(savedDraft, true);
-  }
-
-  el("btn-random-prompt").addEventListener("click", () => {
-    const prompt = surprisePrompts[Math.floor(Math.random() * surprisePrompts.length)];
-    el("prompt-input").value = prompt;
-    syncPrompt(prompt);
-    el("prompt-input").focus();
-    notify("A rough idea, ready to shape");
-  });
-
-  el("btn-clear-prompt").addEventListener("click", () => {
-    el("prompt-input").value = "";
-    syncPrompt("");
-    el("prompt-input").focus();
-    notify("Prompt cleared");
-  });
-
-  document.addEventListener("keydown", event => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
-      event.preventDefault();
-      if (!el("btn-enhance").disabled) runEnhance();
-    }
-    if (event.key === "Escape" && !el("settings-modal").classList.contains("hidden")) {
-      el("settings-modal").classList.add("hidden");
-    }
-  });
-
-  renderTechniques();
-  renderTemplates();
-  renderHistory();
-  renderVersions();
-  showTip();
-}
-
-document.addEventListener("DOMContentLoaded", initApp);
-</script>
+    renderFilters();
+    renderBank();
+    renderAudit();
+    renderSaved();
+    updateWriter();
+  </script>
 </body>
 </html>
