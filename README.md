@@ -1,212 +1,217 @@
 # Vibe Check
 
-Vibe Check is a small web app that helps you write better prompts for AI coding tools.
+Vibe Check is a small web application that helps you to write better prompts for AI coding tools.
 
-If you usually type things like:
+If you normally type in something like
 
 ```text
+
 make me a cool dashboard
+
 ```
 
-and don't get the result you expected, Vibe Check helps turn that short idea into a clearer and more useful prompt.
+but never get the prompt you were hoping to receive, then Vibe Check allows you to turn such a short prompt into a much richer and more useful one.
 
 ## What it does
 
-You enter your prompt, choose the AI coding tool you want to use, and enhance it.
+Enter your prompt, select an AI coding tool and enhance it.
 
 Vibe Check can:
 
-* Improve unclear prompts
-* Give your prompt a score
-* Show what is missing from your prompt
-* Remove unnecessary words
-* Give suggestions based on the AI tool you selected
-* Compare your original prompt with the improved version
-* Save your previous prompts
-* Use ready-made prompt templates
+Enhance unclear prompt
 
-Everything is designed to work directly in the browser.
+Rate your prompt
 
-## Main Features
+Indicate what is missing in your prompt
 
-### Prompt Enhancement
+Remove extra words
 
-Write a basic idea and Vibe Check adds more useful details to it.
+Provide suggestions based on the selected AI coding tool
 
-For example:
+Compare the original and enhanced prompts
+
+Save previous prompts
+
+Use built-in prompt templates
+
+All in your browser.
+
+## Main features
+
+### Prompt enhancement
+
+Write a simple prompt and let Vibe Check add additional meaningful details to it.
+
+For instance,
 
 ```text
+
 make a login page
+
 ```
 
-can be changed into a prompt that includes things such as:
+can be improved to a rich prompt that defines
 
-* Page layout
-* Required fields
-* Buttons
-* Validation
-* Responsive design
-* Technology requirements
+the page layout
 
-You can also connect your own API if you want to use AI-powered enhancement.
+the required fields
 
-### Prompt Score
+the required buttons
 
-Your prompt is checked using five areas:
+etc.
 
-* Clarity
-* Specificity
-* Completeness
-* Structure
-* Effectiveness
+Besides, you can use a built-in connection to your API (if you want to use it) for prompt enhancement.
 
-You get a score out of 100 along with suggestions for improving it.
+### Prompt score
 
-### Token Efficiency
+Your prompt is assessed across 5 different domains, with a final score out of 100, along with suggestions for each.
 
-Vibe Check looks for unnecessary words and phrases in your prompt.
+### Token efficiency
 
-It can find things like:
+Vibe Check detects and highlights extra words and phrases such as
 
-* Repeated words
-* Filler text
-* Unnecessary politeness
-* Hedging phrases
-* Extra wording
+redundant information
 
-You can then clean up the prompt before sending it to an AI tool.
+extra explanations
 
-### AI Tool Tips
+unnecessary politeness
 
-Different AI coding tools work better with different types of prompts.
+hedging language
 
-Vibe Check includes tips for tools such as:
+etc.
 
-* v0
-* Bolt
-* Lovable
-* Cursor
-* Replit
-* Claude
-* ChatGPT
-* Gemini
-* Perplexity
-* DeepSeek
-* Windsurf
-* GitHub Copilot
-* CodeSandbox
-* StackBlitz
-* Phind
+you can edit them out before pasting your prompt in an AI coding tool.
 
-Choose a tool and the app gives suggestions that are relevant to it.
+### AI tool tips
 
-### Before and After
+AI coding tools can have different requirements for the prompts that you send to them.
 
-You can compare your original prompt with the enhanced prompt.
+Vibe Check provides code suggestions for v0, Bolt, Lovable, Cursor, Replit, Claude, ChatGPT, Gemini, Perplexity, DeepSeek, Windsurf, GitHub Copilot, CodeSandbox, StackBlitz, Phind, and many more.
 
-This makes it easier to understand what was changed instead of simply receiving a new prompt without knowing why it is different.
+Choose an AI coding tool and Vibe Check will provide code suggestions specific to that tool.
 
-### Prompt Templates
+### Before and after
 
-The app includes templates for common tasks, including:
+Compare your original prompt to the enhanced prompt side by side, to see what has been changed.
 
-* UI components
-* Full applications
-* Bug fixing
-* API endpoints
-* Database schemas
+### Prompt templates
 
-You can choose a template, add your own information, and then improve the prompt.
+There are dozens of prompt templates for
 
-### Prompt History
+UI components
+
+complete applications
+
+bug fixes
+
+API endpoints
+
+database schema
+
+etc.
+
+that you can use as a starting point for your own prompts.
+
+### Prompt history
 
 Enhanced prompts can be saved in your browser.
 
-You can go back and check older prompts, their scores, timestamps, and selected AI tools.
+You can search, star and export your prompts.
 
-You can also search, favorite, and export your saved prompts.
+You can also see the score, timestamp, and the selected AI coding tool for previously saved prompts.
 
-### Engineer Tab
+### Engineer tab
 
-The Engineer section contains some extra tools for working with prompts.
+The engineer tab has some additional features for working with prompts.
 
-It includes:
+It includes
 
-* Prompt quality checks
-* Different prompting techniques
-* Multiple prompt versions
-* Version history
-* Three prompt variants
-* Credit Saver mode
+prompt quality checks
 
-The Credit Saver option can translate prompts into Chinese to reduce the number of tokens used with some AI providers.
+various prompting techniques
+
+multiple prompt versions
+
+version history
+
+3 prompt variants
+
+Credit Saver mode
+
+etc.
+
+The Credit Saver mode can be used to switch prompts to Chinese to save on the token count for some prompt APIs.
 
 ### Settings
 
-The settings page lets you control how the application works.
+The settings page lets you configure the app, including setting up an API endpoint, toggling features off and on, and exporting and importing your data.
 
-You can:
+There is no account system or database required to use this application.
 
-* Configure an AI endpoint
-* Turn features on or off
-* Export your data
-* Import your data
+## Getting started
 
-There is no account system or database required for normal use.
+There is nothing to install.
 
-## Quick Start
+Just
 
-You don't need to install anything.
+open up the Vibe Check website
 
-1. Open the Vibe Check website.
-2. Enter your prompt.
-3. Select the AI tool you are using.
-4. Click **Enhance**.
-5. Review the improved prompt.
-6. Copy it and use it in your coding tool.
+type in a prompt
 
-## Tech Stack
+select an AI coding tool
 
-The project is intentionally kept simple.
+click enhance
 
-* HTML
-* CSS
-* Vanilla JavaScript
-* Vercel
-* CSS Custom Properties
+review the enhanced prompt
 
-There is no frontend framework and no complicated build setup.
+copy the enhanced prompt to your clipboard
 
-## Why I Made It
+and start using it in your AI coding tool of choice.
 
-I made Vibe Check because I was spending a lot of time rewriting prompts before giving them to AI coding tools.
+## Tech stack
 
-A prompt that is too short can leave out important details, while a long prompt can contain a lot of unnecessary text.
+The stack is intentionally kept simple and only includes
 
-I wanted one simple place where I could write an idea, improve it, check its quality, and then copy the result.
+HTML
 
-That's how Vibe Check started.
+CSS
+
+Vanilla JS
+
+Vercel
+
+CSS Custom Properties
+
+There is no frontend framework or any other complex infrastructure involved.
+
+## Why I made it
+
+I made Vibe Check because I was frustrated with having to spend too much time editing prompts before sending them to my AI coding tool.
+
+A prompt that is too short may miss out on important details, while a prompt that is too long may contain lots of extra text.
+
+I wanted to have a single place where I could write out a prompt, improve it, score it, and then copy it to my clipboard.
+
+That is how I came up with Vibe Check.
 
 ## Privacy
 
-The application is designed to work in the browser.
+The application is designed to be run in the browser, and does not require you to sign up or create an account to use the main features of the application.
 
-There is no signup required and no account is needed to use the main features.
-
-Saved information can be managed through the settings and export/import options.
+However, if you do sign up, then your information can be managed in your settings, and you can export and import your data as needed.
 
 ## Contributing
 
-If you find a problem or have an idea for improving the project, feel free to open an issue or submit a pull request.
+If you find a bug or have an idea for a new feature, feel free to open an issue or submit a pull request.
 
-You can also add support for another AI coding tool by extending the stack-related prompt tips.
+You can also help out by adding support for another AI coding tool by extending the stack-related prompt tips.
 
 ## License
 
 This project is licensed under the MIT License.
 
-You are free to use, modify, and share the project according to the license.
+You are free to use, modify, and share this project as you see fit.
 
 ---
 
-Built as a small project to make working with AI coding tools a little easier.
+Built as a small project to improve the experience of working with AI Coding tools
