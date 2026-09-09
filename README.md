@@ -100,7 +100,7 @@ That's it. Nothing to install, nothing to configure.
 
 ## Why I built this
 
-I'm 17. I use AI coding tools every day -- Cursor, Claude, v0, Bolt. The biggest bottleneck isn't the tools themselves, it's writing prompts good enough for them to work with. I kept rewriting the same structured prompts by hand and figured there had to be a better way.
+I'm 18. I use AI coding tools every day -- Cursor, Claude, v0, Bolt. The biggest bottleneck isn't the tools themselves, it's writing prompts good enough for them to work with. I kept rewriting the same structured prompts by hand and figured there had to be a better way.
 
 Vibe Check started as a weekend project for the Stardance QOL Mission. Now it helps me write better prompts across every AI tool I use.
 
@@ -117,5 +117,3 @@ PRs are welcome. If you find a bug, open an issue. If you want to add support fo
 MIT -- do whatever you want with it.
 
 ---
-
-*Built by a 17-year-old who got tired of rewriting prompts.*
