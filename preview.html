@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Check — Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Preview wrapper styles — MewoOS-level elite */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.preview-body {
+      background: #010103;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', system-ui, sans-serif;
+      overflow: auto;
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    /* Ambient glow orbs */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(80px);
+      z-index: 0;
+      opacity: 0.5;
+    }
+    .ambient-orb-1 {
+      width: 500px; height: 500px;
+      top: -100px; right: -50px;
+      background: radial-gradient(circle, rgba(196,162,101,0.08) 0%, rgba(139,115,85,0.04) 40%, transparent 70%);
+      animation: orb-drift-1 25s ease-in-out infinite;
+    }
+    .ambient-orb-2 {
+      width: 450px; height: 450px;
+      bottom: -80px; left: -40px;
+      background: radial-gradient(circle, rgba(139,115,85,0.06) 0%, rgba(196,162,101,0.03) 40%, transparent 70%);
+      animation: orb-drift-2 30s ease-in-out infinite;
+    }
+    @keyframes orb-drift-1 {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(15px, -20px); }
+      50% { transform: translate(-10px, 15px); }
+      75% { transform: translate(20px, 10px); }
+    }
+    @keyframes orb-drift-2 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-15px, 10px); }
+      66% { transform: translate(10px, -15px); }
+    }
+
+    /* Grid pattern */
+    .ambient-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(196,162,101,0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(196,162,101,0.012) 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.6;
+    }
+
+    /* Cursor trail canvas */
+    #cursor-trail-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99999;
+    }
+
+    /* Shimmer sweep */
+    @keyframes shimmer-sweep {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .preview-bg {
+      position: fixed;
+      inset: 0;
+      background:
+        url('popup/crystal-bg.jpg') center/cover no-repeat;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .preview-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 20%, #010103 80%);
+    }
+    .preview-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 100%;
+      max-width: 520px;
+    }
+    .preview-header {
+      text-align: center;
+    }
+    .preview-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #C4A265, #e8d5a8, #8B7355);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    .preview-header p {
+      color: #555;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .extension-frame {
+      width: 100%;
+      max-width: 460px;
+      background: linear-gradient(135deg, rgba(8,10,18,0.65) 0%, rgba(4,5,12,0.7) 50%, rgba(10,12,20,0.65) 100%);
+      backdrop-filter: blur(30px) saturate(1.6) brightness(1.1);
+      -webkit-backdrop-filter: blur(30px) saturate(1.6) brightness(1.1);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04),
+        0 20px 60px rgba(0,0,0,0.6),
+        0 0 80px rgba(196,162,101,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden;
+      position: relative;
+    }
+    /* Shimmer on extension frame */
+    .extension-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 58%, transparent 65%);
+      transform: translateX(-100%);
+      animation: shimmer-sweep 12s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Chrome rim */
+    .extension-frame::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow:
+        inset 1px 1px 1px rgba(255,255,255,0.1),
+        inset -1px -1px 1px rgba(255,255,255,0.03);
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body class="preview-body">
+  <!-- Ambient effects (preview wrapper) -->
+  <div class="ambient-orb ambient-orb-1"></div>
+  <div class="ambient-orb ambient-orb-2"></div>
+  <div class="ambient-grid"></div>
+  <!-- Note: cursor trail is handled by popup.html's inline script -->
+
+  <div class="preview-bg"></div>
+  <div class="preview-container">
+    <div class="preview-header">
+      <h1>VIBE CHECK</h1>
+      <p>AI Prompt Enhancer — Local Preview</p>
+    </div>
+    <div class="extension-frame">
+      <!-- The popup content gets injected here -->
+      <div id="popup-mount"></div>
+    </div>
+  </div>
+
+  <!-- Cursor trail is handled by popup.html's inline script when loaded -->
+
+  <!-- Load all library modules -->
+  <script src="lib/settings.js"></script>
+  <script src="lib/stack-detector.js"></script>
+  <script src="lib/templates.js"></script>
+  <script src="lib/scorer.js"></script>
+  <script src="lib/enhancer.js"></script>
+  <script src="lib/prompt-engineer.js"></script>
+  <script src="lib/history.js"></script>
+  <!-- Load popup CSS and HTML -->
+  <link rel="stylesheet" href="popup/popup.css">
+  <script>
+    // Fetch and inject popup.html body content, then load popup.js
+    fetch('popup/popup.html')
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        var match = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+        if (match) {
+          document.getElementById('popup-mount').innerHTML = match[1];
+        }
+        // Load popup.js — it registers DOMContentLoaded which we fire after
+        var script = document.createElement('script');
+        script.src = 'popup/popup.js';
+        script.onload = function() {
+          document.dispatchEvent(new Event('DOMContentLoaded'));
+        };
+        document.body.appendChild(script);
+      });
+  </script>
+</body>
+</html>

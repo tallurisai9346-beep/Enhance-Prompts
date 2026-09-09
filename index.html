@@ -1,1616 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vibe Check — Prompt Toolkit</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0a0f;
-  --text: #f5f5f7;
-  --text-dim: #86868b;
-  --text-muted: #48484a;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* NAV */
-.nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  background: rgba(255,255,255,0.07);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  transition: 0.3s;
-}
-
-.nav.scrolled {
-  background: rgba(10,10,15,0.92);
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.nav-icon {
-  width: 28px;
-  height: 28px;
-  background: #fff;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
-.nav-links {
-  display: flex;
-  gap: 4px;
-  background: rgba(255,255,255,0.04);
-  padding: 3px;
-  border-radius: 9px;
-}
-
-.nav-link {
-  padding: 6px 14px;
-  border: none;
-  background: transparent;
-  color: var(--text-dim);
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 7px;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.nav-link.active,
-.nav-link:hover {
-  background: rgba(255,255,255,0.12);
-  color: #fff;
-}
-
-.nav-icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-/* HERO */
-.hero {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 120px 24px 80px;
-  background: radial-gradient(circle at 50% 30%, rgba(120,90,255,0.18), transparent 70%),
-              linear-gradient(180deg, #12121a, #0a0a0f);
-}
-
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  font-size: 12px;
-  margin-bottom: 24px;
-  color: rgba(255,255,255,0.8);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  background: #34c759;
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(52,199,89,0.5);
-}
-
-.hero h1 {
-  font-size: clamp(42px, 8vw, 80px);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  margin-bottom: 16px;
-}
-
-.hero h1 em {
-  font-style: normal;
-  background: linear-gradient(135deg, #fff, rgba(255,255,255,0.55));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero p {
-  font-size: 17px;
-  color: rgba(255,255,255,0.6);
-  max-width: 460px;
-  margin: 0 auto 32px;
-  line-height: 1.5;
-}
-
-.hero-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 28px;
-  background: #fff;
-  color: #0a0a0f;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 15px;
-  text-decoration: none;
-  transition: transform 0.2s;
-}
-
-.hero-btn:hover {
-  transform: scale(1.03);
-}
-
-/* APP */
-.app-wrap {
-  max-width: 640px;
-  margin: -40px auto 80px;
-  padding: 0 16px;
-  position: relative;
-  z-index: 10;
-}
-
-.glass {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-}
-
-.app-top {
-  display: flex;
-  align-items: center;
-  height: 48px;
-  padding: 0 14px;
-  background: rgba(255,255,255,0.04);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  gap: 12px;
-}
-
-.app-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.logo-ic {
-  width: 24px;
-  height: 24px;
-  background: linear-gradient(135deg, #fff, #aaa);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.app-tabs {
-  display: flex;
-  gap: 2px;
-  flex: 1;
-  overflow-x: auto;
-}
-
-.tab-btn {
-  padding: 6px 14px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 7px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-}
-
-.tab-btn.active {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-#tab-content {
-  padding: 16px;
-}
-
-.tab-panel {
-  display: none;
-}
-
-.tab-panel.active {
-  display: block;
-}
-
-/* INPUT */
-.textarea-wrap {
-  margin-bottom: 12px;
-}
-
-#prompt-input,
-#engineer-input {
-  width: 100%;
-  padding: 14px 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  color: #fff;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  resize: vertical;
-  outline: none;
-}
-
-#prompt-input {
-  height: 150px;
-}
-
-#engineer-input {
-  height: 90px;
-}
-
-#prompt-input:focus,
-#engineer-input:focus {
-  border-color: rgba(255,255,255,0.25);
-}
-
-.input-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-/* BUTTONS */
-.action-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.btn-enhance {
-  flex: 1;
-  height: 44px;
-  background: #fff;
-  color: #0a0a0f;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: inherit;
-}
-
-.btn-enhance:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.btn-enhance.loading .btn-label {
-  display: none;
-}
-
-.btn-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(0,0,0,0.15);
-  border-top-color: #000;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  display: none;
-}
-
-.btn-enhance.loading .btn-spinner {
-  display: block;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.btn-outline {
-  padding: 6px 14px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  color: var(--text-dim);
-  font-size: 12px;
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.btn-outline:hover {
-  border-color: rgba(255,255,255,0.25);
-  color: #fff;
-}
-
-.btn-outline.btn-sm {
-  font-size: 11px;
-  padding: 4px 10px;
-}
-
-.btn-outline.btn-red {
-  border-color: rgba(255,69,58,0.3);
-  color: #ff453a;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* SCORE */
-.score-box {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 18px;
-  margin-bottom: 12px;
-}
-
-.score-num {
-  font-size: 42px;
-  font-weight: 700;
-}
-
-.score-lbl {
-  font-size: 15px;
-  font-weight: 600;
-  margin: 8px 0 12px;
-}
-
-.score-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 11px;
-}
-
-.score-bar-l {
-  width: 90px;
-  color: var(--text-dim);
-}
-
-.score-bar-t {
-  flex: 1;
-  height: 4px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.score-bar-f {
-  height: 100%;
-  background: #fff;
-  width: 0;
-  transition: width 0.5s ease;
-  border-radius: 3px;
-}
-
-/* ENHANCED */
-.enhanced-box {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-left: 2px solid #fff;
-  border-radius: 16px;
-  margin-bottom: 12px;
-  overflow: hidden;
-}
-
-.enh-hdr {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 14px 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255,255,255,0.7);
-}
-
-.enh-txt {
-  padding: 10px 14px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  max-height: 260px;
-  overflow-y: auto;
-}
-
-.imp-list {
-  padding: 0 14px 12px;
-}
-
-.imp-i {
-  font-size: 11px;
-  color: var(--text-dim);
-  padding: 2px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.imp-i::before {
-  content: '';
-  width: 4px;
-  height: 4px;
-  background: #34c759;
-  border-radius: 50%;
-}
-
-/* BEFORE / AFTER */
-.ba-cols {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.ba-col {
-  flex: 1;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.ba-hdr {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.ba-before { color: #ff453a; }
-.ba-after { color: #34c759; }
-
-.ba-txt {
-  padding: 10px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  max-height: 140px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-}
-
-/* TEMPLATES */
-.template-categories {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 10px;
-  overflow-x: auto;
-}
-
-.template-cat-btn {
-  padding: 5px 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 11px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: inherit;
-}
-
-.template-cat-btn.active {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-.search-wrap {
-  margin-bottom: 10px;
-}
-
-#template-search {
-  width: 100%;
-  padding: 8px 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  color: #fff;
-  font-size: 12px;
-  outline: none;
-}
-
-.templates-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.template-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 14px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.template-card:hover {
-  border-color: rgba(255,255,255,0.2);
-  transform: translateY(-2px);
-}
-
-.tmpl-nm {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.tmpl-pv {
-  font-size: 11px;
-  color: var(--text-muted);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.tmpl-tg {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 600;
-  background: rgba(255,255,255,0.06);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-top: 6px;
-  color: var(--text-dim);
-}
-
-/* ENGINEER */
-.eng-sec {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 14px;
-}
-
-.sec-hdr {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.sec-lbl {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: rgba(255,255,255,0.7);
-}
-
-.chk-i {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-
-.chk-i.pass { background: rgba(52,199,89,0.06); }
-.chk-i.fail { background: rgba(255,69,58,0.06); }
-
-.chk-ic {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.chk-i.pass .chk-ic {
-  background: rgba(52,199,89,0.15);
-  color: #34c759;
-}
-
-.chk-i.fail .chk-ic {
-  background: rgba(255,69,58,0.15);
-  color: #ff453a;
-}
-
-.tech-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-
-.tech-card {
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  cursor: pointer;
-  position: relative;
-}
-
-.tech-card.sel {
-  border-color: rgba(255,255,255,0.3);
-  background: rgba(255,255,255,0.08);
-}
-
-.tech-card input {
-  position: absolute;
-  opacity: 0;
-}
-
-.tech-chk {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid rgba(255,255,255,0.25);
-  border-radius: 4px;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.tech-card.sel .tech-chk {
-  background: #fff;
-  border-color: #fff;
-}
-
-.tech-nm {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.tech-ds {
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-/* HISTORY */
-.history-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  margin-bottom: 6px;
-  cursor: pointer;
-}
-
-.history-item:hover {
-  border-color: rgba(255,255,255,0.15);
-}
-
-.history-item-text {
-  flex: 1;
-  font-size: 12px;
-  color: var(--text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.history-item-score {
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 24px;
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-/* TIPS */
-.tips-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.tips-arr {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-  font-size: 16px;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal.hidden {
-  display: none !important;
-}
-
-.modal-bg {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
-}
-
-.modal-box {
-  position: relative;
-  width: 90%;
-  max-width: 400px;
-  background: rgba(16,16,24,0.95);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 18px;
-  padding: 20px;
-}
-
-.modal-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
-  font-weight: 700;
-}
-
-.modal-top button {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.set-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  font-size: 13px;
-}
-
-.tog {
-  position: relative;
-  width: 38px;
-  height: 22px;
-}
-
-.tog input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.tog-sl {
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.12);
-  border-radius: 22px;
-  transition: 0.2s;
-}
-
-.tog-sl::before {
-  content: '';
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  left: 3px;
-  bottom: 3px;
-  background: #fff;
-  border-radius: 50%;
-  transition: 0.2s;
-}
-
-input:checked + .tog-sl {
-  background: #34c759;
-}
-
-input:checked + .tog-sl::before {
-  transform: translateX(16px);
-}
-
-/* HOW */
-.how {
-  padding: 60px 24px;
-  text-align: center;
-}
-
-.sec-tag {
-  display: inline-block;
-  padding: 5px 14px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  color: rgba(255,255,255,0.7);
-}
-
-.how h2 {
-  font-size: clamp(26px, 4vw, 34px);
-  font-weight: 700;
-  margin-bottom: 32px;
-}
-
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  max-width: 880px;
-  margin: 0 auto;
-}
-
-.step {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 24px 18px;
-  text-align: left;
-}
-
-.step-n {
-  font-size: 28px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.15);
-  margin-bottom: 8px;
-}
-
-.step-t {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.step-d {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.5;
-}
-
-footer {
-  text-align: center;
-  padding: 30px;
-  font-size: 12px;
-  color: var(--text-muted);
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-/* TOAST */
-#toast-container {
-  position: fixed;
-  top: 64px;
-  right: 20px;
-  z-index: 300;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.toast {
-  padding: 10px 16px;
-  background: rgba(16,16,24,0.95);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  font-size: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  animation: toastIn 0.25s ease;
-}
-
-@keyframes toastIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: none; }
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .steps { grid-template-columns: 1fr; }
-  .templates-grid { grid-template-columns: 1fr; }
-  .tech-grid { grid-template-columns: 1fr; }
-  .ba-cols { flex-direction: column; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Check — AI Prompt Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="lib/settings.js"></script><script src="lib/stack-detector.js"></script><script src="lib/templates.js"></script><script src="lib/scorer.js"></script><script src="lib/enhancer.js"></script><script src="lib/prompt-engineer.js"></script><script src="lib/history.js"></script>
+  <style>
+    :root{--bg:#0a0a0f;--accent:#fff;--accent-dim:rgba(255,255,255,0.7);--text:#f5f5f7;--text-dim:#86868b;--text-muted:#48484a;--border:rgba(255,255,255,0.12);--glass:rgba(255,255,255,0.08);--glass-strong:rgba(255,255,255,0.12);--ease:cubic-bezier(0.25,0.46,0.45,0.94)}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh}
+    ::selection{background:rgba(255,255,255,0.2);color:#fff}
+    img{display:block;max-width:100%}
+
+    /* ══════ NAV — Apple-style ══════ */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,48px);height:52px;background:rgba(255,255,255,0.08);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,0.12);transition:all .4s var(--ease)}
+    .nav.scrolled{background:rgba(255,255,255,0.12);box-shadow:0 1px 0 rgba(255,255,255,0.15)}
+    .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-icon{width:28px;height:28px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center}
+    .nav-icon svg{width:14px;height:14px}
+    .nav-name{font-size:14px;font-weight:600;color:#fff;letter-spacing:-0.01em}
+    .nav-links{display:flex;gap:2px;background:rgba(255,255,255,0.04);border-radius:9px;padding:3px}
+    .nav-link{padding:6px 16px;border-radius:7px;background:transparent;border:none;color:var(--text-dim);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s var(--ease);letter-spacing:-0.01em}
+    .nav-link:hover{color:#fff}
+    .nav-link.active{background:rgba(255,255,255,0.08);color:#fff}
+    .nav-actions{display:flex;gap:8px}
+    .nav-icon-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s var(--ease)}
+    .nav-icon-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
+
+    /* ══════ HERO — Full-bleed image + glass ══════ */
+    .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.85}
+    .hero-gradient{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,15,0.0) 0%,rgba(10,10,15,0.05) 50%,var(--bg) 100%)}
+    .hero-content{position:relative;z-index:2;text-align:center;padding:120px 24px 80px;max-width:800px}
+    .hero-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:9999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);font-size:12px;font-weight:500;color:rgba(255,255,255,0.8);margin-bottom:28px;letter-spacing:0.02em}
+    .hero-pill-dot{width:6px;height:6px;border-radius:50%;background:#34c759;box-shadow:0 0 8px rgba(52,199,89,0.5)}
+    .hero-h1{font-size:clamp(52px,9vw,96px);font-weight:700;line-height:0.92;letter-spacing:-0.04em;margin-bottom:20px;color:#fff}
+    .hero-h1 em{font-style:normal;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.6) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-p{font-size:18px;color:rgba(255,255,255,0.6);line-height:1.6;max-width:520px;margin:0 auto 40px;font-weight:400}
+    .hero-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:9999px;background:#fff;color:#0a0a0f;font-size:15px;font-weight:600;font-family:inherit;text-decoration:none;border:none;cursor:pointer;transition:all .3s var(--ease);box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+    .hero-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+
+    /* ══════ SECTIONS — Image backgrounds + glass ══════ */
+    .section-img{position:relative;overflow:hidden}
+    .section-img .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.65}
+    .section-img .frost{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,15,0.15) 0%,rgba(10,10,15,0.35) 50%,var(--bg) 100%)}
+
+    /* ══════ GLASS — Real Glassmorphism ══════ */
+    .glass{background:rgba(255,255,255,0.08);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,0.15);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.15)}
+    .glass-subtle{background:rgba(255,255,255,0.08);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid rgba(255,255,255,0.12);border-radius:14px}
+
+    /* ══════ APP ══════ */
+    .app-bg{position:relative;overflow:hidden;border-radius:20px;margin:-40px auto 0;max-width:580px;padding:0 20px 100px}
+    .app-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.50;border-radius:20px}
+    .app-bg-frost{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,15,0.2) 0%,rgba(10,10,15,0.35) 50%,var(--bg) 100%);border-radius:20px}
+    .app-wrap{max-width:540px;margin:0 auto;padding:0 0 0;position:relative;z-index:5}
+
+    /* ══════ APP HEADER ══════ */
+    .app-top{display:flex;align-items:center;height:48px;padding:0 14px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.08);border-radius:20px 20px 0 0;gap:8px}
+    .app-logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .app-logo-ic{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#fff,#aaa);display:flex;align-items:center;justify-content:center}
+    .app-logo-ic svg{width:14px;height:14px}
+    .app-logo-t{font-size:11px;font-weight:700;letter-spacing:0.08em;color:#fff}
+    .app-tabs{display:flex;gap:1px;flex:1;overflow-x:auto;scrollbar-width:none}
+    .app-tabs::-webkit-scrollbar{display:none}
+    .tab-btn{padding:6px 14px;border-radius:7px;border:none;background:transparent;color:var(--text-muted);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s var(--ease);white-space:nowrap}
+    .tab-btn:hover{color:var(--text-dim)}
+    .tab-btn.active{background:rgba(255,255,255,0.10);color:#fff}
+    #tab-content{padding:14px}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block;animation:fadeUp .2s var(--ease)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+    /* ══════ STACK ══════ */
+    .stack-badge{display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:9999px;font-size:12px;margin-bottom:10px;cursor:pointer;transition:all .15s var(--ease)}
+    .stack-badge:hover{background:rgba(255,255,255,0.08)}
+    .stack-badge.hidden,.stack-tips.hidden{display:none}
+    .stack-dot{width:6px;height:6px;border-radius:50%;background:#34c759;box-shadow:0 0 6px rgba(52,199,89,0.5)}
+    .stack-lbl{color:var(--text-muted)}
+    .stack-nm{color:#fff;font-weight:600}
+    .stack-tips{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;margin-bottom:10px;font-size:12px}
+    .tips-hdr{color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:8px}
+    #tips-list{list-style:none}
+    #tips-list li{padding:4px 0 4px 14px;position:relative;color:var(--text-dim)}
+    #tips-list li::before{content:'';position:absolute;left:0;top:10px;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.5)}
+
+    /* ══════ TEXTAREA ══════ */
+    .textarea-wrap{margin-bottom:12px}
+    #prompt-input{width:100%;height:140px;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;resize:vertical;outline:none;transition:border-color .2s,box-shadow .2s}
+    #prompt-input:focus{border-color:rgba(255,255,255,0.25);box-shadow:0 0 0 3px rgba(255,255,255,0.06)}
+    #prompt-input::placeholder{color:var(--text-muted);font-family:'Inter',sans-serif}
+    .input-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:10px;color:var(--text-muted)}
+    .complexity-badge{padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+    .complexity-badge.simple{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7)}
+    .complexity-badge.moderate{background:rgba(175,130,255,0.12);color:#af82ff}
+    .complexity-badge.detailed{background:rgba(52,199,89,0.12);color:#34c759}
+    .complexity-badge.hidden{display:none}
+
+    /* ══════ BUTTONS ══════ */
+    .action-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .btn-enhance{flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#0a0a0f;border:none;border-radius:12px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s var(--ease);box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+    .btn-enhance:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+    .btn-enhance:active:not(:disabled){transform:scale(.98)}
+    .btn-enhance:disabled{opacity:.3;cursor:not-allowed}
+    .btn-spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,.12);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .btn-enhance.loading .btn-label,.btn-enhance.loading .btn-icon{display:none}
+    .btn-enhance.loading .btn-spinner{display:inline-block}
+    .btn-icon{display:flex;align-items:center}
+    .btn-icon-only{width:36px;height:36px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:var(--text-muted);cursor:pointer;border-radius:9px;display:flex;align-items:center;justify-content:center;transition:all .15s var(--ease)}
+    .btn-icon-only:hover{color:#fff;background:rgba(255,255,255,0.08)}
+    .btn-icon-only.hidden{display:none}
+    .hidden{display:none}
+    .btn-outline{padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.10);border-radius:8px;color:var(--text-dim);font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s var(--ease);display:inline-flex;align-items:center;gap:6px}
+    .btn-outline:hover{border-color:rgba(255,255,255,0.20);color:#fff;background:rgba(255,255,255,0.04)}
+    .btn-outline.btn-sm{font-size:11px;padding:4px 10px}
+    .btn-outline.btn-red{border-color:rgba(255,69,58,0.25);color:#ff453a}
+    .btn-outline.btn-red:hover{background:rgba(255,69,58,0.06)}
+
+    /* ══════ SCORE ══════ */
+    .score-box{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:16px;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+    .score-box.hidden{display:none}
+    .score-num{font-size:42px;font-weight:700;color:#fff;line-height:1;letter-spacing:-0.03em}
+    .score-div{font-size:16px;color:var(--text-muted);font-weight:300}
+    .score-max{font-size:12px;color:var(--text-muted)}
+    .score-lbl{font-size:15px;font-weight:600;margin-bottom:10px}
+    .score-bars{width:100%}
+    .score-bar{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+    .score-bar-l{width:80px;font-size:11px;color:var(--text-dim);flex-shrink:0;font-weight:500}
+    .score-bar-t{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+    .score-bar-f{height:100%;border-radius:3px;transition:width .5s var(--ease);width:0}
+    .score-bar-v{width:30px;font-size:10px;color:var(--text-muted);text-align:right}
+    .score-fb{width:100%;border-top:0.5px solid rgba(255,255,255,0.06);padding-top:10px}
+    .score-fi{font-size:11px;color:rgba(255,255,255,0.7);padding:2px 0;display:flex;align-items:center;gap:6px}
+    .score-fi::before{content:'';width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.5)}
+
+    /* ══════ ENHANCED ══════ */
+    .enhanced-box{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-left:2px solid #fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+    .enhanced-box.hidden{display:none}
+    .enh-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 0}
+    .enh-t{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px}
+    .btn-cp{background:none;border:0.5px solid rgba(255,255,255,0.08);color:var(--text-muted);cursor:pointer;padding:5px;border-radius:7px;transition:all .15s var(--ease)}
+    .btn-cp:hover{color:#fff;border-color:rgba(255,255,255,0.15)}
+    .btn-cp.ok{color:#34c759;border-color:#34c759}
+    .enh-txt{padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:#fff;white-space:pre-wrap;word-wrap:break-word;max-height:200px;overflow-y:auto}
+    .imp-list{padding:0 14px 12px}
+    .imp-i{font-size:11px;color:var(--text-dim);padding:2px 0;display:flex;align-items:center;gap:6px;opacity:0;transform:translateY(4px);transition:all .3s var(--ease)}
+    .imp-i.vis{opacity:1;transform:none}
+    .imp-i::before{content:'';width:4px;height:4px;border-radius:50%;background:#34c759}
+
+    /* ══════ BEFORE/AFTER ══════ */
+    .ba{margin-bottom:12px}
+    .ba.hidden{display:none}
+    .ba-cols{display:flex;gap:8px}
+    .ba-col{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden}
+    .ba-hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:0.5px solid rgba(255,255,255,0.04)}
+    .ba-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+    .ba-before{color:#ff453a}
+    .ba-after{color:#34c759}
+    .btn-cps{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:2px;border-radius:3px;transition:color .15s;display:flex;align-items:center}
+    .btn-cps:hover{color:#fff}
+    .ba-txt{padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.5;color:#fff;white-space:pre-wrap;word-wrap:break-word;max-height:150px;overflow-y:auto}
+    .ch-list{margin-top:8px}
+    .ch-i{font-size:11px;color:var(--text-dim);padding:2px 0;display:flex;align-items:center;gap:6px}
+    .ch-i::before{content:'';width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.5)}
+
+    /* ══════ TOKEN EFF ══════ */
+    .tok-eff{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden}
+    .tok-eff.hidden{display:none}
+    .eff-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+    .eff-hdr:hover{background:rgba(255,255,255,0.02)}
+    .eff-pct{margin-left:auto;font-size:11px;color:var(--text-muted)}
+    .eff-chv{transition:transform .2s var(--ease)}
+    .eff-chv.open{transform:rotate(180deg)}
+    .eff-body{display:flex;gap:14px;padding:0 14px 12px}
+    .eff-body.hidden{display:none}
+    .eff-ring{position:relative;width:56px;height:56px;flex-shrink:0}
+    .eff-rp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:700}
+    .eff-det{flex:1}
+    .fill-cnt{font-size:11px;color:var(--text-dim);margin-bottom:6px}
+    .fill-lst{list-style:none;margin-bottom:8px}
+    .fill-lst li{font-size:10px;color:var(--text-muted);padding:2px 0;font-family:'JetBrains Mono',monospace}
+    .fill-lst li::before{content:'';display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.4);margin-right:5px;vertical-align:middle}
+
+    /* ══════ TEMPLATES ══════ */
+    .template-categories{display:flex;gap:4px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
+    .template-categories::-webkit-scrollbar{display:none}
+    .template-cat-btn{padding:5px 12px;border:1px solid rgba(255,255,255,0.08);border-radius:9999px;background:transparent;color:var(--text-muted);font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all .15s var(--ease)}
+    .template-cat-btn:hover{color:var(--text-dim)}
+    .template-cat-btn.active{background:rgba(255,255,255,0.10);color:#fff;border-color:rgba(255,255,255,0.15)}
+    .template-search-wrapper,.history-search-wrapper{position:relative;margin-bottom:10px}
+    .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+    .template-search,.history-search{width:100%;padding:8px 12px 8px 34px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-size:12px;font-family:inherit;outline:none;transition:all .15s var(--ease)}
+    .template-search:focus,.history-search:focus{border-color:rgba(255,255,255,0.20);box-shadow:0 0 0 3px rgba(255,255,255,0.05)}
+    .template-search::placeholder,.history-search::placeholder{color:var(--text-muted)}
+    .templates-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .template-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s var(--ease)}
+    .template-card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+    .template-card-name{font-size:13px;font-weight:600;margin-bottom:3px}
+    .template-card-preview{font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4}
+    .template-card-tag{display:inline-block;font-size:9px;font-weight:600;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;margin-top:6px;text-transform:uppercase}
+    .tmpl-nm{font-size:13px;font-weight:600;margin-bottom:3px}
+    .tmpl-pv{font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4}
+    .tmpl-tg{display:inline-block;font-size:9px;font-weight:600;color:var(--text-dim);background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;margin-top:6px;text-transform:uppercase}
+
+    /* ══════ ENGINEER ══════ */
+    .eng-sec{margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px}
+    .sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .sec-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:.06em}
+    .sec-sub{font-size:10px;color:var(--text-muted)}
+    .chk-score{font-size:11px;font-weight:600}
+    .ver-act{display:flex;gap:4px}
+    #engineer-input{width:100%;height:90px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;resize:vertical;outline:none;transition:all .15s var(--ease)}
+    #engineer-input:focus{border-color:rgba(255,255,255,0.20);box-shadow:0 0 0 3px rgba(255,255,255,0.05)}
+    #engineer-input::placeholder{color:var(--text-muted);font-family:'Inter',sans-serif}
+    .chk-grid{display:flex;flex-direction:column;gap:3px}
+    .chk-i{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;font-size:12px;transition:background .15s}
+    .chk-i.pass{background:rgba(52,199,89,0.04)}
+    .chk-i.fail{background:rgba(255,69,58,0.04)}
+    .chk-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;font-weight:700}
+    .chk-i.pass .chk-ic{background:rgba(52,199,89,0.12);color:#34c759}
+    .chk-i.fail .chk-ic{background:rgba(255,69,58,0.12);color:#ff453a}
+    .chk-lbl{flex:1}
+    .chk-fix{font-size:10px;color:rgba(255,255,255,0.5);max-width:160px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .tech-card{display:flex;align-items:flex-start;gap:8px;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;cursor:pointer;transition:all .15s var(--ease);position:relative}
+    .tech-card:hover{border-color:rgba(255,255,255,0.15)}
+    .tech-card.sel{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.08)}
+    .tech-card input{position:absolute;opacity:0;width:0;height:0}
+    .tech-chk{width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.12);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s var(--ease);margin-top:1px}
+    .tech-card.sel .tech-chk{background:#fff;border-color:#fff}
+    .tech-card.sel .tech-chk::after{content:'';width:6px;height:3px;border-left:2px solid #000;border-bottom:2px solid #000;transform:rotate(-45deg);margin-top:-1px}
+    .tech-nm{font-size:12px;font-weight:600;margin-bottom:2px}
+    .tech-ds{font-size:10px;color:var(--text-muted);line-height:1.4}
+
+    /* ══════ CREDIT ══════ */
+    .cr-sav{margin-top:14px;padding-top:12px;border-top:0.5px solid rgba(255,255,255,0.06)}
+    .cr-int{display:flex;gap:8px;font-size:11px;color:var(--text-dim);margin-bottom:10px;line-height:1.5;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:10px;border:0.5px solid rgba(255,255,255,0.05)}
+    .cr-int strong{color:#fff}
+    .cr-int svg{flex-shrink:0;margin-top:1px;color:rgba(255,255,255,0.5)}
+    .cr-ta{margin-bottom:10px}
+    #credit-input{width:100%;height:70px;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;resize:vertical;outline:none;transition:all .15s var(--ease)}
+    #credit-input:focus{border-color:rgba(255,255,255,0.20);box-shadow:0 0 0 3px rgba(255,255,255,0.05)}
+    #credit-input::placeholder{color:var(--text-muted);font-family:'Inter',sans-serif}
+    .btn-cr{flex:1}
+    .cr-badge{font-size:10px;font-weight:600;color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:9999px;white-space:nowrap}
+
+    /* ══════ HISTORY ══════ */
+    .history-list{min-height:80px}
+    .history-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:12px;margin-bottom:6px;cursor:pointer;transition:all .15s var(--ease)}
+    .history-item:hover{border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.06)}
+    .history-item-text{flex:1;font-size:12px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .history-item-score{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7)}
+    .history-copy-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s var(--ease)}
+    .history-copy-btn:hover{color:#fff;background:rgba(255,255,255,0.06)}
+    .history-star{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;transition:color .15s}
+    .history-star:hover,.history-star.active{color:#fbbf24}
+    .empty-state{text-align:center;padding:24px 16px}
+    .empty-state p{color:var(--text-muted);font-size:12px}
+    .empty-state .sub{font-size:11px;opacity:.5;margin-top:4px}
+    .empty-state.sm{padding:14px 8px}
+    .btn-del{padding:6px 14px;background:transparent;border:1px solid rgba(255,69,58,0.20);border-radius:8px;color:#ff453a;font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .15s var(--ease);margin-top:8px}
+    .btn-del:hover{background:rgba(255,69,58,0.06)}
+
+    /* ══════ TIPS ══════ */
+    .tips-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.06)}
+    .tips-arr{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px;border-radius:6px;transition:color .15s;display:flex;align-items:center}
+    .tips-arr:hover{color:#fff}
+    .tips-txt{flex:1;font-size:11px;color:var(--text-muted);text-align:center}
+
+    /* ══════ MODAL ══════ */
+    .modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center}
+    .modal.hidden{display:none}
+    .modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.60);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .modal-box{position:relative;width:90%;max-width:440px;max-height:80vh;overflow-y:auto;background:rgba(16,16,24,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.10);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,0.5)}
+    .modal-top{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 0}
+    .modal-t{font-size:15px;font-weight:700}
+    .modal-x{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:6px;border-radius:8px;transition:all .15s var(--ease)}
+    .modal-x:hover{color:#fff;background:rgba(255,255,255,0.06)}
+    .modal-body{padding:18px 22px 22px}
+    .set-sec{margin-bottom:18px}
+    .set-title{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+    .set-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0}
+    .set-lbl{font-size:13px}
+    .set-inp{width:180px;padding:7px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#fff;font-size:12px;font-family:'JetBrains Mono',monospace;outline:none}
+    .set-inp:focus{border-color:rgba(255,255,255,0.20)}
+    .tog{position:relative;width:38px;height:22px;cursor:pointer}
+    .tog input{opacity:0;width:0;height:0}
+    .tog-sl{position:absolute;inset:0;background:rgba(255,255,255,0.10);border-radius:22px;transition:all .2s var(--ease)}
+    .tog-sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:all .2s var(--ease)}
+    input:checked+.tog-sl{background:#34c759}
+    input:checked+.tog-sl::before{transform:translateX(16px)}
+
+    /* ══════ HOW IT WORKS ══════ */
+    .how{position:relative;padding:80px 24px;overflow:hidden}
+    .how .bg{opacity:0.50}
+    .how-in{position:relative;z-index:2;max-width:880px;margin:0 auto}
+    .sec-tag{display:inline-block;padding:5px 14px;border-radius:9999px;background:rgba(255,255,255,0.08);backdrop-filter:blur(16px);border:0.5px solid rgba(255,255,255,0.10);font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+    .sec-t{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-0.03em;text-align:center;margin-bottom:44px}
+    .sec-t .dim{color:var(--text-muted)}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .step{padding:24px 20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;transition:all .3s var(--ease)}
+    .step:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.25)}
+    .step-n{font-size:28px;font-weight:700;color:rgba(255,255,255,0.15);margin-bottom:8px;line-height:1}
+    .step-t{font-size:15px;font-weight:600;margin-bottom:4px}
+    .step-d{font-size:13px;color:var(--text-dim);line-height:1.5}
+
+    /* ══════ PLATFORMS ══════ */
+    .plats{position:relative;padding:40px 24px 80px;overflow:hidden;text-align:center}
+    .plats .bg{opacity:0.45}
+    .plats-in{position:relative;z-index:2;max-width:780px;margin:0 auto}
+    .plats-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}
+    .plat-chip{padding:6px 14px;border-radius:9999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);font-size:13px;font-weight:500;color:var(--text-dim);transition:all .15s var(--ease)}
+    .plat-chip:hover{border-color:rgba(255,255,255,0.15);color:#fff}
+
+    /* ══════ FOOTER ══════ */
+    footer{text-align:center;padding:28px 24px 40px;font-size:12px;color:var(--text-muted);border-top:1px solid rgba(255,255,255,0.06)}
+
+    /* ══════ TOAST ══════ */
+    #toast-container{position:fixed;top:64px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+    .toast{padding:10px 16px;border-radius:10px;background:rgba(16,16,24,0.90);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.10);color:#fff;font-size:12px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+    .toast.cyan{border-color:rgba(255,255,255,0.15)}
+    .toast.crimson{border-color:rgba(255,69,58,0.30);color:#ff453a}
+
+    /* ══════ RESPONSIVE ══════ */
+    @media(max-width:768px){.nav{padding:0 16px}.nav-links{display:none}.hero-h1{letter-spacing:-0.03em}.app-wrap{padding:0 14px 60px}.steps{grid-template-columns:1fr}.templates-grid{grid-template-columns:1fr}.tech-grid{grid-template-columns:1fr}.ba-cols{flex-direction:column}}
+  </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav class="nav" id="mainNav">
-  <a href="#" class="nav-brand">
-    <div class="nav-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
-      </svg>
-    </div>
-    Vibe Check
+    <a href="#" class="nav-brand">
+    <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <span class="nav-name">Vibe Check</span>
   </a>
-
   <div class="nav-links">
     <button class="nav-link active" data-tab="enhance">Enhance</button>
     <button class="nav-link" data-tab="templates">Templates</button>
     <button class="nav-link" data-tab="engineer">Engineer</button>
     <button class="nav-link" data-tab="history">History</button>
   </div>
-
-  <button class="nav-icon-btn" id="settings-btn" title="Settings">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-    </svg>
-  </button>
+  <div class="nav-actions">
+    <a href="#app" class="nav-icon-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></a>
+    <button class="nav-icon-btn" id="settings-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+  </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
+  <img class="hero-img" src="assets/bg-light-streaks.jpg" alt="">
+  <div class="hero-gradient"></div>
   <div class="hero-content">
-    <div class="hero-pill">
-      <span class="dot"></span>
-      Offline Prompt Toolkit
-    </div>
-    <h1>Write <em>better</em><br>prompts.</h1>
-    <p>Enhance, score and organize prompts locally in your browser. No AI service needed.</p>
-    <a href="#app" class="hero-btn">Start Writing →</a>
+    <div class="hero-pill"><span class="hero-pill-dot"></span>AI-Powered Prompt Engineering</div>
+    <h1 class="hero-h1">Write <em>better</em><br>prompts.</h1>
+    <p class="hero-p">Enhance, score, and engineer prompts with AI. Built for v0, Bolt, Cursor, ChatGPT, Claude, and any coding tool.</p>
+    <a href="#app" class="hero-btn">Start Writing <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
   </div>
 </section>
 
-<!-- MAIN APP -->
+<!-- APP -->
+<div class="app-bg">
+  <img class="app-bg-img" src="assets/bg-light-streaks.jpg" alt="">
+  <div class="app-bg-frost"></div>
+</div>
 <section id="app" class="app-wrap">
   <div class="glass">
-
     <div class="app-top">
-      <div class="app-logo">
-        <div class="logo-ic">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-            <path d="M2 17l10 5 10-5"/>
-            <path d="M2 12l10 5 10-5"/>
-          </svg>
-        </div>
-        <span>VIBE CHECK</span>
+      <div class="app-logo"><div class="app-logo-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+      <span class="app-logo-t">VIBE CHECK</span>
       </div>
-
-      <div class="app-tabs">
+      <nav class="app-tabs">
         <button class="tab-btn active" data-tab="enhance">Enhance</button>
         <button class="tab-btn" data-tab="templates">Templates</button>
         <button class="tab-btn" data-tab="engineer">Engineer</button>
         <button class="tab-btn" data-tab="history">History</button>
-      </div>
+      </nav>
     </div>
-
     <div id="tab-content">
-
-      <!-- ENHANCE TAB -->
       <div class="tab-panel active" id="panel-enhance">
-        <div class="textarea-wrap">
-          <textarea id="prompt-input" placeholder="Type or paste your prompt here..."></textarea>
-          <div class="input-meta">
-            <span id="word-count">0 words · 0 characters</span>
-          </div>
-        </div>
-
-        <div class="action-row">
-          <button class="btn-enhance" id="btn-enhance" disabled>
-            <span class="btn-label">Enhance Prompt</span>
-            <span class="btn-spinner"></span>
-          </button>
-        </div>
-
-        <div id="score-display" class="score-box hidden">
-          <div class="score-num" id="score-number">0</div>
-          <div class="score-lbl" id="score-label">Prompt Quality</div>
-          <div id="score-bars"></div>
-        </div>
-
-        <div id="enhanced-area" class="enhanced-box hidden">
-          <div class="enh-hdr">
-            <span>✓ Enhanced</span>
-            <button class="btn-outline btn-sm" id="btn-copy-enhanced">Copy</button>
-          </div>
-          <pre class="enh-txt" id="enhanced-text"></pre>
-          <div class="imp-list" id="improvements-list"></div>
-        </div>
-
-        <div id="before-after" class="hidden">
-          <div class="ba-cols">
-            <div class="ba-col">
-              <div class="ba-hdr"><span class="ba-before">Before</span></div>
-              <pre class="ba-txt" id="before-text"></pre>
-            </div>
-            <div class="ba-col">
-              <div class="ba-hdr"><span class="ba-after">After</span></div>
-              <pre class="ba-txt" id="after-text"></pre>
-            </div>
-          </div>
-        </div>
+        <div id="stack-badge" class="stack-badge hidden"><span class="stack-dot"></span><span class="stack-lbl">Currently on:</span><span class="stack-nm" id="stack-name"></span></div>
+        <div id="stack-tips" class="stack-tips hidden"><div class="tips-hdr">Tips for <span id="tips-stack-name"></span>:</div><ul id="tips-list"></ul></div>
+        <div class="textarea-wrap"><textarea id="prompt-input" placeholder="Type or paste your prompt here..." maxlength="5000"></textarea><div class="input-meta"><span id="word-count">0 words &middot; 0 characters</span><span id="complexity-badge" class="complexity-badge hidden"></span></div></div>
+        <div class="action-row"><button class="btn-enhance" id="btn-enhance" disabled><svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span class="btn-label">Enhance Prompt</span><span class="btn-spinner"></span></button><button class="btn-icon-only hidden" id="btn-undo" title="Undo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button><button class="btn-icon-only hidden" id="btn-redo" title="Redo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:scaleX(-1)"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button></div>
+        <div id="score-display" class="score-box hidden"><div style="display:flex;align-items:baseline;gap:2px"><span class="score-num" id="score-number">0</span><span class="score-div">/</span><span class="score-max">100</span></div><div class="score-lbl" id="score-label"></div><div class="score-bars" id="score-bars"></div><div class="score-fb" id="score-feedback"></div></div>
+        <div id="enhanced-area" class="enhanced-box hidden"><div class="enh-hdr"><span class="enh-t"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Enhanced</span><button class="btn-cp" id="btn-copy-enhanced"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div><pre class="enh-txt" id="enhanced-text"></pre><div class="imp-list" id="improvements-list"></div></div>
+        <div id="before-after" class="ba hidden"><div class="ba-cols"><div class="ba-col"><div class="ba-hdr"><span class="ba-lbl ba-before">Before</span><button class="btn-cps" id="btn-copy-before"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div><pre class="ba-txt" id="before-text"></pre></div><div class="ba-col"><div class="ba-hdr"><span class="ba-lbl ba-after">After</span><button class="btn-cps" id="btn-copy-after"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div><pre class="ba-txt" id="after-text"></pre></div></div><div class="ch-list" id="changes-list"></div></div>
+        <div id="token-efficiency" class="tok-eff hidden"><div class="eff-hdr" id="efficiency-toggle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Token Efficiency</span><span class="eff-pct" id="efficiency-pct"></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eff-chv"><polyline points="6 9 12 15 18 9"/></svg></div><div class="eff-body hidden" id="efficiency-body"><div class="eff-ring"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3.5"/><circle id="efficiency-ring" cx="28" cy="28" r="24" fill="none" stroke="#fff" stroke-width="3.5" stroke-dasharray="150.8" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 28 28)"/></svg><span class="eff-rp" id="ring-percent">100%</span></div><div class="eff-det"><div class="fill-cnt" id="filler-count"></div><ul class="fill-lst" id="filler-list"></ul><button class="btn-outline btn-sm" id="btn-strip-filler"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Strip Filler</button></div></div></div>
       </div>
-
-      <!-- TEMPLATES TAB -->
-      <div class="tab-panel" id="panel-templates">
-        <div class="template-categories">
-          <button class="template-cat-btn active" data-category="ui-components">UI Components</button>
-          <button class="template-cat-btn" data-category="full-apps">Full Apps</button>
-          <button class="template-cat-btn" data-category="fixes">Fixes</button>
-          <button class="template-cat-btn" data-category="api-backend">API</button>
-          <button class="template-cat-btn" data-category="code-prompts">Code</button>
-        </div>
-
-        <div class="search-wrap">
-          <input type="text" id="template-search" placeholder="Search templates...">
-        </div>
-
-        <div class="templates-grid" id="templates-grid"></div>
-      </div>
-
-      <!-- ENGINEER TAB -->
+      <div class="tab-panel" id="panel-templates"><div class="template-categories" id="templates-category-tabs"><button class="template-cat-btn active" data-category="ui-components">UI Components</button><button class="template-cat-btn" data-category="full-apps">Full Apps</button><button class="template-cat-btn" data-category="fixes">Fixes</button><button class="template-cat-btn" data-category="api-backend">API</button><button class="template-cat-btn" data-category="ai-prompts">AI</button></div><div class="template-search-wrapper"><svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="template-search" id="template-search" placeholder="Search templates..."></div><div class="templates-grid" id="templates-grid"></div></div>
       <div class="tab-panel" id="panel-engineer">
         <div class="eng-sec">
-          <div class="sec-hdr">
-            <span class="sec-lbl">Source Prompt</span>
-            <button class="btn-outline btn-sm" id="btn-use-last">Use Last Enhanced</button>
-          </div>
-          <textarea id="engineer-input" placeholder="Paste your prompt here..."></textarea>
+          <div class="sec-hdr"><span class="sec-lbl">Source Prompt</span><button class="btn-outline btn-sm" id="btn-engineer-from-enhance">Use last enhanced</button></div>
+          <textarea id="engineer-input" placeholder="Paste or type your prompt to engineer..." maxlength="5000"></textarea>
+          <div class="input-meta"><span id="engineer-word-count">0 words &middot; 0 characters</span></div>
         </div>
-
         <div class="eng-sec">
-          <div class="sec-hdr">
-            <span class="sec-lbl">Quality Checklist</span>
-            <span id="checklist-score">0/6</span>
-          </div>
-          <div id="checklist-grid"></div>
+          <div class="sec-hdr"><span class="sec-lbl">Quality Checklist</span><span class="chk-score" id="checklist-score"></span></div>
+          <div class="chk-grid" id="checklist-grid"></div>
         </div>
-
         <div class="eng-sec">
-          <div class="sec-hdr">
-            <span class="sec-lbl">Apply Techniques</span>
-            <button class="btn-outline btn-sm" id="btn-apply">Apply Selected</button>
-          </div>
+          <div class="sec-hdr"><span class="sec-lbl">Apply Techniques</span><button class="btn-outline btn-sm" id="btn-apply-techniques">Apply Selected</button></div>
           <div class="tech-grid" id="techniques-grid"></div>
         </div>
-      </div>
-
-      <!-- HISTORY TAB -->
-      <div class="tab-panel" id="panel-history">
-        <div id="history-list">
-          <div class="empty-state">No prompts yet. Enhance one to start building history.</div>
+        <div class="eng-sec">
+          <div class="sec-hdr"><span class="sec-lbl">Prompt Variants</span><button class="btn-outline btn-sm" id="btn-generate-variants">Generate</button></div>
+          <div id="variants-container"><div class="empty sm"><p>Click Generate to create 3 variations</p></div></div>
         </div>
-        <button class="btn-outline btn-red" id="btn-clear-history" style="margin-top:12px">Clear All History</button>
+        <div class="eng-sec">
+          <div class="sec-hdr"><span class="sec-lbl">Version History</span><div class="ver-act"><button class="btn-outline btn-sm" id="btn-save-version">Save</button><button class="btn-outline btn-sm" id="btn-clear-versions">Clear</button></div></div>
+          <div id="versions-list"><div class="empty sm"><p>No versions saved</p></div></div>
+        </div>
+        <div class="eng-sec cr-sav">
+          <div class="sec-hdr"><span class="sec-lbl">Credit Saver</span><span class="sec-sub">English to Chinese</span></div>
+          <div class="cr-int">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>Chinese uses ~60% fewer tokens. Save on <strong>any</strong> provider.</span>
+          </div>
+          <div class="textarea-wrap cr-ta">
+            <textarea id="credit-input" placeholder="Paste your English prompt..." maxlength="5000" spellcheck="false"></textarea>
+            <div class="input-meta"><span id="credit-word-count">0 words &middot; 0 characters</span></div>
+          </div>
+          <div class="action-row">
+            <button class="btn-enhance btn-cr" id="btn-credit-transform" disabled>
+              <svg class="btn-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 8l6 6M5 8l-6 6M5 8v12"/><path d="M19 4v14"/><path d="M16 4l3-3 3 3"/></svg>
+              <span class="btn-label">Transform</span><span class="btn-spinner"></span>
+            </button>
+            <span class="cr-badge">Save ~60%</span>
+          </div>
+          <div id="credit-result" class="enhanced-box hidden">
+            <div class="enh-hdr"><span class="enh-t">Chinese Prompt</span><button class="btn-cp" id="btn-copy-credit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
+            <pre class="enh-txt" id="credit-text"></pre>
+          </div>
+        </div>
       </div>
-
+      <div class="tab-panel" id="panel-history"><div class="history-search-wrapper"><svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" class="history-search" id="history-search" placeholder="Search prompts..."></div><div class="history-list" id="history-list"><div class="empty-state" id="history-empty"><p>No prompts yet.</p><p class="sub">Enhance your first prompt to build history.</p></div></div><button class="btn-del" id="btn-clear-history">Clear All History</button></div>
     </div>
-
-    <div class="tips-bar">
-      <button class="tips-arr" id="tip-prev">‹</button>
-      <span id="tip-text">Tip: Specify edge cases for fewer revision loops.</span>
-      <button class="tips-arr" id="tip-next">›</button>
-    </div>
+    <div class="tips-bar"><button class="tips-arr" id="tip-prev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><span class="tips-txt" id="tip-text"></span><button class="tips-arr" id="tip-next"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button></div>
   </div>
 </section>
 
-<!-- SETTINGS MODAL -->
-<div id="settings-modal" class="modal hidden">
-  <div class="modal-bg" id="settings-backdrop"></div>
-  <div class="modal-box">
-    <div class="modal-top">
-      <span>Settings</span>
-      <button id="settings-close">×</button>
-    </div>
-    <div class="set-row">
-      <span>Show Before / After</span>
-      <label class="tog">
-        <input type="checkbox" id="setting-before-after" checked>
-        <span class="tog-sl"></span>
-      </label>
-    </div>
-    <div style="margin-top:20px;display:flex;gap:8px">
-      <button class="btn-outline" id="btn-export">Export Data</button>
-      <button class="btn-outline btn-red" id="btn-reset">Reset All</button>
-    </div>
-  </div>
-</div>
+<!-- MODAL -->
+<div id="settings-modal" class="modal hidden"><div class="modal-bg" id="settings-backdrop"></div><div class="modal-box"><div class="modal-top"><span class="modal-t">Settings</span><button class="modal-x" id="settings-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="modal-body"><div class="set-sec"><div class="set-title">Behavior</div><div class="set-row"><label class="set-lbl" for="setting-auto-stack">Auto-detect stack</label><label class="tog"><input type="checkbox" id="setting-auto-stack" checked><span class="tog-sl"></span></label></div><div class="set-row"><label class="set-lbl" for="setting-token-eff">Token efficiency</label><label class="tog"><input type="checkbox" id="setting-token-eff" checked><span class="tog-sl"></span></label></div><div class="set-row"><label class="set-lbl" for="setting-before-after">Before/after</label><label class="tog"><input type="checkbox" id="setting-before-after" checked><span class="tog-sl"></span></label></div></div><div class="set-sec"><div class="set-title">Data</div><button class="btn-outline" id="btn-export">Export</button> <button class="btn-outline btn-red" id="btn-clear-data">Clear All</button></div><button class="btn-outline btn-sm" id="btn-reset-settings">Reset</button></div></div></div>
+<input type="file" id="import-file-input" accept=".json" style="display:none">
 
 <!-- HOW IT WORKS -->
-<section class="how">
-  <div class="sec-tag">How It Works</div>
-  <h2>Three steps to better prompts</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-n">01</div>
-      <div class="step-t">Type Your Prompt</div>
-      <div class="step-d">Write what you want. Even a rough idea is fine.</div>
-    </div>
-    <div class="step">
-      <div class="step-n">02</div>
-      <div class="step-t">Enhance</div>
-      <div class="step-d">The tool rewrites it with better structure and constraints.</div>
-    </div>
-    <div class="step">
-      <div class="step-n">03</div>
-      <div class="step-t">Copy & Use</div>
-      <div class="step-d">Paste the improved prompt into Cursor, v0, Bolt, etc.</div>
+<section class="how section-img" id="how">
+  <img class="bg" src="assets/bg-light-flow.jpg" alt="">
+  <div class="frost"></div>
+  <div class="how-in">
+    <div style="text-align:center"><div class="sec-tag">How It Works</div></div>
+    <h2 class="sec-t">Three steps to <span class="dim">better prompts</span></h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><div class="step-t">Type Your Prompt</div><div class="step-d">Write what you want to build. Even a rough idea works.</div></div>
+      <div class="step"><div class="step-n">02</div><div class="step-t">Enhance or Engineer</div><div class="step-d">AI rewrites it with structure, tech stack, and constraints.</div></div>
+      <div class="step"><div class="step-n">03</div><div class="step-t">Copy & Build</div><div class="step-d">Paste into any AI coding tool. Ship it.</div></div>
     </div>
   </div>
 </section>
 
-<footer>Vibe Check — Prompt Toolkit</footer>
+<!-- PLATFORMS -->
+<section class="plats section-img" id="platforms">
+  <img class="bg" src="assets/bg-firefly.jpg" alt="">
+  <div class="frost"></div>
+  <div class="plats-in">
+    <div class="sec-tag">Works With</div>
+    <h2 class="sec-t" style="font-size:clamp(22px,3vw,32px)">Any AI coding <span class="dim">platform</span></h2>
+    <div class="plats-grid">
+      <div class="plat-chip">v0</div><div class="plat-chip">Bolt</div><div class="plat-chip">Lovable</div><div class="plat-chip">Cursor</div>
+      <div class="plat-chip">ChatGPT</div><div class="plat-chip">Claude</div><div class="plat-chip">Gemini</div><div class="plat-chip">Perplexity</div>
+      <div class="plat-chip">DeepSeek</div><div class="plat-chip">Replit</div><div class="plat-chip">StackBlitz</div><div class="plat-chip">GitHub Copilot</div>
+      <div class="plat-chip">Phind</div><div class="plat-chip">Windsurf</div><div class="plat-chip">Cody</div>
+    </div>
+  </div>
+</section>
 
-<div id="toast-container"></div>
+<footer><span>Vibe Check — AI Prompt Engineer</span></footer>
 
+<script src="popup/popup.js"></script>
 <script>
-// ====================== DATA ======================
-const TEMPLATES = [
-  { name: "Responsive Navbar", category: "ui-components", tag: "UI", text: "Build a responsive navigation bar with mobile hamburger menu, smooth active state transitions, accessible ARIA attributes, and dynamic scroll blur." },
-  { name: "Modern Landing Page", category: "ui-components", tag: "UI", text: "Create a high-converting modern landing page with a glassmorphic hero section, feature grid cards, interactive pricing toggle, and animated footer." },
-  { name: "Analytics Dashboard", category: "full-apps", tag: "APP", text: "Build an interactive SaaS analytics dashboard with collapsible sidebar, summary statistics cards, real-time filtering, data table, and light/dark theme toggle." },
-  { name: "Task Manager App", category: "full-apps", tag: "APP", text: "Create a complete task management application featuring drag-and-drop Kanban columns, category tagging, search filter, local storage persistence, and task analytics." },
-  { name: "Fix Mobile Layout Bug", category: "fixes", tag: "FIX", text: "Diagnose and fix mobile viewport overflow issues, unclickable button elements, and broken flex wrap layouts across screens smaller than 640px without affecting desktop styles." },
-  { name: "Debug Runtime Exception", category: "fixes", tag: "FIX", text: "Examine the provided code, identify the root cause of the silent state mutation or null pointer exception, implement proper defensive checks, and return clean working code." },
-  { name: "REST API CRUD Endpoints", category: "api-backend", tag: "API", text: "Build production-ready REST API CRUD endpoints with request body validation, pagination, structured error responses, and proper HTTP status code handling." },
-  { name: "Firebase Firestore Integration", category: "api-backend", tag: "API", text: "Integrate Firebase v9 SDK for real-time Firestore database queries, optimistic UI updates, error catching, and secure authentication state management." },
-  { name: "Senior Code Architect", category: "code-prompts", tag: "AI", text: "Act as a Senior Software Engineer. Refactor the code for optimal computational performance, strict type safety, modular architecture, and maximum code readability." },
-  { name: "Code Reviewer & Auditor", category: "code-prompts", tag: "AI", text: "Audit the codebase for potential security vulnerabilities, memory leaks, performance bottlenecks, and compliance with accessibility (WCAG 2.1) standards." }
-];
+(function(){
+  var nav=document.getElementById('mainNav');
+  addEventListener('scroll',function(){nav.classList.toggle('scrolled',scrollY>60)},{passive:true});
 
-const TIPS = [
-  "Tip: Specify edge cases (empty states, offline) for fewer revision loops.",
-  "Tip: State the role, task, inputs, constraints and expected output clearly.",
-  "Tip: Use negative constraints ('Do NOT use external libraries') to avoid bloat.",
-  "Tip: Remove filler words and keep instructions direct.",
-  "Tip: Include test scenarios so the AI generates unit tests automatically."
-];
+  // Credit Saver Transform
+  var creditInput = document.getElementById('credit-input');
+  var btnCredit = document.getElementById('btn-credit-transform');
+  var creditResult = document.getElementById('credit-result');
+  var creditText = document.getElementById('credit-text');
+  var btnCopyCredit = document.getElementById('btn-copy-credit');
+  var creditWordCount = document.getElementById('credit-word-count');
 
-const ENGINEER_CHECKS = [
-  { name: "Clear Action Verb", test: t => /build|create|make|develop|design|fix|refactor|debug|write|generate/i.test(t), hint: "Add a clear action verb" },
-  { name: "Context Length", test: t => t.length >= 60, hint: "Add more context (at least 60 characters)" },
-  { name: "Explicit Constraints", test: t => /must|should|without|only|limit|avoid|never|don't/i.test(t), hint: "Add constraints or boundaries" },
-  { name: "Output Format", test: t => /return|output|provide|format|json|code|html|css/i.test(t), hint: "Specify desired output structure" },
-  { name: "Edge Cases", test: t => /test|working|responsive|validation|error|empty|loading/i.test(t), hint: "Mention error handling or edge cases" },
-  { name: "Detailed Scope", test: t => t.length >= 120, hint: "Provide more detail for better results" }
-];
-
-const TECHNIQUES = [
-  { id: "role", name: "Expert Persona", desc: "Assign principal engineer role" },
-  { id: "context", name: "Project Context", desc: "Add architecture background" },
-  { id: "constraints", name: "Strict Constraints", desc: "Define clear boundaries" },
-  { id: "output", name: "Output Schema", desc: "Demand complete runnable code" },
-  { id: "testing", name: "Validation Suite", desc: "Require unit test cases" },
-  { id: "examples", name: "Step-by-step", desc: "Ask for reasoning breakdown" }
-];
-
-// ====================== STATE ======================
-let state = {
-  history: JSON.parse(localStorage.getItem("vibe_history") || "[]"),
-  settings: JSON.parse(localStorage.getItem("vibe_settings") || '{"beforeAfter":true}'),
-  lastEnhanced: "",
-  tipIndex: 0
-};
-
-// ====================== INIT ======================
-document.addEventListener("DOMContentLoaded", () => {
-  // Tabs
-  document.querySelectorAll(".nav-link, .tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
-  });
-
-  // Scroll effect on nav
-  window.addEventListener("scroll", () => {
-    document.getElementById("mainNav").classList.toggle("scrolled", window.scrollY > 40);
-  });
-
-  // Prompt input
-  const input = document.getElementById("prompt-input");
-  input.addEventListener("input", () => {
-    updateCounter(input.value, document.getElementById("word-count"));
-    document.getElementById("btn-enhance").disabled = !input.value.trim();
-  });
-
-  document.getElementById("btn-enhance").addEventListener("click", performEnhance);
-  document.getElementById("btn-copy-enhanced").addEventListener("click", () => {
-    copyText(document.getElementById("enhanced-text").textContent);
-  });
-
-  // Templates
-  document.querySelectorAll(".template-cat-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".template-cat-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderTemplates();
+  if (creditInput && btnCredit) {
+    creditInput.addEventListener('input', function() {
+      var val = creditInput.value.trim();
+      btnCredit.disabled = val.length === 0;
+      if (creditWordCount) {
+        var words = val ? val.split(/\s+/).length : 0;
+        creditWordCount.textContent = words + ' words \u00b7 ' + val.length + ' characters';
+      }
     });
-  });
-  document.getElementById("template-search").addEventListener("input", renderTemplates);
 
-  // Engineer
-  document.getElementById("engineer-input").addEventListener("input", renderChecklist);
-  document.getElementById("btn-use-last").addEventListener("click", () => {
-    const src = state.lastEnhanced || document.getElementById("prompt-input").value;
-    if (!src.trim()) return showToast("Enhance a prompt first");
-    document.getElementById("engineer-input").value = src;
-    renderChecklist();
-    showToast("Loaded into Engineer");
-  });
-  document.getElementById("btn-apply").addEventListener("click", applyTechniques);
-
-  // History
-  document.getElementById("btn-clear-history").addEventListener("click", () => {
-    if (confirm("Clear all history?")) {
-      state.history = [];
-      localStorage.removeItem("vibe_history");
-      renderHistory();
-      showToast("History cleared");
-    }
-  });
-
-  // Settings
-  document.getElementById("settings-btn").addEventListener("click", () => {
-    document.getElementById("settings-modal").classList.remove("hidden");
-  });
-  document.getElementById("settings-close").addEventListener("click", closeSettings);
-  document.getElementById("settings-backdrop").addEventListener("click", closeSettings);
-
-  document.getElementById("btn-export").addEventListener("click", () => {
-    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-    const a = document.createElement("a");
-    a.href = data;
-    a.download = "vibe_check_backup.json";
-    a.click();
-    showToast("Exported!");
-  });
-
-  document.getElementById("btn-reset").addEventListener("click", () => {
-    if (confirm("Reset everything?")) {
-      localStorage.clear();
-      location.reload();
-    }
-  });
-
-  // Tips
-  document.getElementById("tip-prev").addEventListener("click", () => {
-    state.tipIndex = (state.tipIndex - 1 + TIPS.length) % TIPS.length;
-    document.getElementById("tip-text").textContent = TIPS[state.tipIndex];
-  });
-  document.getElementById("tip-next").addEventListener("click", () => {
-    state.tipIndex = (state.tipIndex + 1) % TIPS.length;
-    document.getElementById("tip-text").textContent = TIPS[state.tipIndex];
-  });
-
-  // First render
-  renderTemplates();
-  renderChecklist();
-  renderTechniques();
-  renderHistory();
-});
-
-// ====================== CORE FUNCTIONS ======================
-function switchTab(name) {
-  document.querySelectorAll(".nav-link, .tab-btn").forEach(el => {
-    el.classList.toggle("active", el.dataset.tab === name);
-  });
-  document.querySelectorAll(".tab-panel").forEach(p => {
-    p.classList.toggle("active", p.id === "panel-" + name);
-  });
-}
-
-function updateCounter(text, el) {
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  el.textContent = words + " words · " + text.length + " characters";
-}
-
-function performEnhance() {
-  const input = document.getElementById("prompt-input");
-  const raw = input.value.trim();
-  if (!raw) return;
-
-  const btn = document.getElementById("btn-enhance");
-  btn.classList.add("loading");
-  btn.disabled = true;
-
-  setTimeout(() => {
-    btn.classList.remove("loading");
-    btn.disabled = false;
-
-    // Build enhanced prompt based on what the user actually wrote
-    const enhanced = buildEnhancedPrompt(raw);
-
-    state.lastEnhanced = enhanced;
-    document.getElementById("enhanced-text").textContent = enhanced;
-
-    document.getElementById("improvements-list").innerHTML = `
-      <div class="imp-i">Kept your original request as the main goal</div>
-      <div class="imp-i">Added clear role and structure</div>
-      <div class="imp-i">Added practical requirements and edge cases</div>
-      <div class="imp-i">Specified clean output format</div>
-    `;
-    document.getElementById("enhanced-area").classList.remove("hidden");
-
-    calculateScore(raw);
-
-    if (state.settings.beforeAfter !== false) {
-      document.getElementById("before-text").textContent = raw;
-      document.getElementById("after-text").textContent = enhanced;
-      document.getElementById("before-after").classList.remove("hidden");
-    }
-
-    // Save to history
-    state.history.unshift({
-      id: Date.now(),
-      original: raw,
-      enhanced: enhanced,
-      score: document.getElementById("score-number").textContent
+    btnCredit.addEventListener('click', async function() {
+      var prompt = creditInput.value.trim();
+      if (!prompt) return;
+      btnCredit.classList.add('loading');
+      btnCredit.disabled = true;
+      creditResult.classList.add('hidden');
+      try {
+        var resp = await fetch('/api/enhance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt, mode: 'chinese' })
+        });
+        var data = await resp.json();
+        if (data.enhanced) {
+          creditText.textContent = data.enhanced;
+          creditResult.classList.remove('hidden');
+        } else {
+          alert(data.error || 'Transform failed');
+        }
+      } catch (e) {
+        alert('Network error: ' + e.message);
+      } finally {
+        btnCredit.classList.remove('loading');
+        btnCredit.disabled = false;
+      }
     });
-    if (state.history.length > 40) state.history.pop();
-    localStorage.setItem("vibe_history", JSON.stringify(state.history));
-    renderHistory();
-
-    showToast("Prompt enhanced successfully!");
-  }, 400);
-}
-
-// This function makes the enhanced prompt relevant to what the user typed
-function buildEnhancedPrompt(userText) {
-  let techNote = "";
-  if (/react|next|vue|angular/i.test(userText)) {
-    techNote = "- Prefer modern component-based architecture and clean hooks/composables.\n";
-  }
-  if (/tailwind|css|style/i.test(userText)) {
-    techNote += "- Use clean, maintainable styling (preferably utility-first if possible).\n";
-  }
-  if (/api|backend|server|firebase|node/i.test(userText)) {
-    techNote += "- Include proper error handling, validation and security best practices.\n";
-  }
-  if (/mobile|responsive|app/i.test(userText)) {
-    techNote += "- Make sure the result works well on both desktop and mobile.\n";
   }
 
-  return `You are a skilled senior developer and product-minded engineer.
-
-GOAL
-${userText}
-
-REQUIREMENTS
-- Deliver a clean, production-ready solution.
-- Keep the code readable and well structured.
-- Handle edge cases properly (loading, empty, error states).
-${techNote}- Make it responsive and accessible where it makes sense.
-
-OUTPUT
-- Return complete, working code.
-- Do not leave placeholder comments or incomplete parts.
-- Organize the code clearly if multiple files are needed.`;
-}
-
-function calculateScore(text) {
-  let clarity = Math.min(25, Math.floor(text.length / 4));
-  let context = /build|create|make|develop|design|fix|write|generate|app|page|component/i.test(text) ? 20 : 8;
-  let constraints = /must|should|without|only|limit|avoid|never|don't|please/i.test(text) ? 20 : 6;
-  let format = /return|output|provide|format|json|code|html|css|js/i.test(text) ? 20 : 7;
-  let edge = /test|working|responsive|validation|error|empty|loading|mobile/i.test(text) ? 15 : 5;
-
-  const total = Math.min(100, clarity + context + constraints + format + edge);
-  document.getElementById("score-number").textContent = total;
-
-  let label = "Needs more detail";
-  if (total >= 80) label = "Excellent Prompt";
-  else if (total >= 60) label = "Good foundation";
-  else if (total >= 40) label = "Moderate — can be improved";
-
-  document.getElementById("score-label").textContent = label;
-
-  document.getElementById("score-bars").innerHTML = `
-    ${bar("Clarity", clarity, 25)}
-    ${bar("Context", context, 20)}
-    ${bar("Constraints", constraints, 20)}
-    ${bar("Format", format, 20)}
-    ${bar("Edge Cases", edge, 15)}
-  `;
-  document.getElementById("score-display").classList.remove("hidden");
-
-  setTimeout(() => {
-    document.querySelectorAll(".score-bar-f").forEach(el => {
-      el.style.width = el.dataset.w + "%";
+  if (btnCopyCredit && creditText) {
+    btnCopyCredit.addEventListener('click', function() {
+      navigator.clipboard.writeText(creditText.textContent).then(function() {
+        btnCopyCredit.classList.add('copied');
+        setTimeout(function() { btnCopyCredit.classList.remove('copied'); }, 1500);
+      });
     });
-  }, 40);
-}
-
-function bar(label, val, max) {
-  const pct = Math.round((val / max) * 100);
-  return `<div class="score-bar">
-    <span class="score-bar-l">${label}</span>
-    <div class="score-bar-t"><div class="score-bar-f" data-w="${pct}"></div></div>
-    <span style="width:32px;text-align:right;font-size:10px;color:var(--text-muted)">${val}/${max}</span>
-  </div>`;
-}
-
-function renderTemplates() {
-  const cat = document.querySelector(".template-cat-btn.active").dataset.category;
-  const q = document.getElementById("template-search").value.toLowerCase();
-  const list = TEMPLATES.filter(t => t.category === cat && (t.name.toLowerCase().includes(q) || t.text.toLowerCase().includes(q)));
-
-  const grid = document.getElementById("templates-grid");
-  if (!list.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">No templates found</div>`;
-    return;
   }
-
-  grid.innerHTML = list.map(t => `
-    <div class="template-card" onclick="useTemplate(\`${t.text.replace(/`/g, "\\`")}\`)">
-      <div class="tmpl-nm">${t.name}</div>
-      <div class="tmpl-pv">${t.text}</div>
-      <span class="tmpl-tg">${t.tag}</span>
-    </div>
-  `).join("");
-}
-
-function useTemplate(text) {
-  document.getElementById("prompt-input").value = text;
-  document.getElementById("prompt-input").dispatchEvent(new Event("input"));
-  switchTab("enhance");
-  showToast("Template loaded");
-}
-
-function renderChecklist() {
-  const text = document.getElementById("engineer-input").value;
-  let passed = 0;
-  document.getElementById("checklist-grid").innerHTML = ENGINEER_CHECKS.map(c => {
-    const ok = c.test(text);
-    if (ok) passed++;
-    return `<div class="chk-i ${ok ? "pass" : "fail"}">
-      <div class="chk-ic">${ok ? "✓" : "!"}</div>
-      <span style="flex:1">${c.name}</span>
-      ${!ok ? `<span style="font-size:10px;color:rgba(255,255,255,0.45)">${c.hint}</span>` : ""}
-    </div>`;
-  }).join("");
-  document.getElementById("checklist-score").textContent = passed + "/6";
-}
-
-function renderTechniques() {
-  document.getElementById("techniques-grid").innerHTML = TECHNIQUES.map(t => `
-    <label class="tech-card" onclick="this.classList.toggle('sel')">
-      <input type="checkbox" value="${t.id}">
-      <div class="tech-chk"></div>
-      <div>
-        <div class="tech-nm">${t.name}</div>
-        <div class="tech-ds">${t.desc}</div>
-      </div>
-    </label>
-  `).join("");
-}
-
-function applyTechniques() {
-  const input = document.getElementById("engineer-input");
-  let text = input.value.trim();
-  if (!text) return showToast("Type a prompt first");
-
-  const selected = [...document.querySelectorAll("#techniques-grid .tech-card.sel input")];
-  if (!selected.length) return showToast("Select at least one technique");
-
-  let extra = "\n\n--- Extra specifications ---\n";
-  selected.forEach(b => {
-    if (b.value === "role") extra += "- Act as a Principal Software Engineer.\n";
-    if (b.value === "context") extra += "- This is for a production-ready product.\n";
-    if (b.value === "constraints") extra += "- Keep dependencies minimal and handle errors properly.\n";
-    if (b.value === "output") extra += "- Return complete, runnable code only.\n";
-    if (b.value === "testing") extra += "- Include basic unit tests for main edge cases.\n";
-    if (b.value === "examples") extra += "- Explain the approach step by step before the code.\n";
-  });
-
-  input.value = text + extra;
-  renderChecklist();
-  showToast("Techniques applied");
-}
-
-function renderHistory() {
-  const list = document.getElementById("history-list");
-  if (!state.history.length) {
-    list.innerHTML = `<div class="empty-state">No prompts yet. Enhance one to start building history.</div>`;
-    return;
-  }
-  list.innerHTML = state.history.map(item => `
-    <div class="history-item" onclick="loadHistory(${item.id})">
-      <div class="history-item-text">${item.original}</div>
-      <span class="history-item-score">${item.score}/100</span>
-    </div>
-  `).join("");
-}
-
-function loadHistory(id) {
-  const item = state.history.find(h => h.id === id);
-  if (!item) return;
-  document.getElementById("prompt-input").value = item.original;
-  document.getElementById("prompt-input").dispatchEvent(new Event("input"));
-  switchTab("enhance");
-  showToast("Loaded from history");
-}
-
-function closeSettings() {
-  document.getElementById("settings-modal").classList.add("hidden");
-}
-
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => showToast("Copied!"));
-}
-
-function showToast(msg) {
-  const container = document.getElementById("toast-container");
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = msg;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transition = "0.2s";
-    setTimeout(() => toast.remove(), 200);
-  }, 2200);
-}
+})();
 </script>
 </body>
 </html>
