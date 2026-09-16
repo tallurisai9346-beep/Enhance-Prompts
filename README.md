@@ -8,112 +8,68 @@
 [![Claude Compatible](https://img.shields.io/badge/Claude-compatible-orange.svg)](https://claude.ai)
 [![Cursor Compatible](https://img.shields.io/badge/Cursor-compatible-blue.svg)](https://cursor.sh)
 
----
+# Vibe Check
 
-I built this because I got tired of typing "make me a cool dashboard" into Cursor and getting garbage back. Vibe Check takes whatever half-baked prompt you throw at it and turns into something an AI coding tool can actually work with.
+Vibe Check is a utility created to enhance prompts prior to interacting with code generation models.
 
-Paste a prompt, hit enhance, get something useful. That's the whole idea.
-
----
-
-## What it does
-
-Paste a prompt like "make a dashboard" or "fix the login bug" into the textarea. Vibe Check:
-
-- **Enhances it** -- rewrites your vague idea into structured, specific instructions that AI tools actually understand
-- **Scores it** -- gives you a /100 score across 5 categories and tells you exactly what's wrong
-- **Checks token efficiency** -- shows you how many of your tokens are wasted on filler words
-- **Gives stack-aware tips** -- knows what v0, Bolt, Cursor, ChatGPT, Claude, and 10+ other tools expect
-
-All of this runs locally in your browser. No signup, no tracking, no account needed.
-
----
+After using Cursor, Claude, ChatGPT, v0, Bolt, and other AI coding assistants, I had grown accustomed to vague prompts resulting in unsatisfactory outputs. Thus, I present Vibe Check - a tool to enhance prompts to be more comprehensible and maximized.
 
 ## Features
 
-**Prompt Enhancement**
+Improve vague prompts
 
-Takes your rough idea and rewrites it with proper structure: tech stack context, requirements, constraints. Works with rule-based logic out of the box. If you want AI-powered enhancement, plug in your own API key in settings.
+Score prompts out of 100
 
-**5-Category Scoring Engine**
+Improve clarity
 
-Clarity, Specificity, Completeness, Structure, Effectiveness -- each category gets a point value and specific feedback. Not "your prompt could be better" but "add the tech stack and you get +12 points."
+Enhance structure
 
-**Token Efficiency Checker**
+Improve completion
 
-Detects filler phrases, hedging language, politeness overhead, and redundant words. Shows your efficiency percentage. One click to strip the filler. If you're paying per token, this pays for itself.
+Remove unneeded verbiage
 
-**Stack-Aware Tips**
+Suggestions for code generation models
 
-Knows the quirks of 15+ AI coding tools:
+Prompt before/after view
 
-| Tool | Tool | Tool |
-|------|------|------|
-| v0 | Bolt | Lovable |
-| Cursor | Replit | Claude |
-| ChatGPT | Gemini | Perplexity |
-| DeepSeek | Windsurf | GitHub Copilot |
-| CodeSandbox | StackBlitz | Phind |
+Prompt templates
 
-Each platform gets its own prompt tips. What works in Cursor doesn't always work in ChatGPT.
+Local storage of prompts
 
-**Before/After Diff View**
+Prompt variation generation
 
-Side-by-side view showing exactly what changed between your original and enhanced prompt. You can see why each edit was made.
+## Technologies
 
-**15+ Templates**
+HTML
 
-Pre-built prompt templates for UI components, full apps, bug fixes, API endpoints, and database schemas. Pick one, fill in the blanks, enhance.
+CSS
 
-**History**
+JavaScript
 
-Every enhanced prompt gets saved with its score, timestamp, and target stack. Search through old ones, favorite the good ones, export everything.
+Local Storage
 
-**Engineer Tab**
+Fetch API
 
-Quality checklist, technique combos, variant generation (3 versions per prompt), version history, and a Credit Saver mode that translates English to Chinese for roughly 60% token savings on any provider.
+Vercel
 
-**Settings**
+No heavy frameworks or tools were neccessary for this project.
 
-Configure your AI endpoint, toggle features on/off, export and import your data. No cloud, no database, everything stays in your browser.
+## Demo
 
----
+[Vibe Check Live Demo](https://vibe-check-vert-theta.vercel.app?utm_source=chatgpt.com)
 
-## Quick Start
+## Why?
 
-1. Open [vibe-check-vert-theta.vercel.app](https://vibe-check-vert-theta.vercel.app)
-2. Type a prompt into the textarea
-3. Pick your stack from the dropdown
-4. Hit Enhance
+I was spending hours upon hours reworking prompts for my own coding projects. Instead of doing this manually, I decided to create a nifty little utility for myself.
 
-That's it. Nothing to install, nothing to configure.
-
----
-
-## Tech Stack
-
-- **Vanilla JS / HTML / CSS** -- no frameworks, no build step, no node_modules
-- **Vercel** -- serverless API for the enhancement endpoint
-- **CSS Custom Properties** -- dark glass theme, pure black backgrounds
-
----
-
-## Why I built this
-
-I'm 18. I use AI coding tools every day -- Cursor, Claude, v0, Bolt. The biggest bottleneck isn't the tools themselves, it's writing prompts good enough for them to work with. I kept rewriting the same structured prompts by hand and figured there had to be a better way.
-
-Vibe Check started as a weekend project for the Stardance QOL Mission. Now it helps me write better prompts across every AI tool I use.
-
----
+This was a small project for the Stardance QOL Mission, and I chose to continue working on it for my own purposes.
 
 ## Contributing
 
-PRs are welcome. If you find a bug, open an issue. If you want to add support for a new AI tool, the stack-detector module is pretty straightforward to extend.
-
----
+Fork the project, find an issue, and submit a PR.
 
 ## License
 
-MIT -- do whatever you want with it.
+MIT License
 
----
+Created by Sai Kumar
