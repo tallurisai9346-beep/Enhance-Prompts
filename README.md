@@ -56,7 +56,7 @@ No heavy frameworks or tools were neccessary for this project.
 
 ## Demo
 
-[Vibe Check Live Demo]([https://vibe-check-vert-theta.vercel.app?utm_source=chatgpt.com](https://enhance-prompts-pt3g.vercel.app/))
+[Vibe Check Live Demo](https://enhance-prompts-pt3g.vercel.app/)
 
 ## Why?
 
